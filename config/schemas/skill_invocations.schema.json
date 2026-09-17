@@ -13,6 +13,7 @@
         "required": ["skill", "source"],
         "properties": {
           "skill": { "type": "string" },
+          "requested_as": { "type": "string" },
           "steps": { "type": "array", "items": { "type": "string" } },
           "source": { "enum": ["user_explicit", "auto"] }
         }

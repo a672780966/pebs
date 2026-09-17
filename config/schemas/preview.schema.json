@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/preview",
+  "title": "Preview",
+  "type": "object",
+  "required": ["markdown"],
+  "properties": {
+    "markdown": { "type": "string" }
+  }
+}

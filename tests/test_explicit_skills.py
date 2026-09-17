@@ -17,7 +17,10 @@ def test_explicit_invocation_is_recorded(engine):
     run_id, changeset_id = run_build(engine, REQUEST_1 + "\n/evidence-review")
     invocations = engine.store.get_revision(engine.store.revisions_of("skill_invocations")[-1])["content"]
     assert invocations["requested"] == ["evidence-review"]
-    assert invocations["resolved"][0]["steps"] == ["evidence"]
+    resolved = invocations["resolved"][0]
+    assert resolved["skill"] == "evidence-reviewer"
+    assert resolved["requested_as"] == "evidence-review"
+    assert resolved["steps"] == ["evidence", "evidence_topup"]
     step = next(s for s in engine.store.get_steps(run_id) if s["step_id"] == "parse_inputs")
     assert "显式调用" in (step["note"] or "")
     preview = engine.store.get_revision(engine.store.revisions_of("preview")[-1])["content"]["markdown"]

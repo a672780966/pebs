@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/evidence_index",
+  "title": "EvidenceIndex",
+  "type": "object",
+  "required": ["claims"],
+  "properties": {
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "version", "status"],
+        "properties": {
+          "claim_id": { "type": "string" },
+          "version": { "type": "integer" },
+          "status": {
+            "enum": [
+              "PENDING",
+              "SUPPORTED",
+              "QUALIFY_REQUIRED",
+              "UNSUPPORTED",
+              "DISPUTED",
+              "HUMAN_REVIEW_REQUIRED"
+            ]
+          }
+        }
+      }
+    },
+    "assessments": { "type": "array", "items": { "type": "object" } },
+    "unavailable": { "type": "array", "items": { "type": "string" } }
+  }
+}

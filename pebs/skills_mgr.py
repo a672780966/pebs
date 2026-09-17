@@ -211,28 +211,37 @@ def import_candidate(
     existing = registry.get(name, {})
     record = {
         "name": name,
-        "description": existing.get("description", "未审查的外部 Skill 候选"),
         "version": existing.get("version", "0.0.0"),
         "domain": "external",
-        "risk_level": "unknown",
-        "user_invocable": False,
-        "auto_invocable": False,
-        "input_schema": None,
-        "output_schema": None,
+        "description": existing.get("description", "未审查的外部 Skill 候选"),
+        "status": "REFERENCE_ONLY",
+        "invocation": {"auto": False, "explicit": False},
         "requires": [],
         "produces": [],
-        "allowed_providers": [],
-        "allowed_tools": [],
-        "network_access": False,
-        "filesystem_access": "none",
+        "optional_requires": [],
+        "aliases": [],
+        "input_schema": None,
+        "output_schema": None,
+        "provider": [],
+        "tools": [],
+        "risk_level": "unknown",
+        "network": False,
+        "filesystem": "none",
         "external_side_effects": False,
-        "requires_evidence_gate": False,
+        "runtime": "external_skill",
+        "handler": {"skill_path": str(quarantine), "entrypoint": existing.get("handler", {}).get("entrypoint")},
+        "gates_before": [],
+        "gates_after": [],
+        "parallelizable": False,
+        "estimated_cost": {"model_calls": 0, "research_calls": 0},
+        "self_implemented": False,
+        "user_invocable": False,
+        "auto_invocable": False,
         "review_status": "UNVERIFIED",
         "adoption_decision": "REFERENCE_ONLY",
         "role": "ACTION_SKILL",
         "execution_policy": "SANDBOX_ONLY",
         "enabled_by_default": False,
-        "self_implemented": False,
         "source": {
             "repository_url": url,
             "ref": ref,
@@ -298,6 +307,12 @@ def review(
     if target == "APPROVED" and config_review.get("require_evidence", True) and not (evidence or "").strip():
         raise ReviewTransitionRejected("批准必须提供审查证据（源码/哈希/测试记录位置）")
     record["review_status"] = target
+    if target == "APPROVED":
+        record["status"] = "APPROVED"
+    elif target == "REJECTED":
+        record["status"] = "DISABLED"
+    elif target == "IN_REVIEW":
+        record["status"] = "REFERENCE_ONLY"
     record["review"] = {
         "reviewed_at": now_iso(),
         "reviewed_by": reviewer,

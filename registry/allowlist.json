@@ -1,18 +1,44 @@
 {
   "skills": [
-    "template-parser",
-    "requirements-builder",
-    "learning-designer",
-    "claim-extractor",
-    "evidence-reviewer",
-    "pck-developer",
-    "case-designer",
+    "animation-gate",
     "assessment-designer",
+    "case-designer",
+    "claim-extractor",
+    "diagram-designer",
+    "docx-exporter",
+    "evidence-indexer",
+    "evidence-reviewer",
+    "gate-runner",
+    "learning-designer",
+    "lesson-designer",
+    "load-reviewer",
+    "media-router",
+    "pck-developer",
+    "presentation-composer",
+    "presentation-planner",
+    "preview-builder",
+    "requirements-builder",
     "script-writer",
-    "psychology-safety",
-    "docx-exporter"
+    "storyboard-designer",
+    "template-parser",
+    "worksheet-designer"
   ],
-  "tools": ["file_read", "file_write", "web_read"],
-  "network_hosts": ["api.crossref.org", "api.openalex.org", "api.semanticscholar.org", "localhost", "127.0.0.1"],
-  "providers": ["default-llm", "default-research"]
+  "tools": [
+    "file_read",
+    "file_write",
+    "web_read"
+  ],
+  "network_hosts": [
+    "api.crossref.org",
+    "api.openalex.org",
+    "api.semanticscholar.org",
+    "eutils.ncbi.nlm.nih.gov",
+    "api.unpaywall.org",
+    "localhost",
+    "127.0.0.1"
+  ],
+  "providers": [
+    "default-llm",
+    "default-research"
+  ]
 }

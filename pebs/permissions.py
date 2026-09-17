@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from . import config
+from . import config, registry
 
 
 class PermissionDenied(Exception):
@@ -27,28 +27,34 @@ class PermissionManager:
         self.allowlist = json.loads((config.REGISTRY_DIR / "allowlist.json").read_text(encoding="utf-8"))
 
     def skill(self, name: str) -> dict[str, Any]:
-        if name not in self.allowlist.get("skills", []):
-            raise PermissionDenied(f"skill not in allowlist: {name}")
-        record = self.skills.get(name)
+        if registry.is_denied(name):
+            raise PermissionDenied(f"skill is denylisted: {name}")
+        canonical = registry.resolve_alias(name) or name
+        if canonical not in self.allowlist.get("skills", []):
+            raise PermissionDenied(f"skill not in allowlist: {canonical}")
+        record = self.skills.get(canonical) or registry.get(canonical)
         if record is None:
-            raise PermissionDenied(f"skill not registered: {name}")
-        if record.get("review_status") != "APPROVED":
-            raise PermissionDenied(f"skill not approved: {name} ({record.get('review_status')})")
-        if not record.get("enabled_by_default", False):
-            raise PermissionDenied(f"skill disabled by default: {name}")
+            raise PermissionDenied(f"skill not registered: {canonical}")
+        status = record.get("status")
+        review_status = record.get("review_status")
+        approved = status in ("APPROVED", "PATCHED") or review_status == "APPROVED"
+        if not approved:
+            raise PermissionDenied(f"skill not approved: {canonical} (status={status or review_status})")
+        if not record.get("enabled_by_default", True):
+            raise PermissionDenied(f"skill disabled by default: {canonical}")
         policy = record.get("execution_policy")
-        if policy not in ("NO_CODE", "TRUSTED_RUNNER"):
+        if policy not in ("NO_CODE", "TRUSTED_RUNNER", None):
             from . import sandbox
 
             if not sandbox.available():
                 raise PermissionDenied(
-                    f"no verified sandbox adapter available for execution_policy={policy}: {name}"
+                    f"no verified sandbox adapter available for execution_policy={policy}: {canonical}"
                 )
         return record
 
     def provider(self, skill_name: str, provider_name: str | None) -> None:
         record = self.skill(skill_name)
-        allowed = record.get("allowed_providers", [])
+        allowed = record.get("provider") or record.get("allowed_providers") or []
         if provider_name and provider_name not in allowed:
             raise PermissionDenied(f"provider {provider_name} not allowed for {skill_name}")
 

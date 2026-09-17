@@ -1,0 +1,115 @@
+{
+  "format": 1,
+  "skills": {
+    "template-parser": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "requirements-builder": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "learning-designer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "claim-extractor": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "evidence-reviewer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "pck-developer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "lesson-designer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "case-designer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "assessment-designer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "worksheet-designer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "script-writer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "media-router": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "diagram-designer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "load-reviewer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "animation-gate": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "storyboard-designer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "evidence-indexer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "presentation-planner": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "presentation-composer": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "gate-runner": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "preview-builder": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    },
+    "docx-exporter": {
+      "builtin_version": "0.1.0",
+      "pinned_version": null,
+      "versions": []
+    }
+  }
+}

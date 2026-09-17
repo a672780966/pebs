@@ -1,378 +1,1004 @@
 {
   "template-parser": {
     "name": "template-parser",
-    "description": "解析 DOCX 表格模板或 Markdown 模板，提取栏目、顺序、术语与字数规则",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "low",
-    "user_invocable": false,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "template_spec",
+    "description": "解析 DOCX/Markdown 模板与材料，生成 template_spec 与 materials",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
     "requires": [],
     "produces": [
       "template_spec",
       "materials"
     ],
-    "allowed_providers": [],
-    "allowed_tools": [
-      "file_read"
-    ],
-    "network_access": false,
-    "filesystem_access": "project_inputs_read",
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "template_spec",
+    "provider": [],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "project_inputs_read",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "ACTION_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_template.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_parse_inputs",
+      "steps": [
+        "parse_inputs"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 0,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "requirements-builder": {
     "name": "requirements-builder",
-    "description": "由用户请求、模板与材料生成 Requirements Artifact",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "low",
-    "user_invocable": false,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "requirements",
+    "description": "由请求、模板与项目规则生成 Requirements Artifact",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
     "requires": [
       "template_spec"
     ],
     "produces": [
       "requirements"
     ],
-    "allowed_providers": [
-      "default-llm"
+    "optional_requires": [
+      "materials"
     ],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "requirements",
+    "provider": [],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_rules.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_requirements",
+      "steps": [
+        "requirements"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 0,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "learning-designer": {
     "name": "learning-designer",
-    "description": "生成学习目标、知识类型、理解难点与评价证据（Backwards Design）",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "medium",
-    "user_invocable": true,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "learning_design",
+    "description": "Backwards Design：学习目标、知识类型、难点与评价证据",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
     "requires": [
       "requirements"
     ],
     "produces": [
       "learning_design"
     ],
-    "allowed_providers": [
+    "optional_requires": [
+      "materials"
+    ],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "learning_design",
+    "provider": [
       "default-llm"
     ],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
+    "tools": [],
+    "risk_level": "medium",
+    "network": true,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_pipeline.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_learning_design",
+      "steps": [
+        "learning_design"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "claim-extractor": {
     "name": "claim-extractor",
-    "description": "从需求/材料中提取待核验心理学 Claim，写入 Evidence Store（PENDING）",
     "version": "0.1.0",
     "domain": "psychology",
-    "risk_level": "high",
-    "user_invocable": false,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "claims",
+    "description": "提取可核验的实证性 Claim（PENDING），排除教学惯例",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
     "requires": [
       "learning_design"
     ],
     "produces": [
-      "claims"
+      "claims_set"
     ],
-    "allowed_providers": [
+    "optional_requires": [
+      "materials"
+    ],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "claims_set",
+    "provider": [
       "default-llm"
     ],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
+    "tools": [],
+    "risk_level": "high",
+    "network": true,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_qualify.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_claims",
+      "steps": [
+        "claims"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "evidence-reviewer": {
     "name": "evidence-reviewer",
-    "description": "基于可定位原文片段评估 Claim 与来源的支持关系，产出 Evidence Assessment",
     "version": "0.1.0",
     "domain": "psychology",
-    "risk_level": "high",
-    "user_invocable": true,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "evidence_assessment",
+    "description": "检索用户材料与研究来源，基于可定位原文片段评估 Claim 支持关系；QUALIFY 自动限定改写并重审",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
     "requires": [
-      "claims"
+      "claims_set"
     ],
-    "produces": [],
-    "allowed_providers": [
+    "produces": [
+      "evidence_index"
+    ],
+    "optional_requires": [
+      "materials"
+    ],
+    "aliases": [
+      "evidence-review"
+    ],
+    "input_schema": null,
+    "output_schema": "evidence_index",
+    "provider": [
       "default-llm",
       "default-research"
     ],
-    "allowed_tools": [
-      "web_read"
-    ],
-    "network_access": true,
-    "filesystem_access": "project_snapshots_write",
+    "tools": [],
+    "risk_level": "high",
+    "network": true,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": true,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_evidence.py",
-      "tests/test_research.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_evidence",
+      "steps": [
+        "evidence",
+        "evidence_topup"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [
+      "G2"
+    ],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 2,
+      "research_calls": 3
+    },
+    "self_implemented": true
   },
   "pck-developer": {
     "name": "pck-developer",
-    "description": "教学设计：按知识类型选择教学策略，消费有效 Evidence，输出 Teaching Plan 与 UDL 方案",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "high",
-    "user_invocable": true,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "teaching_plan",
+    "description": "PCK + UDL：按知识类型选策略（消费 SUPPORTED Evidence），输出 teaching_plan",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
     "requires": [
       "learning_design",
-      "evidence"
+      "evidence_index"
     ],
     "produces": [
       "teaching_plan"
     ],
-    "allowed_providers": [
+    "optional_requires": [],
+    "aliases": [
+      "udl-lesson-auditor"
+    ],
+    "input_schema": null,
+    "output_schema": "teaching_plan",
+    "provider": [
       "default-llm"
     ],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
+    "tools": [],
+    "risk_level": "high",
+    "network": true,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": true,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_gates.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_teaching_plan",
+      "steps": [
+        "teaching_plan"
+      ]
+    },
+    "gates_before": [
+      "G2"
+    ],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "lesson-designer": {
+    "name": "lesson-designer",
+    "version": "0.1.0",
+    "domain": "education",
+    "description": "生成教案（目标/重难点/教学过程/板书/作业）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "teaching_plan"
+    ],
+    "produces": [
+      "lesson_plan"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "lesson_plan",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_lesson_plans",
+      "steps": [
+        "lesson_plans"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": true,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "case-designer": {
     "name": "case-designer",
-    "description": "设计教学案例，虚构案例明确标注，新增事实登记为待核验 Claim",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "medium",
-    "user_invocable": false,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "case",
+    "description": "设计教学案例（虚构须标注）；新增事实登记为 PENDING Claim",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
     "requires": [
       "teaching_plan"
     ],
     "produces": [
       "case"
     ],
-    "allowed_providers": [
+    "optional_requires": [
+      "requirements"
+    ],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "case",
+    "provider": [
       "default-llm"
     ],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
+    "tools": [],
+    "risk_level": "medium",
+    "network": true,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_locality.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_cases",
+      "steps": [
+        "cases"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": true,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "assessment-designer": {
     "name": "assessment-designer",
-    "description": "生成形成性评价与 hinge question，题、答、干扰项与解析联动校验",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "medium",
-    "user_invocable": false,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "assessment",
+    "description": "形成性评价与 hinge question（题/答/干扰项/解析一致）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
     "requires": [
-      "teaching_plan"
+      "lesson_plan"
     ],
     "produces": [
       "assessment"
     ],
-    "allowed_providers": [
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "assessment",
+    "provider": [
       "default-llm"
     ],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
+    "tools": [],
+    "risk_level": "medium",
+    "network": true,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_autofix.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_assessments",
+      "steps": [
+        "assessments"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": true,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "worksheet-designer": {
+    "name": "worksheet-designer",
+    "version": "0.1.0",
+    "domain": "education",
+    "description": "学习单（学生版不含答案）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "assessment"
+    ],
+    "produces": [
+      "worksheet"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "worksheet",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_worksheets",
+      "steps": [
+        "worksheets"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": true,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "script-writer": {
     "name": "script-writer",
-    "description": "生成课程脚本；仅 SUPPORTED Claim 可作为事实，其余显示待核验占位",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "high",
-    "user_invocable": true,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "script",
+    "description": "课程脚本；仅 SUPPORTED Claim 作为事实，其余待核验占位",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
     "requires": [
       "teaching_plan",
-      "evidence"
+      "evidence_index",
+      "lesson_plan",
+      "assessment"
     ],
     "produces": [
       "script"
     ],
-    "allowed_providers": [
+    "optional_requires": [
+      "case",
+      "materials"
+    ],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "script",
+    "provider": [
       "default-llm"
     ],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
-    "external_side_effects": false,
-    "requires_evidence_gate": true,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "REASONING_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_autofix.py",
-      "tests/test_qualify.py"
-    ]
-  },
-  "psychology-safety": {
-    "name": "psychology-safety",
-    "description": "心理学安全扫描（G4）：诊断措辞、标签化、单因果、神经过度简化等",
-    "version": "0.1.0",
-    "domain": "psychology",
+    "tools": [],
     "risk_level": "high",
-    "user_invocable": false,
-    "auto_invocable": true,
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_scripts",
+      "steps": [
+        "scripts"
+      ]
+    },
+    "gates_before": [
+      "G2"
+    ],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "media-router": {
+    "name": "media-router",
+    "version": "0.1.0",
+    "domain": "media",
+    "description": "媒体选型（知识功能/时间依赖/对比依赖 → text/diagram/animation）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "script"
+    ],
+    "produces": [
+      "media_plan"
+    ],
+    "optional_requires": [],
+    "aliases": [],
     "input_schema": null,
-    "output_schema": "gate_result",
+    "output_schema": "media_plan",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_media_plan",
+      "steps": [
+        "media_plan"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "diagram-designer": {
+    "name": "diagram-designer",
+    "version": "0.1.0",
+    "domain": "media",
+    "description": "知识语义 → 视觉语法，生成通过校验的 SVG 图示",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "requires": [
+      "media_plan"
+    ],
+    "produces": [
+      "diagrams"
+    ],
+    "optional_requires": [],
+    "aliases": [
+      "diagram-design"
+    ],
+    "input_schema": null,
+    "output_schema": "diagrams",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_diagrams",
+      "steps": [
+        "diagrams"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "load-reviewer": {
+    "name": "load-reviewer",
+    "version": "0.1.0",
+    "domain": "media",
+    "description": "认知负荷分析 + 双重编码配对（禁止伪精确评分）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "diagrams",
+      "script"
+    ],
+    "produces": [
+      "load_review"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "load_review",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "medium",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_load_review",
+      "steps": [
+        "load_review"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "animation-gate": {
+    "name": "animation-gate",
+    "version": "0.1.0",
+    "domain": "media",
+    "description": "Educational Animation Gate（8 判据；静态替代足够即 REJECT）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "media_plan"
+    ],
+    "produces": [
+      "animation_decisions"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "animation_decisions",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_storyboard",
+      "steps": [
+        "storyboard"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [
+      "G6"
+    ],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 2,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "storyboard-designer": {
+    "name": "storyboard-designer",
+    "version": "0.1.0",
+    "domain": "media",
+    "description": "教学分镜与视频生成提示词；rendered 恒为 false（渲染前停止）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "animation_decisions",
+      "script"
+    ],
+    "produces": [
+      "storyboard"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "storyboard",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_storyboard",
+      "steps": [
+        "storyboard"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "evidence-indexer": {
+    "name": "evidence-indexer",
+    "version": "0.1.0",
+    "domain": "education",
+    "description": "Evidence Index：材料/图示/证据评估 → 资产索引（role/clarity/relevance/risk）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "diagrams",
+      "evidence_index"
+    ],
+    "produces": [
+      "evidence_assets"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "evidence_assets",
+    "provider": [],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_evidence_assets",
+      "steps": [
+        "evidence_assets"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 0,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "presentation-planner": {
+    "name": "presentation-planner",
+    "version": "0.1.0",
+    "domain": "presentation",
+    "description": "Production Planning Table：逐页 11 字段 + 引用/备注",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "evidence_assets",
+      "script"
+    ],
+    "produces": [
+      "slide_plan"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "slide_plan",
+    "provider": [
+      "default-llm"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": true,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_slide_plan",
+      "steps": [
+        "slide_plan"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "presentation-composer": {
+    "name": "presentation-composer",
+    "version": "0.1.0",
+    "domain": "presentation",
+    "description": "原生可编辑 PPTX（形状/表格/备注/幻灯片族/模板）+ 渲染缩略图 + 交付检查",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "slide_plan"
+    ],
+    "produces": [
+      "pptx_deck"
+    ],
+    "optional_requires": [
+      "diagrams",
+      "storyboard"
+    ],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "pptx_deck",
+    "provider": [],
+    "tools": [
+      "file_write"
+    ],
+    "risk_level": "medium",
+    "network": false,
+    "filesystem": "project_media_write",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_pptx",
+      "steps": [
+        "pptx"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 0,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "gate-runner": {
+    "name": "gate-runner",
+    "version": "0.1.0",
+    "domain": "education",
+    "description": "G1–G7 统一门禁（含自动修正两轮与冲突展示）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
     "requires": [
       "script"
     ],
     "produces": [
       "gate_result"
     ],
-    "allowed_providers": [],
-    "allowed_tools": [],
-    "network_access": false,
-    "filesystem_access": "none",
+    "optional_requires": [],
+    "aliases": [
+      "psychology-safety"
+    ],
+    "input_schema": null,
+    "output_schema": "gate_result",
+    "provider": [],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "project",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "ACTION_SKILL",
-    "execution_policy": "NO_CODE",
-    "enabled_by_default": true,
-    "self_implemented": true,
-    "tests": [
-      "tests/test_gates.py"
-    ]
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_gates",
+      "steps": [
+        "gates"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 2,
+      "research_calls": 0
+    },
+    "self_implemented": true
+  },
+  "preview-builder": {
+    "name": "preview-builder",
+    "version": "0.1.0",
+    "domain": "education",
+    "description": "Build Preview（草稿/待核验/门禁状态/媒体与 PPT 摘要）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": false
+    },
+    "requires": [
+      "gate_result"
+    ],
+    "produces": [
+      "preview"
+    ],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": "preview",
+    "provider": [],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "project",
+    "external_side_effects": false,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_preview",
+      "steps": [
+        "preview"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 0,
+      "research_calls": 0
+    },
+    "self_implemented": true
   },
   "docx-exporter": {
     "name": "docx-exporter",
-    "description": "导出 DOCX/Markdown；正式导出前核对统一 Gate 清单；草稿明确标注未通过 QA",
     "version": "0.1.0",
     "domain": "education",
-    "risk_level": "medium",
-    "user_invocable": true,
-    "auto_invocable": true,
-    "input_schema": null,
-    "output_schema": "export_manifest",
+    "description": "导出 DOCX/Markdown/SVG/分镜/提示词/PPTX；草稿标注；正式导出需 G1–G8 与渲染器",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
     "requires": [
-      "script"
+      "preview"
     ],
     "produces": [
       "export_manifest"
     ],
-    "allowed_providers": [],
-    "allowed_tools": [
+    "optional_requires": [],
+    "aliases": [
+      "export"
+    ],
+    "input_schema": null,
+    "output_schema": "export_manifest",
+    "provider": [],
+    "tools": [
       "file_write"
     ],
-    "network_access": false,
-    "filesystem_access": "project_outputs_write",
+    "risk_level": "medium",
+    "network": false,
+    "filesystem": "project_outputs_write",
     "external_side_effects": false,
-    "requires_evidence_gate": false,
-    "review_status": "APPROVED",
-    "adoption_decision": "ADOPT",
-    "role": "ACTION_SKILL",
-    "execution_policy": "TRUSTED_RUNNER",
-    "enabled_by_default": true,
+    "runtime": "builtin",
+    "handler": {
+      "builtin_function": "pebs.pipeline:step_export",
+      "steps": [
+        "export"
+      ]
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 0,
+      "research_calls": 0
+    },
     "self_implemented": true,
-    "tests": [
-      "tests/test_pipeline.py"
-    ]
+    "execution_policy": "TRUSTED_RUNNER"
   }
 }

@@ -655,6 +655,8 @@ def engine(tmp_path, monkeypatch):
 def render_engine(engine, monkeypatch):
     from pebs import pptx_foundry, render
 
+    if not _REAL_FIND_RENDERER():
+        pytest.skip("no LibreOffice/PowerPoint renderer on this host")
     monkeypatch.setattr(render, "find_renderer", _REAL_FIND_RENDERER)
     monkeypatch.setattr(pptx_foundry, "available", _REAL_PPTX_FOUNDRY_AVAILABLE)
     monkeypatch.setattr(pptx_foundry, "delivery_check", _REAL_PPTX_FOUNDRY_DELIVERY_CHECK)

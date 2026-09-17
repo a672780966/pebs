@@ -1,0 +1,8 @@
+{
+  "format": 1,
+  "skills": [],
+  "prefixes": [
+    "skills-mgr"
+  ],
+  "note": "denylist 优先于 allowlist 与 registry"
+}

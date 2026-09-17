@@ -19,8 +19,10 @@ def test_unknown_and_unapproved_skills_are_denied(permissions):
 
 def test_approved_skill_passes(permissions):
     record = permissions.skill("script-writer")
-    assert record["review_status"] == "APPROVED"
-    assert record["execution_policy"] == "NO_CODE"
+    assert record["status"] == "APPROVED"
+    assert record["runtime"] == "builtin"
+    exporter = permissions.skill("docx-exporter")
+    assert exporter["execution_policy"] == "TRUSTED_RUNNER"
 
 
 def test_external_write_actions_are_denied_in_m1(permissions):

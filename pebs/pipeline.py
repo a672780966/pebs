@@ -133,24 +133,6 @@ def parse_explicit_skills(request: str) -> list[str]:
     return sorted(dict.fromkeys(found))
 
 
-SKILL_STEP_MAP = {
-    "template-parser": ["parse_inputs"],
-    "requirements-builder": ["requirements"],
-    "learning-designer": ["learning_design"],
-    "claim-extractor": ["claims"],
-    "evidence-review": ["evidence"],
-    "evidence-reviewer": ["evidence"],
-    "pck-developer": ["teaching_plan"],
-    "case-designer": ["cases"],
-    "assessment-designer": ["assessments"],
-    "script-writer": ["scripts"],
-    "psychology-safety": ["gates"],
-    "docx-exporter": ["export"],
-    "udl-lesson-auditor": ["teaching_plan"],
-    "diagram-design": ["media_plan", "diagrams"],
-}
-
-
 def _materials_excerpt(ctx: PipelineContext, limit: int = 6000) -> str:
     materials = ctx.content("materials") or {}
     parts = []
@@ -276,10 +258,15 @@ def step_parse_inputs(ctx: PipelineContext) -> dict[str, Any]:
     if blocked:
         notes.append("以下材料含可识别学生资料，已在外部发送前排除（请脱敏后重新上传）：" + "；".join(blocked))
     ctx.emit("materials", "materials", {"files": files}, "template-parser")
-    invocations = [
-        {"skill": name, "steps": SKILL_STEP_MAP.get(name, []), "source": "user_explicit"}
-        for name in ctx.explicit_skills
-    ]
+    from . import registry as skill_registry
+
+    explicit_map = skill_registry.explicit_skill_map()
+    invocations = []
+    for name in ctx.explicit_skills:
+        canonical = skill_registry.resolve_alias(name) or name
+        invocations.append(
+            {"skill": canonical, "requested_as": name, "steps": explicit_map.get(name, explicit_map.get(canonical, [])), "source": "user_explicit"}
+        )
     ctx.emit(
         "skill_invocations",
         "skill_invocations",
@@ -1953,7 +1940,7 @@ def step_load_review(ctx: PipelineContext) -> dict[str, Any]:
 
 def step_gates(ctx: PipelineContext) -> dict[str, Any]:
     _check_cancel(ctx)
-    _skill(ctx, "psychology-safety")
+    _skill(ctx, "gate-runner")
     gate_ctx = gates.GateContext(
         store=ctx.store,
         evidence=ctx.evidence,

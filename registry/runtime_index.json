@@ -1,0 +1,685 @@
+{
+  "format": 1,
+  "skills": {
+    "animation-gate": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_storyboard",
+        "steps": [
+          "storyboard"
+        ]
+      },
+      "requires": [
+        "media_plan"
+      ],
+      "produces": [
+        "animation_decisions"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 2,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [
+        "G6"
+      ]
+    },
+    "assessment-designer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_assessments",
+        "steps": [
+          "assessments"
+        ]
+      },
+      "requires": [
+        "lesson_plan"
+      ],
+      "produces": [
+        "assessment"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": true,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "case-designer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_cases",
+        "steps": [
+          "cases"
+        ]
+      },
+      "requires": [
+        "teaching_plan"
+      ],
+      "produces": [
+        "case"
+      ],
+      "optional_requires": [
+        "requirements"
+      ],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": true,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "claim-extractor": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_claims",
+        "steps": [
+          "claims"
+        ]
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "claims_set"
+      ],
+      "optional_requires": [
+        "materials"
+      ],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "diagram-designer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_diagrams",
+        "steps": [
+          "diagrams"
+        ]
+      },
+      "requires": [
+        "media_plan"
+      ],
+      "produces": [
+        "diagrams"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [
+        "diagram-design"
+      ],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "docx-exporter": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_export",
+        "steps": [
+          "export"
+        ]
+      },
+      "requires": [
+        "preview"
+      ],
+      "produces": [
+        "export_manifest"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [
+        "export"
+      ],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "evidence-indexer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_evidence_assets",
+        "steps": [
+          "evidence_assets"
+        ]
+      },
+      "requires": [
+        "diagrams",
+        "evidence_index"
+      ],
+      "produces": [
+        "evidence_assets"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "evidence-reviewer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_evidence",
+        "steps": [
+          "evidence",
+          "evidence_topup"
+        ]
+      },
+      "requires": [
+        "claims_set"
+      ],
+      "produces": [
+        "evidence_index"
+      ],
+      "optional_requires": [
+        "materials"
+      ],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [
+        "evidence-review"
+      ],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 2,
+        "research_calls": 3
+      },
+      "gates_before": [],
+      "gates_after": [
+        "G2"
+      ]
+    },
+    "gate-runner": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_gates",
+        "steps": [
+          "gates"
+        ]
+      },
+      "requires": [
+        "script"
+      ],
+      "produces": [
+        "gate_result"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [
+        "psychology-safety"
+      ],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 2,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "learning-designer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_learning_design",
+        "steps": [
+          "learning_design"
+        ]
+      },
+      "requires": [
+        "requirements"
+      ],
+      "produces": [
+        "learning_design"
+      ],
+      "optional_requires": [
+        "materials"
+      ],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "lesson-designer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_lesson_plans",
+        "steps": [
+          "lesson_plans"
+        ]
+      },
+      "requires": [
+        "teaching_plan"
+      ],
+      "produces": [
+        "lesson_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": true,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "load-reviewer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_load_review",
+        "steps": [
+          "load_review"
+        ]
+      },
+      "requires": [
+        "diagrams",
+        "script"
+      ],
+      "produces": [
+        "load_review"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "media-router": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_media_plan",
+        "steps": [
+          "media_plan"
+        ]
+      },
+      "requires": [
+        "script"
+      ],
+      "produces": [
+        "media_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "pck-developer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_teaching_plan",
+        "steps": [
+          "teaching_plan"
+        ]
+      },
+      "requires": [
+        "learning_design",
+        "evidence_index"
+      ],
+      "produces": [
+        "teaching_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [
+        "udl-lesson-auditor"
+      ],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [
+        "G2"
+      ],
+      "gates_after": []
+    },
+    "presentation-composer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_pptx",
+        "steps": [
+          "pptx"
+        ]
+      },
+      "requires": [
+        "slide_plan"
+      ],
+      "produces": [
+        "pptx_deck"
+      ],
+      "optional_requires": [
+        "diagrams",
+        "storyboard"
+      ],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "presentation-planner": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_slide_plan",
+        "steps": [
+          "slide_plan"
+        ]
+      },
+      "requires": [
+        "evidence_assets",
+        "script"
+      ],
+      "produces": [
+        "slide_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "preview-builder": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_preview",
+        "steps": [
+          "preview"
+        ]
+      },
+      "requires": [
+        "gate_result"
+      ],
+      "produces": [
+        "preview"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "requirements-builder": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_requirements",
+        "steps": [
+          "requirements"
+        ]
+      },
+      "requires": [
+        "template_spec"
+      ],
+      "produces": [
+        "requirements"
+      ],
+      "optional_requires": [
+        "materials"
+      ],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "script-writer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_scripts",
+        "steps": [
+          "scripts"
+        ]
+      },
+      "requires": [
+        "teaching_plan",
+        "evidence_index",
+        "lesson_plan",
+        "assessment"
+      ],
+      "produces": [
+        "script"
+      ],
+      "optional_requires": [
+        "case",
+        "materials"
+      ],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [
+        "G2"
+      ],
+      "gates_after": []
+    },
+    "storyboard-designer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_storyboard",
+        "steps": [
+          "storyboard"
+        ]
+      },
+      "requires": [
+        "animation_decisions",
+        "script"
+      ],
+      "produces": [
+        "storyboard"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "template-parser": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_parse_inputs",
+        "steps": [
+          "parse_inputs"
+        ]
+      },
+      "requires": [],
+      "produces": [
+        "template_spec",
+        "materials"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    },
+    "worksheet-designer": {
+      "runtime": "builtin",
+      "status": "APPROVED",
+      "handler": {
+        "builtin_function": "pebs.pipeline:step_worksheets",
+        "steps": [
+          "worksheets"
+        ]
+      },
+      "requires": [
+        "assessment"
+      ],
+      "produces": [
+        "worksheet"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": true,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": []
+    }
+  }
+}
