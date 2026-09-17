@@ -476,7 +476,7 @@ class Store:
     def list_changesets(self) -> list[dict[str, Any]]:
         rows = self._query(
             "SELECT changeset_id, status, reason, created_at, decided_at FROM changesets "
-            "WHERE project_id = ? ORDER BY created_at DESC",
+            "WHERE project_id = ? ORDER BY created_at DESC, rowid DESC",
             (self.project_id,),
         )
         result = []
@@ -708,6 +708,6 @@ class Store:
 
     def list_search_logs(self) -> list[dict[str, Any]]:
         rows = self._query(
-            "SELECT payload FROM search_logs WHERE project_id = ? ORDER BY created_at DESC", (self.project_id,)
+            "SELECT payload FROM search_logs WHERE project_id = ? ORDER BY created_at DESC, rowid DESC", (self.project_id,)
         )
         return [json.loads(r["payload"]) for r in rows]

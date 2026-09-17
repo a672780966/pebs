@@ -154,3 +154,16 @@ def test_budget_enforced(store):
 
     with pytest.raises(BudgetExceeded):
         store.check_budget(run_id, model_calls=1)
+
+
+def test_changeset_listing_is_newest_first_within_the_same_second(store):
+    """created_at has second resolution: rowid must break the tie.
+
+    Two changesets created inside the same second previously had an
+    unspecified order, so list_changesets()[0] could be the older one
+    (observed on the Linux CI runners).
+    """
+    first = store.create_changeset(None, "first", store.current_baseline())
+    second = store.create_changeset(None, "second", store.current_baseline())
+    listed = [item["changeset_id"] for item in store.list_changesets()]
+    assert listed[:2] == [second, first]
