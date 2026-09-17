@@ -13,7 +13,7 @@ from .hooks import Hooks, HookFailure
 from .permissions import PermissionManager, PermissionDenied
 from .providers import ProviderError, ProviderUnavailable, merge_research_items as _merge_research_items
 from .store import ConflictError, Store, content_hash, file_hash, now_iso
-from .template_parse import ParseError, extract_text, parse_template
+from .template_parse import ParseError, check_import_limits, extract_text, parse_template
 
 SYSTEM = (
     "你是心理学教育课程生产系统中的严格助手。只输出 JSON，不输出解释或 Markdown 代码块之外的内容。"
@@ -272,6 +272,14 @@ def step_parse_inputs(ctx: PipelineContext) -> dict[str, Any]:
     _check_cancel(ctx)
     _skill(ctx, "template-parser")
     notes: list[str] = []
+    # Spec 83.2: the batch limits are checked before any parsing or extraction
+    # work, and an over-limit batch is rejected rather than truncated.
+    try:
+        check_import_limits(ctx.material_paths)
+    except ParseError as exc:
+        raise StepFailed(str(exc)) from exc
+    except OSError as exc:
+        raise StepFailed(f"输入文件不可读：{exc}") from exc
     template_spec: dict[str, Any]
     if ctx.template_path and ctx.template_path.exists():
         try:

@@ -15,9 +15,12 @@ from . import config, gates, providers, sandbox, skills_mgr
 from .engine import Engine, ExplicitSkillDenied, PiiBlocked, PlanEditRejected
 from .hooks import HookFailure
 from .store import ConflictError, StoreError, canonical_json
+from .template_parse import MAX_FILE_BYTES, ImportLimitExceeded, ParseError, check_import_limits
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 PROJECT_ID_RE = re.compile(r"^[A-Za-z0-9_\-\u4e00-\u9fff]{1,40}$")
+
+UPLOAD_CHUNK = 1024 * 1024
 
 app = FastAPI(title="Psychology Education Build System", version="0.1.0")
 _engines: dict[str, Engine] = {}
@@ -202,9 +205,25 @@ async def upload(project_id: str, file: UploadFile) -> dict[str, Any]:
     base = config.ensure_project_dirs(project_id) / "inputs"
     safe_name = Path(file.filename or "upload.bin").name
     target = base / safe_name
-    with target.open("wb") as fh:
-        shutil.copyfileobj(file.file, fh)
-    return {"path": str(target), "size": target.stat().st_size}
+    written = 0
+    try:
+        with target.open("wb") as fh:
+            while True:
+                chunk = await file.read(UPLOAD_CHUNK)
+                if not chunk:
+                    break
+                written += len(chunk)
+                if written > MAX_FILE_BYTES:
+                    raise ImportLimitExceeded(
+                        f"文件超过 {MAX_FILE_BYTES // (1024 * 1024)} MiB: {safe_name}",
+                        http_status=413,
+                    )
+                fh.write(chunk)
+    except ImportLimitExceeded as exc:
+        # An over-limit upload is refused, never stored truncated.
+        target.unlink(missing_ok=True)
+        raise HTTPException(status_code=exc.http_status, detail=str(exc)) from exc
+    return {"path": str(target), "size": written}
 
 
 @app.post("/api/projects/{project_id}/build")
@@ -215,6 +234,12 @@ def build(project_id: str, payload: BuildIn) -> dict[str, Any]:
     for path in [*materials, *([template] if template else [])]:
         if not path.exists():
             raise HTTPException(status_code=400, detail=f"文件不存在: {path}")
+    try:
+        check_import_limits(materials)
+    except ImportLimitExceeded as exc:
+        raise HTTPException(status_code=exc.http_status, detail=str(exc)) from exc
+    except ParseError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     if payload.environment not in ("production", "test_fixture"):
         raise HTTPException(status_code=400, detail="非法 environment")
     try:

@@ -12,6 +12,20 @@ class ParseError(Exception):
     pass
 
 
+class ImportLimitExceeded(ParseError):
+    """Deterministic pre-parse limit rejection (spec 83.2).
+
+    `http_status` carries the transport mapping so the API layer never has to
+    pattern-match a message: a byte-size violation is 413, the batch file-count
+    violation is 400. Pipeline and CLI ignore it and surface the message through
+    the ordinary ParseError -> StepFailed path.
+    """
+
+    def __init__(self, message: str, *, http_status: int) -> None:
+        super().__init__(message)
+        self.http_status = http_status
+
+
 MAX_FILE_BYTES = int(config.RULES.get("limits", {}).get("max_file_mib", 25)) * 1024 * 1024
 MAX_FILES = int(config.RULES.get("limits", {}).get("max_files_per_import", 20))
 MAX_TOTAL_BYTES = int(config.RULES.get("limits", {}).get("max_total_mib", 100)) * 1024 * 1024
@@ -28,15 +42,21 @@ def sha256_file(path: Path) -> str:
 def check_import_limits(paths: list[Path]) -> list[str]:
     warnings: list[str] = []
     if len(paths) > MAX_FILES:
-        raise ParseError(f"一次导入最多 {MAX_FILES} 个文件，当前 {len(paths)} 个")
+        raise ImportLimitExceeded(
+            f"一次导入最多 {MAX_FILES} 个文件，当前 {len(paths)} 个", http_status=400
+        )
     total = 0
     for path in paths:
         size = path.stat().st_size
         if size > MAX_FILE_BYTES:
-            raise ParseError(f"文件超过 {MAX_FILE_BYTES // (1024 * 1024)} MiB: {path.name}")
+            raise ImportLimitExceeded(
+                f"文件超过 {MAX_FILE_BYTES // (1024 * 1024)} MiB: {path.name}", http_status=413
+            )
         total += size
     if total > MAX_TOTAL_BYTES:
-        raise ParseError(f"导入总量超过 {MAX_TOTAL_BYTES // (1024 * 1024)} MiB")
+        raise ImportLimitExceeded(
+            f"导入总量超过 {MAX_TOTAL_BYTES // (1024 * 1024)} MiB", http_status=413
+        )
     return warnings
 
 
