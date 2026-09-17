@@ -30,6 +30,7 @@ class PlanNode:
     parallel_group: int = 0
     gate_before: list[str] = field(default_factory=list)
     gate_after: list[str] = field(default_factory=list)
+    preconditions: list[dict[str, Any]] = field(default_factory=list)
     reason: str = ""
     reused: bool = False
     degraded: bool = False
@@ -47,6 +48,7 @@ class PlanNode:
             "parallel_group": self.parallel_group,
             "gate_before": list(self.gate_before),
             "gate_after": list(self.gate_after),
+            "preconditions": [dict(item) for item in self.preconditions],
             "reason": self.reason,
             "reused": self.reused,
             "degraded": self.degraded,

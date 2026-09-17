@@ -71,11 +71,17 @@ def test_safety_fix_removes_diagnosis_wording(engine):
     assert g4["status"] == "PASS"
 
 
-def test_preview_marks_status_pending_and_gates(engine):
+def test_unverifiable_evidence_blocks_pck_and_downstream_authoring(engine):
+    """With no evidence provider, PCK must not author and nothing may bypass that."""
     engine.research = FakeResearch(available=False)
     run_id, changeset_id = run_build(engine, REQUEST_1)
-    preview = engine.store.get_revision(engine.store.revisions_of("preview")[-1])["content"]["markdown"]
-    assert "待核验占位" in preview
-    assert "G2=FAIL" in preview
-    assert "【待核验】" in preview
-    assert "超出范围" in preview or "在范围内" in preview
+
+    steps = {step["step_id"]: step for step in engine.store.get_steps(run_id)}
+    assert steps["teaching_plan"]["status"] == "BLOCKED"
+    assert "执行前置条件未满足" in (steps["teaching_plan"]["error"] or "")
+
+    # Downstream authoring cannot bypass the blocked precondition.
+    for downstream in ("scripts", "gates", "preview"):
+        assert steps[downstream]["status"] == "BLOCKED"
+    assert engine.store.revisions_of("script:sec1") == []
+    assert not engine.store.revisions_of("preview")

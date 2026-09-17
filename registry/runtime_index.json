@@ -33,7 +33,8 @@
       "gates_before": [],
       "gates_after": [
         "G6"
-      ]
+      ],
+      "preconditions": []
     },
     "assessment-designer": {
       "runtime": "builtin",
@@ -63,7 +64,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "case-designer": {
       "runtime": "builtin",
@@ -95,7 +97,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "claim-extractor": {
       "runtime": "builtin",
@@ -127,7 +130,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "diagram-designer": {
       "runtime": "builtin",
@@ -159,7 +163,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "docx-exporter": {
       "runtime": "builtin",
@@ -191,7 +196,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "evidence-indexer": {
       "runtime": "builtin",
@@ -224,7 +230,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "evidence-reviewer": {
       "runtime": "builtin",
@@ -259,9 +266,8 @@
         "research_calls": 3
       },
       "gates_before": [],
-      "gates_after": [
-        "G2"
-      ]
+      "gates_after": [],
+      "preconditions": []
     },
     "gate-runner": {
       "runtime": "builtin",
@@ -298,7 +304,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "learning-designer": {
       "runtime": "builtin",
@@ -330,7 +337,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "lesson-designer": {
       "runtime": "builtin",
@@ -360,7 +368,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "load-reviewer": {
       "runtime": "builtin",
@@ -392,7 +401,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "media-router": {
       "runtime": "builtin",
@@ -424,7 +434,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "pck-developer": {
       "runtime": "builtin",
@@ -456,10 +467,19 @@
         "model_calls": 1,
         "research_calls": 0
       },
-      "gates_before": [
-        "G2"
-      ],
-      "gates_after": []
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": [
+        {
+          "kind": "supported_claims",
+          "inputs": [
+            "evidence_index"
+          ],
+          "usage_scope": [
+            "讲解"
+          ]
+        }
+      ]
     },
     "presentation-composer": {
       "runtime": "builtin",
@@ -492,7 +512,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "presentation-planner": {
       "runtime": "builtin",
@@ -524,7 +545,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "preview-builder": {
       "runtime": "builtin",
@@ -556,7 +578,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "requirements-builder": {
       "runtime": "builtin",
@@ -588,7 +611,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "script-writer": {
       "runtime": "builtin",
@@ -623,10 +647,9 @@
         "model_calls": 1,
         "research_calls": 0
       },
-      "gates_before": [
-        "G2"
-      ],
-      "gates_after": []
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
     },
     "storyboard-designer": {
       "runtime": "builtin",
@@ -658,7 +681,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "template-parser": {
       "runtime": "builtin",
@@ -688,7 +712,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     },
     "worksheet-designer": {
       "runtime": "builtin",
@@ -718,7 +743,8 @@
         "research_calls": 0
       },
       "gates_before": [],
-      "gates_after": []
+      "gates_after": [],
+      "preconditions": []
     }
   }
 }

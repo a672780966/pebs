@@ -57,8 +57,12 @@ def check_skill_record(record: dict[str, Any]) -> list[str]:
             errors.append(f"{name}: 政策要求 DISABLED，当前 status={record.get('status')}")
         if record.get("enabled_by_default"):
             errors.append(f"{name}: 政策要求默认不启用")
-    if policy.get("requires_supported_evidence") and not record.get("gates_before"):
-        errors.append(f"{name}: 政策要求声明 gates_before（证据前置）")
+    if policy.get("requires_supported_evidence"):
+        kinds = {str(item.get("kind")) for item in (record.get("preconditions") or [])}
+        if "supported_claims" not in kinds:
+            errors.append(
+                f"{name}: 政策要求声明 SUPPORTED 证据前置条件（preconditions.supported_claims）"
+            )
     return errors
 
 

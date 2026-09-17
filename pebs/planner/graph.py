@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Callable
 
 from .. import registry
-from .contracts import KNOWN_GATES, PlannerError, PlanEdge, PlanNode, node_title
+from .contracts import PlannerError, PlanEdge, PlanNode, node_title
 
 GATE_PROVIDING_SKILLS = {"gate-runner"}
 MAX_NODES = 40
@@ -79,8 +79,9 @@ def expand_graph(
                 steps=steps,
                 inputs=list(record.get("requires", [])) + list(record.get("optional_requires", [])),
                 outputs=list(record.get("produces", [])),
-                gate_before=[g for g in record.get("gates_before", []) if g in KNOWN_GATES],
-                gate_after=[g for g in record.get("gates_after", []) if g in KNOWN_GATES],
+                gate_before=list(record.get("gates_before", [])),
+                gate_after=list(record.get("gates_after", [])),
+                preconditions=[dict(item) for item in record.get("preconditions", [])],
                 reason=f"为产出 {artifact}",
                 optional=True,
             )

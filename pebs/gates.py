@@ -10,6 +10,10 @@ from .store import Store, StoreError, content_hash, now_iso
 
 GATE_ORDER = ["G1", "G2", "G3", "G4", "G5", "G6", "G7"]
 ALL_GATES = GATE_ORDER + ["G8"]
+# Which artifact a gate result is keyed by: G1-G7 are section-scoped on the
+# script (run_section_gates), G8 is the export manifest gate. This is the single
+# source for "what does this gate evaluate", used by plan validation.
+GATE_SCOPE = {**{gate_id: "script" for gate_id in GATE_ORDER}, "G8": "export_manifest"}
 PASSING = {"PASS", "NOT_APPLICABLE"}
 LABEL_CHECK_ROLES = {"lesson_script", "lesson_plan", "worksheet", "worksheet_teacher"}
 COLUMN_KIND_MAP = {

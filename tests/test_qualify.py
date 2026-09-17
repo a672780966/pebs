@@ -29,6 +29,18 @@ def test_qualify_required_claim_is_rewritten_and_reassessed(engine):
 
     claims_doc = engine.store.get_revision(engine.store.revisions_of("claims")[-1])["content"]
     assert claims_doc["claims"][0]["version"] == 2
+
+    # The published evidence index must reference the final claim revision, that
+    # revision must be SUPPORTED, and PCK must therefore be allowed to author.
+    index = engine.store.get_revision(engine.store.revisions_of("evidence_index")[-1])["content"]
+    entry = index["claims"][0]
+    assert entry["version"] == engine.evidence.latest_version(entry["claim_id"])
+    assert engine.evidence.claim_status(entry["claim_id"], entry["version"]) == "SUPPORTED"
+    stored = engine.evidence.get_claim(entry["claim_id"], entry["version"])
+    assert stored["usage"] == "讲解"
+    steps = {step["step_id"]: step for step in engine.store.get_steps(run_id)}
+    assert steps["teaching_plan"]["status"] == "SUCCEEDED"
+
     g2 = engine.store.accepted_content("gate:G2:script:sec1")
     assert g2["status"] == "PASS"
 

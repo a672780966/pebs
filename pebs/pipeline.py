@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from . import config, gates, media, pii, project_rules, router, schemas
+from . import config, gates, media, pii, preconditions, project_rules, router, schemas
 from .evidence import EvidenceStore
 from .hooks import Hooks, HookFailure
 from .permissions import PermissionManager, PermissionDenied
@@ -650,6 +650,13 @@ def _assess_claim(
 
 
 def _qualify_claim(ctx: PipelineContext, claim: dict[str, Any], limitations: str) -> dict[str, Any] | None:
+    # The claims artifact carries no population/usage, so the authoritative scope of the
+    # claim being rewritten has to come from the evidence store: otherwise the new
+    # revision loses its declared scope and every scope-checking consumer blocks.
+    try:
+        stored = ctx.evidence.get_claim(claim["claim_id"], claim["version"])
+    except KeyError:
+        stored = {}
     prompt = f"""任务：下面的 Claim 未获现有证据直接支持。请按证据能够支持的范围改写它：
 - 降低强度（相关而非因果、可能而非必然）、限定人群或情境、或收窄结论范围；
 - 不改变事实方向，不引入新事实，不添加引用。
@@ -666,8 +673,8 @@ def _qualify_claim(ctx: PipelineContext, claim: dict[str, Any], limitations: str
     record = ctx.evidence.add_claim(
         new_text,
         str(claim.get("claim_type", "descriptive")),
-        population=str(data.get("population", claim.get("population", ""))),
-        usage=str(claim.get("usage", "")),
+        population=str(data.get("population") or stored.get("population") or claim.get("population", "")),
+        usage=str(stored.get("usage") or claim.get("usage", "")),
         claim_id=claim["claim_id"],
     )
     record["text"] = new_text
@@ -950,6 +957,14 @@ def _plan_violations(ctx: PipelineContext, section: dict[str, Any], data: dict[s
 
 def step_teaching_plan(ctx: PipelineContext) -> dict[str, Any]:
     notes = []
+    # Fail-closed execution precondition, declared in the registry and evaluated
+    # through the shared checker so both the static and dynamic runtime enforce it.
+    from . import registry as _registry
+
+    declared = (_registry.get("pck-developer") or {}).get("preconditions") or []
+    blocked = preconditions.block_reason(ctx, {"preconditions": declared})
+    if blocked:
+        raise StepBlocked(blocked)
     for section in ctx.sections():
         _check_cancel(ctx)
         _skill(ctx, "pck-developer")

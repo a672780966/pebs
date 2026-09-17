@@ -194,6 +194,7 @@ def build_runtime_index(skills: dict[str, Any] | None = None) -> dict[str, Any]:
             "estimated_cost": record.get("estimated_cost", {}),
             "gates_before": record.get("gates_before", []),
             "gates_after": record.get("gates_after", []),
+            "preconditions": record.get("preconditions", []),
         }
     return index
 

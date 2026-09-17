@@ -76,9 +76,17 @@ def test_trauma_informed_policy_requires_disabled():
     assert policies.check_skill_record(disabled) == []
 
 
-def test_pck_policy_requires_gate_declaration():
-    assert policies.check_skill_record({"name": "pck-developer", "status": "APPROVED", "gates_before": ["G2"]}) == []
-    assert policies.check_skill_record({"name": "pck-developer", "status": "APPROVED", "gates_before": []})
+def test_pck_policy_requires_supported_evidence_precondition():
+    """The PCK evidence requirement is an execution precondition, not a gate declaration."""
+    ok = {
+        "name": "pck-developer",
+        "status": "APPROVED",
+        "gates_before": [],
+        "preconditions": [{"kind": "supported_claims", "inputs": ["evidence_index"]}],
+    }
+    assert policies.check_skill_record(ok) == []
+    missing = {"name": "pck-developer", "status": "APPROVED", "gates_before": ["G2"], "preconditions": []}
+    assert policies.check_skill_record(missing)
 
 
 def test_registry_entries_satisfy_patch_policies():

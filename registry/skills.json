@@ -228,9 +228,7 @@
       ]
     },
     "gates_before": [],
-    "gates_after": [
-      "G2"
-    ],
+    "gates_after": [],
     "parallelizable": false,
     "estimated_cost": {
       "model_calls": 2,
@@ -277,16 +275,25 @@
         "teaching_plan"
       ]
     },
-    "gates_before": [
-      "G2"
-    ],
+    "gates_before": [],
     "gates_after": [],
     "parallelizable": false,
     "estimated_cost": {
       "model_calls": 1,
       "research_calls": 0
     },
-    "self_implemented": true
+    "self_implemented": true,
+    "preconditions": [
+      {
+        "kind": "supported_claims",
+        "inputs": [
+          "evidence_index"
+        ],
+        "usage_scope": [
+          "讲解"
+        ]
+      }
+    ]
   },
   "lesson-designer": {
     "name": "lesson-designer",
@@ -516,9 +523,7 @@
         "scripts"
       ]
     },
-    "gates_before": [
-      "G2"
-    ],
+    "gates_before": [],
     "gates_after": [],
     "parallelizable": false,
     "estimated_cost": {
