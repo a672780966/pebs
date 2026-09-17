@@ -192,3 +192,19 @@ def test_search_by_artifact_and_domain():
     media = registry.search(domain="media")
     names = {item["name"] for item in media}
     assert {"media-router", "diagram-designer", "animation-gate", "storyboard-designer", "load-reviewer"} <= names
+
+
+def test_saving_the_registry_refreshes_the_runtime_index(registry_env):
+    """skills.json is the source of truth: saving it must not leave the index behind."""
+    from pebs import skills_mgr
+
+    skills_path = Path(config.REGISTRY_DIR) / "skills.json"
+    skills = json.loads(skills_path.read_text(encoding="utf-8"))
+    name = sorted(skills)[0]
+    skills[name]["status"] = "DISABLED"
+
+    skills_mgr._save_registry(skills)
+
+    on_disk = json.loads((Path(config.REGISTRY_DIR) / "runtime_index.json").read_text(encoding="utf-8"))
+    assert on_disk == registry.build_runtime_index()
+    assert on_disk["skills"][name]["status"] == "DISABLED"

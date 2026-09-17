@@ -69,6 +69,12 @@ def _save_registry(registry: dict[str, Any]) -> None:
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(registry, ensure_ascii=False, indent=2), encoding="utf-8")
     os.replace(tmp, path)
+    # skills.json is the single source of truth, so its derived projection is
+    # regenerated here through the documented mechanism: every lifecycle verb
+    # routes through this writer, and an index left behind would silently drift.
+    from . import registry as registry_module
+
+    registry_module.write_runtime_index()
 
 
 def check_source_allowed(url: str) -> str:

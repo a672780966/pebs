@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from pebs import config, skills_mgr
+from pebs import config, registry, skills_mgr
 
 
 def _make_archive(tmp_path: Path, files: dict[str, str], name: str = "archive.tar.gz") -> Path:
@@ -247,3 +247,18 @@ def test_sandbox_only_skill_denied_without_verified_adapter(registry_env, monkey
         permissions.skill("ext-skill")
     monkeypatch.setattr(sandbox, "available", lambda refresh=False: True)
     assert permissions.skill("ext-skill")["name"] == "ext-skill"
+
+
+def test_lifecycle_verb_refreshes_the_runtime_index(registry_env):
+    """Every verb that rewrites skills.json refreshes its derived projection."""
+    from pebs import registry
+
+    skills_path = Path(config.REGISTRY_DIR) / "skills.json"
+    name = sorted(json.loads(skills_path.read_text(encoding="utf-8")))[0]
+
+    # enable(..., False) carries no approval precondition and routes through the writer.
+    record = skills_mgr.enable(name, False)
+    assert record["enabled_by_default"] is False
+
+    on_disk = json.loads((Path(config.REGISTRY_DIR) / "runtime_index.json").read_text(encoding="utf-8"))
+    assert on_disk == registry.build_runtime_index()
