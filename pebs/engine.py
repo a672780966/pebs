@@ -19,12 +19,22 @@ class PlanEditRejected(Exception):
 
 
 def _pinned_skill_names() -> list[str]:
+    """自动偏好的 pinned Skill。
+
+    M6 §18：Provider 安装的外部 Skill（record.provider 非空）不自动偏好——
+    生产默认仍用 Builtin；外部 Skill 必须通过显式 `/skill-name`（§43 Explicit User
+    Choice）或 benchmark 实验指定，直到 §68 的 promotion 门槛达成（M7 才会把历史
+    表现用于路由）。
+    """
     from . import registry
 
     names = []
     for name, record in registry.load_skills().items():
-        if record.get("pinned_version") and record.get("status") in ("APPROVED", "PATCHED"):
-            names.append(name)
+        if not record.get("pinned_version") or record.get("status") not in ("APPROVED", "PATCHED"):
+            continue
+        if record.get("provider"):
+            continue
+        names.append(name)
     return sorted(names)
 
 

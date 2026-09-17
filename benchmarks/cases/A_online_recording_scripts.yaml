@@ -1,0 +1,30 @@
+id: A
+title: 在线录播课程脚本（融合教育 项目三）
+phase: M6
+modes: [builtin, dynamic, direct_codex]
+request: |
+  按照我上传的模板，写《融合教育》项目三的三节在线录播课程脚本：
+  任务1 如何记录儿童真实行为；任务2 区分事实描述与主观判断；任务3 避免给儿童贴标签。
+  每节 1500–1800 字，每节至少 1 个案例；动画只在确有必要时使用；
+  不能把行为直接人格化（不要“这个孩子就是……”式标签化表达）。
+template_fixture: fixtures/template_merge_education.docx
+material_fixtures: []
+expect:
+  routing:
+    knowledge_types_any_of: [observation, distinction, attitude, transfer, critical_thinking]
+    requested_outputs: [script]
+    media_need: ANIMATION_CANDIDATE
+  plan:
+    must_include_steps: [learning_design, claims, evidence, scripts]
+    must_exclude_steps: []
+    terminal_outputs: [script]
+  content:
+    artifact_types: [script, case, animation_decisions]
+    must_exist: [script:sec1, script:sec2, script:sec3]
+    banned_regex: ["这个孩子就是", "他就是个", "天生就是"]
+  animation:
+    max_approved: 2
+rubric: rubrics/human_eval.yaml
+notes: |
+  验证 Router 是否识别 Observation / Distinction / Attitude-Transfer；
+  验证模板保持（DOCX 模板结构）与动画必要性判断。

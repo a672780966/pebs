@@ -3,27 +3,95 @@
   "$id": "pebs/assessment",
   "title": "Assessment",
   "type": "object",
-  "required": ["section_id", "items"],
+  "required": [
+    "section_id",
+    "items"
+  ],
   "properties": {
-    "section_id": { "type": "string" },
+    "section_id": {
+      "type": "string"
+    },
     "items": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["assessment_id", "kind", "question", "answer", "target_goal"],
+        "required": [
+          "assessment_id",
+          "kind",
+          "question",
+          "answer",
+          "target_goal"
+        ],
         "properties": {
-          "assessment_id": { "type": "string" },
-          "kind": { "enum": ["hinge_question", "formative", "reflection_prompt"] },
-          "question": { "type": "string" },
-          "options": { "type": "array", "items": { "type": "string" } },
-          "answer": { "type": "string" },
-          "distractors": { "type": "array", "items": { "type": "string" } },
-          "rationale": { "type": "string" },
-          "target_goal": { "type": "string" },
-          "claim_refs": { "type": "array", "items": { "type": "string" } },
-          "student_viewable": { "type": "boolean" }
+          "assessment_id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "hinge_question",
+              "formative",
+              "reflection_prompt"
+            ]
+          },
+          "question": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "answer": {
+            "type": "string"
+          },
+          "distractors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "target_goal": {
+            "type": "string"
+          },
+          "claim_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "student_viewable": {
+            "type": "boolean"
+          },
+          "answer_verification": {
+            "type": "string"
+          },
+          "distractors_detail": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "answer",
+                "misconception"
+              ],
+              "properties": {
+                "answer": {
+                  "type": "string"
+                },
+                "misconception": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         }
       }
+    },
+    "diagnostic_use": {
+      "type": "string"
     }
   }
 }

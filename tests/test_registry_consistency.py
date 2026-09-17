@@ -49,14 +49,29 @@ def test_c_auto_invocable_skills_must_be_approved():
 
 
 def test_d_explicit_skills_resolve():
+    """D：所有 `/skill-name` 都可解析。
+
+    - Builtin：必须映射到真实的 pipeline step；
+    - 外部 Skill（provider 安装，M6）：必须 APPROVED/PATCHED 且已 pin，运行时可直接加载。
+    """
     explicit_map = registry.explicit_skill_map()
     assert "evidence-review" in explicit_map
     assert "diagram-design" in explicit_map
     assert "udl-lesson-auditor" in explicit_map
+    skills = registry.load_skills()
     for name, steps in explicit_map.items():
-        assert name == registry.resolve_alias(name) or registry.resolve_alias(name) is not None
-        assert steps, f"{name} explicit but no steps"
-        assert set(steps) <= _runtime_steps()
+        canonical = registry.resolve_alias(name) or name
+        record = skills.get(canonical) or {}
+        assert record, f"{name} explicit but not registered"
+        if record.get("runtime") == "builtin":
+            assert steps, f"{name} explicit but no steps"
+            assert set(steps) <= _runtime_steps()
+            continue
+        assert record.get("status") in ("APPROVED", "PATCHED"), f"{name} explicit but status={record.get('status')}"
+        assert record.get("pinned_version"), f"{name} explicit but not pinned"
+        assert (record.get("handler") or {}).get("skill_path"), f"{name} explicit but no runtime path"
+        if steps:
+            assert set(steps) <= _runtime_steps()
 
 
 def test_e_artifact_types_have_schemas():

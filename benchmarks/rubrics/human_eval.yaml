@@ -1,0 +1,55 @@
+# M6 Human Evaluation Rubric（§31–§34）
+format: 1
+version: 1
+scale:
+  min: 1
+  max: 5
+  anchors:
+    1: 不可用（需要整体重写）
+    3: 可修改后使用（教师需要中等规模修改）
+    5: 可直接使用（教师只需个别判断）
+dimensions:
+  - id: subject_accuracy
+    label: 学科准确性
+  - id: teaching_logic
+    label: 教学逻辑
+  - id: goal_clarity
+    label: 学习目标清晰度
+  - id: content_alignment
+    label: 内容与目标对齐
+  - id: concept_clarity
+    label: 概念解释清晰度
+  - id: case_quality
+    label: 案例质量
+  - id: executability
+    label: 课堂/录课可执行性
+  - id: student_engagement
+    label: 学生参与度
+  - id: cognitive_challenge
+    label: 认知挑战
+  - id: assessment_design
+    label: 评价设计
+  - id: language_naturalness
+    label: 语言自然度
+  - id: visual_necessity
+    label: 视觉/动画必要性
+  - id: coherence
+    label: 课程整体连贯性
+  - id: teacher_usability
+    label: 教师实际可用性
+optional_dimensions:
+  - id: spoken_naturalness
+    label: 口语自然度（§54，脚本类任务必填）
+edit_categories:
+  - fact correction
+  - teaching restructure
+  - tone edit
+  - case replacement
+  - media correction
+  - assessment correction
+  - template correction
+notes_required:
+  - score
+  - comment
+  - must_fix
+  - nice_to_have

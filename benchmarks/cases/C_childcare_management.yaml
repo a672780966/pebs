@@ -1,0 +1,28 @@
+id: C
+title: 托育机构管理实务 第八章（8.1–8.4）
+phase: M6
+modes: [builtin, dynamic, direct_codex]
+request: |
+  按照我上传的模板，写《托育机构管理实务》第八章四节课程脚本：
+  8.1 办托理念与价值体系构建；8.2 文化建设的策略；
+  8.3 员工行为规范与服务礼仪建设；8.4 品牌形象与口碑传播管理。
+  每节 1800–2100 字，每节至少 1 个案例，动画只在必要处使用；
+  称谓统一使用“婴幼儿”；四节之间减少重复。
+template_fixture: fixtures/template_childcare_management.docx
+material_fixtures: []
+expect:
+  routing:
+    knowledge_types_any_of: [concept, procedure, case_analysis]
+    requested_outputs: [script]
+  plan:
+    must_include_steps: [learning_design, claims, evidence, scripts]
+    terminal_outputs: [script]
+  content:
+    artifact_types: [script, case]
+    must_exist: [script:sec1, script:sec2, script:sec3, script:sec4]
+    banned_regex: ["婴幼儿宝宝", "小孩子嘛"]
+  animation:
+    max_approved: 3
+rubric: rubrics/human_eval.yaml
+notes: |
+  验证 Learning Progression、跨节重复、模板保持、媒体决策；案例 F 在此基础上做局部修改。

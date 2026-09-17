@@ -1,0 +1,48 @@
+# M6 Failure Taxonomy（§65）
+# 每条真实生产/benchmark 失败都必须归入其中一个类别。
+format: 1
+version: 1
+categories:
+  - id: ROUTING
+    description: Router 选择了错误的 task type / knowledge type / 输出集合，或被禁止的能力进入了 Plan
+  - id: PLANNING
+    description: DAG 拓扑、依赖、复用、预算降级、gate 插入错误
+  - id: EVIDENCE
+    description: Claim 支持关系、引文定位、研究限制、来源层级错误
+  - id: CONTENT
+    description: 内容缺失、重复、跑题、结构错误
+  - id: PEDAGOGY
+    description: 教学策略与知识类型不匹配、学习进阶断裂、认知负荷过高
+  - id: ASSESSMENT
+    description: 评价与目标不对齐、题目答案错误、distractor 无语义
+  - id: MEDIA
+    description: 媒体形式选择、动画必要性、图示价值判断错误
+  - id: TEMPLATE
+    description: 模板结构/称谓/格式约束被破坏
+  - id: RUNTIME
+    description: 调度、并发、sandbox、provider、store 层故障
+  - id: SKILL
+    description: 外部 Skill 契约、版本、补丁、内容政策问题
+  - id: SCHEMA
+    description: 产物 schema 校验失败或 repair 后仍失败
+  - id: LOCALITY
+    description: 局部修改越界，重建了 preserve 集合或无关产物
+  - id: SAFETY
+    description: 诊断越界、标签化、治疗性表述、机制过度简化
+  - id: PRIVACY
+    description: PII 外发、可重识别风险、学生材料处置错误
+  - id: EXPORT
+    description: 正式导出、G8、渲染、字体、文件发布问题
+severity:
+  - id: S0
+    label: cosmetic
+  - id: S1
+    label: wording
+  - id: S2
+    label: local_teaching_improvement
+  - id: S3
+    label: conceptual_correction
+  - id: S4
+    label: factual_evidence_correction
+  - id: S5
+    label: major_redesign

@@ -1,0 +1,29 @@
+id: F
+title: Local Edit（8.2 案例替换）
+phase: M6
+modes: [dynamic]
+request: |
+  只把 8.2 的案例换成托育机构晨间接待冲突，其他章节不要修改。
+depends_on: C
+scenario: local_edit
+edit_instruction: 只把8.2的案例换成托育机构晨间接待冲突，其他章节不要修改
+preserve:
+  - script:sec1
+  - script:sec3
+  - script:sec4
+  - learning_design:sec1
+  - learning_design:sec2
+  - learning_design:sec3
+  - learning_design:sec4
+  - evidence_index
+template_fixture: ""
+material_fixtures: []
+expect:
+  routing:
+    requested_outputs: [script]
+  content:
+    artifact_types: [script, case]
+    banned_regex: []
+rubric: rubrics/human_eval.yaml
+notes: |
+  §26 / Acceptance 7：preserve 集（8.1/8.3/8.4、Learning Goals、Evidence）hash 必须不变。

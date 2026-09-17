@@ -1,0 +1,22 @@
+id: E
+title: Existing Course Review（已有讲稿审阅）
+phase: M6
+modes: [dynamic, direct_codex]
+request: |
+  只审核我上传的这份已有心理学讲稿，不要重写：
+  检查理论错误、证据问题、诊断越界、标签化、神经科学过度简化，逐条给出位置与修改建议。
+material_fixtures:
+  - fixtures/lecture/existing_psychology_lecture.md
+template_fixture: ""
+expect:
+  routing:
+    requested_outputs: [review]
+  plan:
+    must_include_steps: [claims, evidence, gates]
+    must_exclude_steps: [scripts, pptx]
+  content:
+    artifact_types: [gate_result, evidence_index]
+    banned_regex: []
+rubric: rubrics/human_eval.yaml
+notes: |
+  §25：Plan 不应进入完整 Authoring Pipeline（不写脚本、不做 PPT）。

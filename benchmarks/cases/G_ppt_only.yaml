@@ -1,0 +1,25 @@
+id: G
+title: PPT-only（复用已有教案与脚本）
+phase: M6
+modes: [dynamic]
+depends_on: C
+scenario: ppt_only
+request: |
+  只生成课堂 PPT，不重新写课程。
+template_fixture: ""
+material_fixtures: []
+expect:
+  routing:
+    requested_outputs: [pptx]
+  plan:
+    must_include_steps: [slide_plan, pptx]
+    must_exclude_steps: [scripts, learning_design]
+    min_reuse_rate: 0.4
+    must_reuse_artifact_types: [script]
+  content:
+    artifact_types: [pptx_deck, slide_plan]
+    must_exist: [pptx_deck]
+    banned_regex: []
+rubric: rubrics/human_eval.yaml
+notes: |
+  §27：reuse learning design / teaching plan / script；run media、slide plan、pptx、QA。

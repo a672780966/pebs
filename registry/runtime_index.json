@@ -67,6 +67,39 @@
       "gates_after": [],
       "preconditions": []
     },
+    "backwards-design-unit-planner": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "curriculum-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\backwards-design-unit-planner-d73d4f45038b",
+        "entrypoint": null,
+        "artifact_ids": {
+          "learning_design": "learning_design:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "requirements"
+      ],
+      "produces": [
+        "learning_design"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
     "case-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
@@ -100,6 +133,39 @@
       "gates_after": [],
       "preconditions": []
     },
+    "checking-for-understanding-protocol-designer": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\checking-for-understanding-protocol-designer-219969ec1587",
+        "entrypoint": null,
+        "artifact_ids": {
+          "assessment": "assessment:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "teaching_plan"
+      ],
+      "produces": [
+        "assessment"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
     "claim-extractor": {
       "runtime": "builtin",
       "status": "APPROVED",
@@ -122,6 +188,72 @@
       "invocation": {
         "auto": true,
         "explicit": false
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "cognitive-load-analyser": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "media-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\cognitive-load-analyser-c86c2353ae63",
+        "entrypoint": null,
+        "artifact_ids": {
+          "load_review": "load_review:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "teaching_plan"
+      ],
+      "produces": [
+        "load_review"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "criterion-referenced-rubric-generator": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "qa-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\criterion-referenced-rubric-generator-a2232bc6cc89",
+        "entrypoint": null,
+        "artifact_ids": {
+          "assessment": "assessment:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "assessment"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
       },
       "aliases": [],
       "parallelizable": false,
@@ -166,6 +298,39 @@
       "gates_after": [],
       "preconditions": []
     },
+    "discipline-specific-critical-thinking-task-designer": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\discipline-specific-critical-thinking-task-designer-4ee650d5bb4f",
+        "entrypoint": null,
+        "artifact_ids": {
+          "lesson_plan": "lesson_plan:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "lesson_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
     "docx-exporter": {
       "runtime": "builtin",
       "status": "APPROVED",
@@ -193,6 +358,40 @@
       "parallelizable": false,
       "estimated_cost": {
         "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "dual-coding-designer": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "media-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\dual-coding-designer-836651897620",
+        "entrypoint": null,
+        "artifact_ids": {
+          "media_plan": "media_plan:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "teaching_plan",
+        "learning_design"
+      ],
+      "produces": [
+        "media_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
         "research_calls": 0
       },
       "gates_before": [],
@@ -269,6 +468,72 @@
       "gates_after": [],
       "preconditions": []
     },
+    "experiential-learning-cycle-designer": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\experiential-learning-cycle-designer-dddfa22dc170",
+        "entrypoint": null,
+        "artifact_ids": {
+          "lesson_plan": "lesson_plan:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "lesson_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "explicit-instruction-sequence-builder": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\explicit-instruction-sequence-builder-a45f007407f3",
+        "entrypoint": null,
+        "artifact_ids": {
+          "teaching_plan": "teaching_plan:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "teaching_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
     "gate-runner": {
       "runtime": "builtin",
       "status": "APPROVED",
@@ -307,6 +572,40 @@
       "gates_after": [],
       "preconditions": []
     },
+    "hinge-question-designer": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\hinge-question-designer-ef856418e4d0",
+        "entrypoint": null,
+        "artifact_ids": {
+          "assessment": "assessment:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "teaching_plan",
+        "evidence_index"
+      ],
+      "produces": [
+        "assessment"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
     "learning-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
@@ -326,6 +625,40 @@
       "optional_requires": [
         "materials"
       ],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "learning-progression-builder": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\learning-progression-builder-9eabe5d6c88b",
+        "entrypoint": null,
+        "artifact_ids": {
+          "teaching_plan": "teaching_plan:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design",
+        "evidence_index"
+      ],
+      "produces": [
+        "teaching_plan"
+      ],
+      "optional_requires": [],
       "invocation": {
         "auto": true,
         "explicit": true
@@ -459,9 +792,7 @@
         "auto": true,
         "explicit": true
       },
-      "aliases": [
-        "udl-lesson-auditor"
-      ],
+      "aliases": [],
       "parallelizable": false,
       "estimated_cost": {
         "model_calls": 1,
@@ -709,6 +1040,139 @@
       "parallelizable": false,
       "estimated_cost": {
         "model_calls": 0,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "udl-barrier-anticipator": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "curriculum-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-barrier-anticipator-76d54b09b073",
+        "entrypoint": null,
+        "artifact_ids": {
+          "load_review": "load_review:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "load_review"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "udl-lesson-auditor": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "qa-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-lesson-auditor-1913f9fa4912",
+        "entrypoint": null,
+        "artifact_ids": {
+          "load_review": "load_review:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design",
+        "teaching_plan"
+      ],
+      "produces": [
+        "load_review"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "udl-options-designer": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-options-designer-3b21d426c974",
+        "entrypoint": null,
+        "artifact_ids": {
+          "teaching_plan": "teaching_plan:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "teaching_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
+        "research_calls": 0
+      },
+      "gates_before": [],
+      "gates_after": [],
+      "preconditions": []
+    },
+    "worked-example-fading-designer": {
+      "runtime": "prompt_skill",
+      "status": "APPROVED",
+      "agent": "pedagogy-agent",
+      "handler": {
+        "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\worked-example-fading-designer-7d83d2950971",
+        "entrypoint": null,
+        "artifact_ids": {
+          "lesson_plan": "lesson_plan:{section_id}"
+        },
+        "outputs": []
+      },
+      "requires": [
+        "learning_design"
+      ],
+      "produces": [
+        "lesson_plan"
+      ],
+      "optional_requires": [],
+      "invocation": {
+        "auto": true,
+        "explicit": true
+      },
+      "aliases": [],
+      "parallelizable": false,
+      "estimated_cost": {
+        "model_calls": 1,
         "research_calls": 0
       },
       "gates_before": [],

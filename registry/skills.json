@@ -255,9 +255,7 @@
       "teaching_plan"
     ],
     "optional_requires": [],
-    "aliases": [
-      "udl-lesson-auditor"
-    ],
+    "aliases": [],
     "input_schema": null,
     "output_schema": "teaching_plan",
     "provider": [
@@ -1064,5 +1062,1171 @@
     },
     "self_implemented": true,
     "execution_policy": "TRUSTED_RUNNER"
+  },
+  "backwards-design-unit-planner": {
+    "name": "backwards-design-unit-planner",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "按 Understanding by Design 逆向设计单元，输出学习目标、难点与评估证据",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "curriculum-agent",
+    "requires": [
+      "requirements"
+    ],
+    "produces": [
+      "learning_design"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\backwards-design-unit-planner-d73d4f45038b",
+      "entrypoint": null,
+      "artifact_ids": {
+        "learning_design": "learning_design:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\backwards-design-unit-planner.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "d73d4f45038b29034ade29534cb91dd75f0dd59016024a3df70bfcac84dd50af",
+      "imported_at": "2026-09-18T01:48:07",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\backwards-design-unit-planner-d73d4f45038b"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:07",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "d73d4f45038b29034ade29534cb91dd75f0dd59016024a3df70bfcac84dd50af",
+        "published_at": "2026-09-18T01:48:07",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\backwards-design-unit-planner\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "learning-progression-builder": {
+    "name": "learning-progression-builder",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "构建跨节学习进阶与教学策略序列",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "learning_design",
+      "evidence_index"
+    ],
+    "produces": [
+      "teaching_plan"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\learning-progression-builder-9eabe5d6c88b",
+      "entrypoint": null,
+      "artifact_ids": {
+        "teaching_plan": "teaching_plan:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\learning-progression-builder.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "9eabe5d6c88bec8e5d1a18c1f2549e0b3c1929e1a545d48aa4c0619cf1483f3c",
+      "imported_at": "2026-09-18T01:48:07",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\learning-progression-builder-9eabe5d6c88b"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:07",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "9eabe5d6c88bec8e5d1a18c1f2549e0b3c1929e1a545d48aa4c0619cf1483f3c",
+        "published_at": "2026-09-18T01:48:07",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\learning-progression-builder\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "discipline-specific-critical-thinking-task-designer": {
+    "name": "discipline-specific-critical-thinking-task-designer",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "设计学科特定的批判性思维任务与活动流程",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "lesson_plan"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\discipline-specific-critical-thinking-task-designer-4ee650d5bb4f",
+      "entrypoint": null,
+      "artifact_ids": {
+        "lesson_plan": "lesson_plan:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\discipline-specific-critical-thinking-task-designer.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "4ee650d5bb4f2b6d15878b8f3f899d554f146c85472cf908f8977e9d6487e70c",
+      "imported_at": "2026-09-18T01:48:07",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\discipline-specific-critical-thinking-task-designer-4ee650d5bb4f"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:07",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "4ee650d5bb4f2b6d15878b8f3f899d554f146c85472cf908f8977e9d6487e70c",
+        "published_at": "2026-09-18T01:48:07",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\discipline-specific-critical-thinking-task-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "cognitive-load-analyser": {
+    "name": "cognitive-load-analyser",
+    "version": "0.0.0",
+    "domain": "media",
+    "description": "分析认知负荷来源与降低方式（PATCH：去数字化负荷评分，输出 LOW/MEDIUM/HIGH + 理由 + 不确定性）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "media-agent",
+    "requires": [
+      "teaching_plan"
+    ],
+    "produces": [
+      "load_review"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\cognitive-load-analyser-c86c2353ae63",
+      "entrypoint": null,
+      "artifact_ids": {
+        "load_review": "load_review:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\cognitive-load-analyser.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "c86c2353ae639d70b755e0b5a9d97d2353fb7fb84a51b3207e0527d6f22e99c9",
+      "imported_at": "2026-09-18T01:48:07",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\cognitive-load-analyser-c86c2353ae63"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:07",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "c86c2353ae639d70b755e0b5a9d97d2353fb7fb84a51b3207e0527d6f22e99c9",
+        "published_at": "2026-09-18T01:48:07",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\cognitive-load-analyser\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": [
+      {
+        "patch_version": "cognitive-load-analyser-pebs-1",
+        "upstream_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "patch_reason": "PEBS 输出契约与政策修订",
+        "reviewed_by": "pebs-m6",
+        "tests": "tests/test_external_skill_acceptance.py",
+        "files": [
+          "SKILL.md"
+        ],
+        "applied_at": "2026-09-18T01:48:07",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\patched\\cognitive-load-analyser\\6bbbce418f82e11044009c9f3b7373a354de5bd0+cognitive-load-analyser-pebs-1"
+      }
+    ]
+  },
+  "dual-coding-designer": {
+    "name": "dual-coding-designer",
+    "version": "0.0.0",
+    "domain": "media",
+    "description": "为言语+视觉双通道设计媒体形式，选择图示与文本配合",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "media-agent",
+    "requires": [
+      "teaching_plan",
+      "learning_design"
+    ],
+    "produces": [
+      "media_plan"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\dual-coding-designer-836651897620",
+      "entrypoint": null,
+      "artifact_ids": {
+        "media_plan": "media_plan:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\dual-coding-designer.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "836651897620c5bae53ddf91b690fb09b58fcd82545cdbcb15299d5e79af36af",
+      "imported_at": "2026-09-18T01:48:07",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\dual-coding-designer-836651897620"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:07",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "836651897620c5bae53ddf91b690fb09b58fcd82545cdbcb15299d5e79af36af",
+        "published_at": "2026-09-18T01:48:07",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\dual-coding-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "worked-example-fading-designer": {
+    "name": "worked-example-fading-designer",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "设计从完整示例到独立练习的渐进撤除序列",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "lesson_plan"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\worked-example-fading-designer-7d83d2950971",
+      "entrypoint": null,
+      "artifact_ids": {
+        "lesson_plan": "lesson_plan:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\worked-example-fading-designer.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "7d83d29509713357bf9eb29978f6a03b73807c124f767c052e4eb5612bd62f35",
+      "imported_at": "2026-09-18T01:48:07",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\worked-example-fading-designer-7d83d2950971"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:07",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "7d83d29509713357bf9eb29978f6a03b73807c124f767c052e4eb5612bd62f35",
+        "published_at": "2026-09-18T01:48:07",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\worked-example-fading-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "explicit-instruction-sequence-builder": {
+    "name": "explicit-instruction-sequence-builder",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "构建显性教学序列（示范→引导练习→独立练习）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "teaching_plan"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\explicit-instruction-sequence-builder-a45f007407f3",
+      "entrypoint": null,
+      "artifact_ids": {
+        "teaching_plan": "teaching_plan:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\explicit-instruction-sequence-builder.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "a45f007407f389b44defff95937f65cf93dbc37c6b69a882ee02add40aca7be7",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\explicit-instruction-sequence-builder-a45f007407f3"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "a45f007407f389b44defff95937f65cf93dbc37c6b69a882ee02add40aca7be7",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\explicit-instruction-sequence-builder\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "experiential-learning-cycle-designer": {
+    "name": "experiential-learning-cycle-designer",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "按经验学习循环设计活动（体验→反思→概念化→应用）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "lesson_plan"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\experiential-learning-cycle-designer-dddfa22dc170",
+      "entrypoint": null,
+      "artifact_ids": {
+        "lesson_plan": "lesson_plan:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\experiential-learning-cycle-designer.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "dddfa22dc170e69a17e2c1aca60af0fa7be9ef8b12b397e1fb8ccb22487955dd",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\experiential-learning-cycle-designer-dddfa22dc170"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "dddfa22dc170e69a17e2c1aca60af0fa7be9ef8b12b397e1fb8ccb22487955dd",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\experiential-learning-cycle-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "hinge-question-designer": {
+    "name": "hinge-question-designer",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "设计可用于课堂即时判断的铰链问题（PATCH：隔离上游示例，答案二次校验，distractor 映射 misconception）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "teaching_plan",
+      "evidence_index"
+    ],
+    "produces": [
+      "assessment"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\hinge-question-designer-ef856418e4d0",
+      "entrypoint": null,
+      "artifact_ids": {
+        "assessment": "assessment:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\hinge-question-designer.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "ef856418e4d04729b0c2976df8aaddcbcece14b78f6787ccbba382c1492827f8",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\hinge-question-designer-ef856418e4d0"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "ef856418e4d04729b0c2976df8aaddcbcece14b78f6787ccbba382c1492827f8",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\hinge-question-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": [
+      {
+        "patch_version": "hinge-question-designer-pebs-1",
+        "upstream_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "patch_reason": "PEBS 输出契约与政策修订",
+        "reviewed_by": "pebs-m6",
+        "tests": "tests/test_external_skill_acceptance.py",
+        "files": [
+          "SKILL.md"
+        ],
+        "applied_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\patched\\hinge-question-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0+hinge-question-designer-pebs-1"
+      }
+    ]
+  },
+  "checking-for-understanding-protocol-designer": {
+    "name": "checking-for-understanding-protocol-designer",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "设计课堂理解检查流程与证据收集方式",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "teaching_plan"
+    ],
+    "produces": [
+      "assessment"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\checking-for-understanding-protocol-designer-219969ec1587",
+      "entrypoint": null,
+      "artifact_ids": {
+        "assessment": "assessment:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\checking-for-understanding-protocol-designer.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "219969ec1587390c50a747a96fb4ce84eb626bb371d4b94ce51a1219623afbff",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\checking-for-understanding-protocol-designer-219969ec1587"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "219969ec1587390c50a747a96fb4ce84eb626bb371d4b94ce51a1219623afbff",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\checking-for-understanding-protocol-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "criterion-referenced-rubric-generator": {
+    "name": "criterion-referenced-rubric-generator",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "生成标准参照评分量规，明确达标描述与层级",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "qa-agent",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "assessment"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\criterion-referenced-rubric-generator-a2232bc6cc89",
+      "entrypoint": null,
+      "artifact_ids": {
+        "assessment": "assessment:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\criterion-referenced-rubric-generator.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "a2232bc6cc897877e7f3df2f1998f1770e1e0dbff5e0ebae6bc320adc91e684d",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\criterion-referenced-rubric-generator-a2232bc6cc89"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "a2232bc6cc897877e7f3df2f1998f1770e1e0dbff5e0ebae6bc320adc91e684d",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\criterion-referenced-rubric-generator\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "udl-barrier-anticipator": {
+    "name": "udl-barrier-anticipator",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "预判学习障碍并给出通用设计调整（PATCH：转介表述改为 individual_support_review_flags）",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "curriculum-agent",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "load_review"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-barrier-anticipator-76d54b09b073",
+      "entrypoint": null,
+      "artifact_ids": {
+        "load_review": "load_review:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\udl-barrier-anticipator.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "76d54b09b073d45d31777cc5a63bdd1b76fe6829f6c4dcdcd0c52f94bf2d430c",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-barrier-anticipator-76d54b09b073"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "76d54b09b073d45d31777cc5a63bdd1b76fe6829f6c4dcdcd0c52f94bf2d430c",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\udl-barrier-anticipator\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": [
+      {
+        "patch_version": "udl-barrier-anticipator-pebs-1",
+        "upstream_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "patch_reason": "PEBS 输出契约与政策修订",
+        "reviewed_by": "pebs-m6",
+        "tests": "tests/test_external_skill_acceptance.py",
+        "files": [
+          "SKILL.md"
+        ],
+        "applied_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\patched\\udl-barrier-anticipator\\6bbbce418f82e11044009c9f3b7373a354de5bd0+udl-barrier-anticipator-pebs-1"
+      }
+    ]
+  },
+  "udl-options-designer": {
+    "name": "udl-options-designer",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "为表征/行动表达/参与提供多种可选项",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "pedagogy-agent",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "teaching_plan"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-options-designer-3b21d426c974",
+      "entrypoint": null,
+      "artifact_ids": {
+        "teaching_plan": "teaching_plan:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\udl-options-designer.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "3b21d426c9743de7c894c66324881d5a312b9795bdf7011ee345e3757b131bcc",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-options-designer-3b21d426c974"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "3b21d426c9743de7c894c66324881d5a312b9795bdf7011ee345e3757b131bcc",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\udl-options-designer\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
+  },
+  "udl-lesson-auditor": {
+    "name": "udl-lesson-auditor",
+    "version": "0.0.0",
+    "domain": "education",
+    "description": "审计一节课程的 UDL 覆盖缺口并给出修改建议",
+    "status": "APPROVED",
+    "invocation": {
+      "auto": true,
+      "explicit": true
+    },
+    "agent": "qa-agent",
+    "requires": [
+      "learning_design",
+      "teaching_plan"
+    ],
+    "produces": [
+      "load_review"
+    ],
+    "emits": [],
+    "optional_requires": [],
+    "aliases": [],
+    "input_schema": null,
+    "output_schema": null,
+    "provider": [
+      "education-agent-skills"
+    ],
+    "tools": [],
+    "risk_level": "low",
+    "network": false,
+    "filesystem": "none",
+    "external_side_effects": false,
+    "runtime": "prompt_skill",
+    "handler": {
+      "skill_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-lesson-auditor-1913f9fa4912",
+      "entrypoint": null,
+      "artifact_ids": {
+        "load_review": "load_review:{section_id}"
+      },
+      "outputs": []
+    },
+    "gates_before": [],
+    "gates_after": [],
+    "parallelizable": false,
+    "estimated_cost": {
+      "model_calls": 1,
+      "research_calls": 0
+    },
+    "self_implemented": false,
+    "user_invocable": false,
+    "auto_invocable": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "adopt",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "source": {
+      "repository_url": "file:///C:\\Users\\admin\\AppData\\Local\\Temp\\tmp78b_rpui\\udl-lesson-auditor.tar.gz",
+      "ref": null,
+      "commit_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "license": "unknown",
+      "package_sha256": "1913f9fa4912521df2aa1a6b721b53c1fa77ec2a33dcfc686aa3aeffb492d948",
+      "imported_at": "2026-09-18T01:48:08",
+      "quarantine_path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\quarantine\\udl-lesson-auditor-1913f9fa4912"
+    },
+    "review": {
+      "reviewed_at": "2026-09-18T01:48:08",
+      "reviewed_by": "pebs-m6",
+      "evidence": "无 scripts/；无外部副作用；仅文本指令，走 RestrictedContext 最小上下文"
+    },
+    "versions": [
+      {
+        "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+        "package_sha256": "1913f9fa4912521df2aa1a6b721b53c1fa77ec2a33dcfc686aa3aeffb492d948",
+        "published_at": "2026-09-18T01:48:08",
+        "path": "C:\\Users\\admin\\Documents\\ChatGPT\\心理学教育skills\\skills\\upstream\\udl-lesson-auditor\\6bbbce418f82e11044009c9f3b7373a354de5bd0"
+      }
+    ],
+    "pinned_version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+    "patches": []
   }
 }

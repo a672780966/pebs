@@ -32,6 +32,9 @@ UPSTREAM_DIR = SKILLS_DIR / "upstream"
 PATCHED_DIR = SKILLS_DIR / "patched"
 PATCHES_DIR = ROOT / "patches"
 
+BENCHMARKS_DIR = ROOT / "benchmarks"
+PROVIDERS_DIR = ROOT / "providers"
+
 RULES_VERSION = "rules-" + hashlib.sha256((CONFIG_DIR / "rules.yaml").read_bytes()).hexdigest()[:12]
 
 CHECK_VERSIONS = {

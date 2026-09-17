@@ -1,0 +1,24 @@
+id: D
+title: Research-driven Psychology Course（手机使用与焦虑）
+phase: M6
+modes: [dynamic, direct_codex]
+request: |
+  围绕“大学生手机使用与焦虑”设计一节心理学科普课：
+  先查研究，区分相关与因果，标出研究限制，再形成课程设计。
+  不得把相关性写成因果结论，不得把群体统计写成对具体学生的判断。
+template_fixture: ""
+material_fixtures: []
+expect:
+  routing:
+    knowledge_types_any_of: [concept, research_literacy, critical_thinking]
+    research_need: LITERATURE
+  plan:
+    must_include_steps: [claims, evidence, learning_design]
+  content:
+    artifact_types: [evidence_index, claims, script, lesson_plan]
+    banned_regex: ["手机使用导致焦虑", "一定会导致", "所有大学生都会"]
+rubric: rubrics/human_eval.yaml
+fixture_research: fixtures/research/phone_anxiety_papers.json
+notes: |
+  §24 / §44 / §50：Evidence Fidelity、Claim Strength、Population Scope、Causal Overclaim。
+  研究检索用离线 fixture 固定，避免实时 API 波动。

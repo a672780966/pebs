@@ -1,0 +1,28 @@
+id: B
+title: 大学生心理健康第一课（90 分钟现场课）
+phase: M6
+modes: [builtin, dynamic, direct_codex]
+request: |
+  为大一学生设计第一节 90 分钟《大学生心理健康教育》现场课：
+  目标是让学生理解心理学有什么用、愿意继续学习心理学；
+  包含 2–3 个深度思考环节；避免与后续情绪、自我意识、学习课的内容重复。
+  最后生成教案和课堂 PPT，不需要录课脚本。
+template_fixture: ""
+material_fixtures: []
+expect:
+  routing:
+    knowledge_types_any_of: [concept, critical_thinking, reflection, transfer]
+    requested_outputs: [lesson_plan, pptx]
+    research_need: VERIFY
+    media_need: STATIC
+  plan:
+    must_include_steps: [learning_design, lesson_plans, slide_plan, pptx]
+    must_exclude_steps: [scripts, storyboard]
+    terminal_outputs: [lesson_plan, pptx_deck]
+  content:
+    artifact_types: [lesson_plan, pptx_deck]
+    must_exist: [lesson_plan:sec1, pptx_deck]
+    banned_regex: ["录课脚本", "分镜"]
+rubric: rubrics/human_eval.yaml
+notes: |
+  验证"不要录课脚本"时不进入完整 Authoring 链；验证 lesson_plan + pptx 组合。

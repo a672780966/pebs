@@ -83,7 +83,21 @@ class PromptSkillExecutor:
 
 
 def _with_section_defaults(ctx: Any, node: dict[str, Any], artifact_type: str | None, data: dict[str, Any]) -> dict[str, Any]:
-    if artifact_type in ("teaching_plan", "lesson_plan", "assessment", "worksheet", "case", "learning_design", "script"):
+    section_scoped = (
+        "teaching_plan",
+        "lesson_plan",
+        "assessment",
+        "worksheet",
+        "case",
+        "learning_design",
+        "script",
+        "media_plan",
+        "load_review",
+        "diagrams",
+        "storyboard",
+        "evidence_assets",
+    )
+    if artifact_type in section_scoped:
         if not data.get("section_id"):
             data["section_id"] = node.get("section_id") or (ctx.sections()[0]["section_id"] if ctx.sections() else "")
         if artifact_type in ("lesson_plan", "worksheet") and not data.get("title"):

@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "note": "M6 benchmark D 的离线研究 fixture（§44）。内容为合成摘要，仅用于固定测试 Evidence 流程，不是真实文献、不是真实 DOI，禁止在教学产物中作为文献引用。",
+  "query": "college students smartphone use anxiety",
+  "results": [
+    {
+      "source_id": "fixture-phone-anxiety-001",
+      "title": "Synthetic study: smartphone use and anxiety symptoms among first-year undergraduates (cross-sectional)",
+      "abstract": "This synthetic cross-sectional survey (N = 1200 first-year undergraduates) reports a moderate positive association between self-reported daily smartphone hours and anxiety symptoms (r = 0.31). The design is cross-sectional; no causal direction can be established. Limitations: self-report measures, single campus, and possible reverse causation.",
+      "year": 2024,
+      "type": "journal-article",
+      "doi": "10.0000/fixture.phone.anxiety.001",
+      "population": "first-year undergraduates",
+      "causal_strength": "association_only"
+    },
+    {
+      "source_id": "fixture-phone-anxiety-002",
+      "title": "Synthetic study: a two-wave panel on bedtime scrolling and anxious mood",
+      "abstract": "This synthetic two-wave panel study (N = 430 students, four-week interval) finds bedtime scrolling predicts later anxious mood (beta = 0.18) but not the reverse path. Authors caution that effects are small and moderation by coping style was not tested.",
+      "year": 2023,
+      "type": "journal-article",
+      "doi": "10.0000/fixture.phone.anxiety.002",
+      "population": "undergraduate students",
+      "causal_strength": "longitudinal_small_effect"
+    },
+    {
+      "source_id": "fixture-phone-anxiety-003",
+      "title": "Synthetic review: interventions reducing problematic smartphone use",
+      "abstract": "This synthetic meta-analysis (k = 24 trials, mostly small) reports heterogeneous effects on wellbeing; authors conclude evidence for causality remains mixed and populations differ by culture and age.",
+      "year": 2025,
+      "type": "review",
+      "doi": "10.0000/fixture.phone.anxiety.003",
+      "population": "adolescents and young adults",
+      "causal_strength": "mixed_evidence"
+    }
+  ]
+}

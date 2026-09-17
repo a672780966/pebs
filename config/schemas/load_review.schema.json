@@ -3,42 +3,161 @@
   "$id": "pebs/load_review",
   "title": "LoadReview",
   "type": "object",
-  "required": ["section_id", "cognitive_load", "dual_coding"],
+  "required": [
+    "section_id",
+    "cognitive_load",
+    "dual_coding"
+  ],
   "properties": {
-    "section_id": { "type": "string" },
+    "section_id": {
+      "type": "string"
+    },
     "cognitive_load": {
       "type": "object",
-      "required": ["level", "reasons"],
+      "required": [
+        "level",
+        "reasons"
+      ],
       "properties": {
-        "level": { "enum": ["LOW", "MEDIUM", "HIGH"] },
-        "reasons": { "type": "array", "items": { "type": "string" } },
-        "uncertainties": { "type": "array", "items": { "type": "string" } },
-        "improvements": { "type": "array", "items": { "type": "string" } }
+        "level": {
+          "enum": [
+            "LOW",
+            "MEDIUM",
+            "HIGH"
+          ]
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "uncertainties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "improvements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "intrinsic": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "extraneous": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "germane_support": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     },
     "dual_coding": {
       "type": "object",
-      "required": ["pairings"],
+      "required": [
+        "pairings"
+      ],
       "properties": {
         "pairings": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["goal_ref", "verbal", "visual", "knowledge_function", "pairing_ok"],
+            "required": [
+              "goal_ref",
+              "verbal",
+              "visual",
+              "knowledge_function",
+              "pairing_ok"
+            ],
             "properties": {
-              "goal_ref": { "type": "string" },
-              "verbal": { "type": "string" },
-              "visual": { "type": "string" },
-              "knowledge_function": {
-                "enum": ["structure", "comparison", "sequence", "causality", "spatial_relation", "state_change", "hierarchy", "example", "counterexample"]
+              "goal_ref": {
+                "type": "string"
               },
-              "diagram_id": { "type": "string" },
-              "pairing_ok": { "type": "boolean" },
-              "note": { "type": "string" }
+              "verbal": {
+                "type": "string"
+              },
+              "visual": {
+                "type": "string"
+              },
+              "knowledge_function": {
+                "enum": [
+                  "structure",
+                  "comparison",
+                  "sequence",
+                  "causality",
+                  "spatial_relation",
+                  "state_change",
+                  "hierarchy",
+                  "example",
+                  "counterexample"
+                ]
+              },
+              "diagram_id": {
+                "type": "string"
+              },
+              "pairing_ok": {
+                "type": "boolean"
+              },
+              "note": {
+                "type": "string"
+              }
             }
           }
         }
       }
+    },
+    "udl": {
+      "type": "object",
+      "properties": {
+        "barriers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "individual_support_review_flags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "flag",
+              "reason"
+            ],
+            "properties": {
+              "flag": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "suggested_action": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "design_adjustments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
     }
   }
 }

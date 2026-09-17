@@ -1,0 +1,5 @@
+{
+  "format": 1,
+  "note": "M6 Skill Performance Registry（§19/§40）。记录必须绑定 skill version / provider SHA / package hash / patch，否则升级后数据不可复现。由 pebs.benchmark.performance 写入。",
+  "skills": {}
+}

@@ -258,15 +258,18 @@ def import_candidate(
     registry = _load_registry()
     existing = registry.get(name, {})
     contract = derive_contract(quarantine)
+    manifest_data = contract["manifest"]
     record = {
         "name": name,
         "version": existing.get("version", "0.0.0"),
-        "domain": "external",
+        "domain": str(manifest_data.get("domain") or "external"),
         "description": contract["description"] or existing.get("description", "未审查的外部 Skill 候选"),
         "status": "REFERENCE_ONLY",
-        "invocation": {"auto": True, "explicit": True},
+        "invocation": dict(manifest_data.get("invocation") or {"auto": True, "explicit": True}),
+        "agent": str(manifest_data.get("agent") or existing.get("agent") or ""),
         "requires": contract["requires"],
         "produces": contract["produces"],
+        "emits": [str(item) for item in (manifest_data.get("emits") or []) if str(item)],
         "optional_requires": contract["optional_requires"],
         "aliases": [],
         "input_schema": None,
@@ -294,7 +297,7 @@ def import_candidate(
         "review_status": "UNVERIFIED",
         "adoption_decision": "REFERENCE_ONLY",
         "role": "ACTION_SKILL",
-        "execution_policy": "SANDBOX_ONLY",
+        "execution_policy": str(manifest_data.get("execution_policy") or "SANDBOX_ONLY"),
         "enabled_by_default": False,
         "source": {
             "repository_url": url,
