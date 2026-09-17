@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
-from . import config, router
+from . import config, policies, router
 from .evidence import EvidenceStore
 from .store import Store, StoreError, content_hash, now_iso
 
@@ -441,6 +441,25 @@ def g4_safety(ctx: GateContext, script_artifact: str) -> dict[str, Any]:
     )
 
 
+def _udl_strings(value: Any, path: str = "udl") -> list[tuple[str, str]]:
+    """Every string inside a UDL payload, with a location for the issue.
+
+    The payload nests barriers, options and review flags, and the owner spec
+    names some of those fields differently from the schema, so the ban is applied
+    to the text wherever it sits rather than to a guessed field name.
+    """
+    found: list[tuple[str, str]] = []
+    if isinstance(value, str):
+        found.append((path, value))
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            found.extend(_udl_strings(item, f"{path}.{key}"))
+    elif isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            found.extend(_udl_strings(item, f"{path}[{index}]"))
+    return found
+
+
 def g5_udl(ctx: GateContext, script_artifact: str) -> dict[str, Any]:
     rev_id, rev_hash = _require_rev(ctx, script_artifact)
     script = ctx.accepted(script_artifact) or {}
@@ -498,6 +517,18 @@ def g5_udl(ctx: GateContext, script_artifact: str) -> dict[str, Any]:
                         "location": f"teaching_plan:{section_id}:udl",
                         "reason": "替代路径未说明 UDL 维度（表征/行动表达/参与）",
                         "next_step": "补充 UDL 维度说明",
+                    }
+                )
+        # Section 27 bans referral wording outright. It is a deterministic policy
+        # violation, so it fails the gate: degrading it to a warning or review
+        # state would let the same wording reach the learner anyway.
+        for location, text in _udl_strings(udl):
+            if any(re.search(pattern, text) for pattern in policies.REFERRAL_PATTERNS):
+                issues.append(
+                    {
+                        "location": f"teaching_plan:{section_id}:{location}",
+                        "reason": f"出现禁止的转介措辞：{text[:40]}",
+                        "next_step": "改为课堂内可执行的支持，不依赖转介",
                     }
                 )
     status = "FAIL" if issues else "PASS"

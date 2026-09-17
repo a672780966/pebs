@@ -120,3 +120,60 @@ def test_gate_result_invalidates_when_script_changes(accepted_build):
     readiness = gates.export_readiness(engine.store)
     assert readiness["ready"] is False
     assert any("已过期" in item for item in readiness["blocking"])
+
+
+def _with_referral_wording(content, phrase="该学生需要转介，由校外机构接手"):
+    """Place the banned wording inside the UDL payload (option text)."""
+    options = content.setdefault("udl", {}).setdefault("options", [])
+    assert options, "fixture teaching plan must contain udl.options"
+    options[0]["representation"] = phrase
+
+
+def _with_barrier_referral_wording(content, phrase="建议转介"):
+    """Same ban, reached through the barrier analysis instead of an option."""
+    barriers = content.setdefault("udl", {}).setdefault("barriers", [])
+    if barriers and isinstance(barriers[0], dict):
+        barriers[0]["mitigation"] = phrase
+    else:
+        barriers.append(phrase)
+
+
+def test_g5_fails_on_prohibited_referral_wording(accepted_build):
+    engine = accepted_build
+    _mutate_accepted(engine, "teaching_plan:sec1", _with_referral_wording)
+    ctx = gates.GateContext(store=engine.store, evidence=engine.evidence)
+    result = gates.g5_udl(ctx, "script:sec1")
+    # A deterministic policy violation fails; it is never a soft review state.
+    assert result["status"] == "FAIL"
+    assert result["status"] != "NEEDS_REVIEW"
+    assert any("禁止的转介措辞" in issue["reason"] for issue in result["issues"])
+
+
+def test_g5_fails_on_referral_wording_inside_barriers(accepted_build):
+    engine = accepted_build
+    _mutate_accepted(engine, "teaching_plan:sec1", _with_barrier_referral_wording)
+    ctx = gates.GateContext(store=engine.store, evidence=engine.evidence)
+    result = gates.g5_udl(ctx, "script:sec1")
+    assert result["status"] == "FAIL"
+    assert any("禁止的转介措辞" in issue["reason"] for issue in result["issues"])
+
+
+def test_g5_passes_without_prohibited_wording(accepted_build):
+    ctx = gates.GateContext(store=accepted_build.store, evidence=accepted_build.evidence)
+    result = gates.g5_udl(ctx, "script:sec1")
+    assert result["status"] == "PASS", result["issues"]
+
+
+def test_g5_failure_is_visible_to_export_readiness(accepted_build):
+    engine = accepted_build
+    _mutate_accepted(engine, "teaching_plan:sec1", _with_referral_wording)
+    ctx = gates.GateContext(store=engine.store, evidence=engine.evidence)
+    result = gates.g5_udl(ctx, "script:sec1")
+    assert result["status"] == "FAIL"
+    # Record the re-evaluated result the way the gate runner does, then accept it.
+    written = gates.write_gate_results(engine.store, [result], "run_g5_regression")
+    assert written
+    engine.store.set_accepted(gates.gate_artifact_id("G5", "script:sec1"), written[-1])
+    readiness = gates.export_readiness(engine.store)
+    assert readiness["ready"] is False
+    assert any("G5 状态为 FAIL" in item for item in readiness["blocking"]), readiness["blocking"]
