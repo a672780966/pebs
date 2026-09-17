@@ -14,7 +14,13 @@ from typing import Any, Callable
 # this usage value; such a claim must never be consumed by PCK authoring.
 PLACEHOLDER_USAGE = "脚本待核验"
 
-PRECONDITION_KINDS = ["supported_claims"]
+# Single owner of the precondition-kind contract: which inputs a checker kind
+# actually consumes. Static validation reads this map, so a declaration can
+# never claim an input the checker does not read.
+PRECONDITION_CONTRACTS: dict[str, dict[str, Any]] = {
+    "supported_claims": {"required_inputs": ["evidence_index"]},
+}
+PRECONDITION_KINDS = list(PRECONDITION_CONTRACTS)
 
 
 def check_supported_claims(
@@ -28,7 +34,8 @@ def check_supported_claims(
     declared usage is outside `usage_scope` is not consumed by PCK and is ignored;
     a claim with no declared usage is ambiguous and fails closed.
     """
-    index = ctx.content("evidence_index") or {}
+    contract = PRECONDITION_CONTRACTS["supported_claims"]
+    index = ctx.content(contract["required_inputs"][0]) or {}
     entries = index.get("claims")
     if not isinstance(entries, list) or not entries:
         return ["证据索引为空：没有可消费的 SUPPORTED Claim"]

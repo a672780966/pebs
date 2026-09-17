@@ -118,12 +118,63 @@ def expand_graph(
         if node.depends_on and node.optional:
             node.optional = all(nodes[dep].optional for dep in node.depends_on)
 
+    apply_gate_topology(nodes, terminals)
     ordered = topological_order(list(nodes.values()))
     levels = parallel_levels(ordered)
     for node in ordered:
         node.parallel_group = levels[node.node_id]
     ordered_edges = [edge for edge in edges if edge.to_node in nodes]
     return ordered, ordered_edges, sorted(reuse)
+
+
+def apply_gate_topology(nodes: dict[str, PlanNode], terminals: list[str]) -> None:
+    """Order every applicable gate evaluator after the data it observes.
+
+    Applicability comes from the deliverable contract (terminal outputs) only -
+    never from which artifacts happen to exist or be reused. Obligations:
+      gate_before -> evaluator is an ancestor of the declaring node
+      gate_after  -> evaluator is a descendant of the declaring node
+      observed artifact -> evaluator is downstream of its planned producer
+    A producer that the evaluator step itself creates and consumes (G8 on the
+    export manifest) is exempt. Absence of an optional observed producer is not
+    an error: the gate's runtime semantics decide the outcome. topological_order
+    stays the authoritative cycle check, so an impossible obligation surfaces as a
+    PlannerError rather than a silently misordered plan.
+    """
+    from .. import gates
+
+    producers: dict[str, list[str]] = {}
+    for node in nodes.values():
+        for output in node.outputs:
+            producers.setdefault(output, []).append(node.node_id)
+
+    def evaluators(gate_id: str) -> list[PlanNode]:
+        step = gates.GATE_EVALUATOR_STEP.get(gate_id)
+        if not step:
+            return []
+        # A reused node is not an executable evaluator for the current run.
+        return [node for node in nodes.values() if step in node.steps and not node.reused]
+
+    def depend(target: PlanNode, source_id: str) -> None:
+        if source_id and source_id != target.node_id and source_id in nodes:
+            target.depends_on = sorted(set(target.depends_on) | {source_id})
+
+    applicable = set(terminals)
+    for gate_id, contract in gates.GATE_CONTRACTS.items():
+        if contract["scope"] not in applicable:
+            continue
+        for evaluator in evaluators(gate_id):
+            intra_step = set(contract.get("produced_and_evaluated_in_same_step") or [])
+            for node in nodes.values():
+                if gate_id in node.gate_after:
+                    depend(evaluator, node.node_id)
+                if gate_id in node.gate_before:
+                    depend(node, evaluator.node_id)
+            for observed in gates.GATE_OBSERVED_ARTIFACTS.get(gate_id, []):
+                if observed in intra_step:
+                    continue
+                for producer_id in producers.get(observed, []):
+                    depend(evaluator, producer_id)
 
 
 def topological_order(nodes: list[PlanNode]) -> list[PlanNode]:

@@ -10,10 +10,55 @@ from .store import Store, StoreError, content_hash, now_iso
 
 GATE_ORDER = ["G1", "G2", "G3", "G4", "G5", "G6", "G7"]
 ALL_GATES = GATE_ORDER + ["G8"]
-# Which artifact a gate result is keyed by: G1-G7 are section-scoped on the
-# script (run_section_gates), G8 is the export manifest gate. This is the single
-# source for "what does this gate evaluate", used by plan validation.
-GATE_SCOPE = {**{gate_id: "script" for gate_id in GATE_ORDER}, "G8": "export_manifest"}
+# Single owner of the gate contract: what a gate evaluates (scope), which runtime
+# step evaluates it, which planned artifacts it observes, and which of those are
+# produced AND evaluated inside the evaluator step itself. Planner validation and
+# the runtime read these derived views; nothing else may restate them.
+GATE_CONTRACTS: dict[str, dict[str, Any]] = {
+    "G1": {
+        "scope": "script",
+        "evaluator_step": "gates",
+        "observed_artifacts_if_planned": ["requirements", "lesson_plan", "worksheet", "assessment"],
+    },
+    "G2": {"scope": "script", "evaluator_step": "gates", "observed_artifacts_if_planned": ["case"]},
+    "G3": {
+        "scope": "script",
+        "evaluator_step": "gates",
+        "observed_artifacts_if_planned": ["learning_design", "teaching_plan", "assessment", "case"],
+    },
+    "G4": {"scope": "script", "evaluator_step": "gates", "observed_artifacts_if_planned": ["assessment", "case"]},
+    "G5": {
+        "scope": "script",
+        "evaluator_step": "gates",
+        "observed_artifacts_if_planned": ["learning_design", "teaching_plan"],
+    },
+    "G6": {
+        "scope": "script",
+        "evaluator_step": "gates",
+        "observed_artifacts_if_planned": [
+            "requirements",
+            "media_plan",
+            "diagrams",
+            "load_review",
+            "animation_decisions",
+            "storyboard",
+        ],
+    },
+    "G7": {"scope": "script", "evaluator_step": "gates", "observed_artifacts_if_planned": ["template_spec"]},
+    "G8": {
+        "scope": "export_manifest",
+        "evaluator_step": "export",
+        "observed_artifacts_if_planned": ["pptx_deck"],
+        # step_export produces the candidate manifest and evaluates G8 in the same
+        # runtime step, so its own producer may be the evaluator node itself.
+        "produced_and_evaluated_in_same_step": ["export_manifest"],
+    },
+}
+GATE_SCOPE = {gate_id: contract["scope"] for gate_id, contract in GATE_CONTRACTS.items()}
+GATE_EVALUATOR_STEP = {gate_id: contract["evaluator_step"] for gate_id, contract in GATE_CONTRACTS.items()}
+GATE_OBSERVED_ARTIFACTS = {
+    gate_id: list(contract["observed_artifacts_if_planned"]) for gate_id, contract in GATE_CONTRACTS.items()
+}
 
 
 # Deliverable outputs that make the script-targeted gates (G1-G7) applicable.
