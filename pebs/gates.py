@@ -354,6 +354,22 @@ def g3_pedagogy(ctx: GateContext, script_artifact: str) -> dict[str, Any]:
                     "next_step": "关联到有效学习目标",
                 }
             )
+    # Spec 19: every progression basis is marked, and model_hypothesis entries must
+    # not enter the formal teaching-material fact section. The ban is a MUST NOT, so
+    # it is raised as an issue like the other deterministic violations.
+    script_text = " ".join(str(unit.get("text") or "") for unit in script.get("units", []))
+    for difficulty in design.get("difficulties", []):
+        if difficulty.get("basis") != "model_hypothesis":
+            continue
+        text = str(difficulty.get("text") or "").strip()
+        if text and text in script_text:
+            issues.append(
+                {
+                    "location": f"script:{section_id}",
+                    "reason": f"模型假设进入正式教材事实部分：{text[:40]}",
+                    "next_step": "标注为教学假设或改为群体层面表述",
+                }
+            )
     status = "FAIL" if issues else "PASS"
     deps = {
         k: v

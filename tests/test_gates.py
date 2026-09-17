@@ -177,3 +177,46 @@ def test_g5_failure_is_visible_to_export_readiness(accepted_build):
     readiness = gates.export_readiness(engine.store)
     assert readiness["ready"] is False
     assert any("G5 状态为 FAIL" in item for item in readiness["blocking"]), readiness["blocking"]
+
+
+HYPOTHESIS_TEXT = "把工作记忆容量当作固定常数"
+
+
+def _with_model_hypothesis(content):
+    content.setdefault("difficulties", []).append({"text": HYPOTHESIS_TEXT, "basis": "model_hypothesis"})
+
+
+def test_g3_fails_when_model_hypothesis_enters_facts(accepted_build):
+    engine = accepted_build
+    _mutate_accepted(engine, "learning_design:sec1", _with_model_hypothesis)
+    _mutate_accepted(
+        engine,
+        "script:sec1",
+        lambda c: c["units"][0].update({"text": f"讲解要点。{HYPOTHESIS_TEXT}，因此按此设计练习。"}),
+    )
+    ctx = gates.GateContext(store=engine.store, evidence=engine.evidence)
+    result = gates.g3_pedagogy(ctx, "script:sec1")
+    assert result["status"] == "FAIL"
+    assert any("模型假设进入正式教材事实部分" in issue["reason"] for issue in result["issues"])
+
+
+def test_g3_allows_model_hypothesis_kept_out_of_facts(accepted_build):
+    engine = accepted_build
+    _mutate_accepted(engine, "learning_design:sec1", _with_model_hypothesis)
+    ctx = gates.GateContext(store=engine.store, evidence=engine.evidence)
+    result = gates.g3_pedagogy(ctx, "script:sec1")
+    assert result["status"] == "PASS", result["issues"]
+
+
+def test_progression_basis_accepts_only_the_documented_values(accepted_build):
+    """Spec 19 lists four bases; anything else fails closed at the schema."""
+    from pebs import schemas
+
+    content = accepted_build.store.accepted_content("learning_design:sec1")
+    for value in ("evidence_supported", "source_derived", "instructor_provided", "model_hypothesis"):
+        content["difficulties"] = [{"text": "标记契约", "basis": value}]
+        schemas.validate(content, "learning_design")
+
+    content["difficulties"] = [{"text": "标记契约", "basis": "model_guess"}]
+    with pytest.raises(schemas.SchemaError):
+        schemas.validate(content, "learning_design")
