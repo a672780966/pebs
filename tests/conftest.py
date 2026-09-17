@@ -37,6 +37,7 @@ class FakeLLM:
         route_payload: dict | None = None,
         external_skill_payloads: list | None = None,
         privacy_payload: dict | None = None,
+        conversation_payload: dict | None = None,
     ):
         self.word_range = word_range
         self.undershoot_first = undershoot_first
@@ -59,6 +60,7 @@ class FakeLLM:
         self.route_payload = route_payload
         self.external_skill_payloads = list(external_skill_payloads or [])
         self.privacy_payload = privacy_payload
+        self.conversation_payload = conversation_payload
         self.calls: dict[str, int] = {}
         self.prompts: list[str] = []
 
@@ -585,6 +587,10 @@ class FakeLLM:
                     },
                 ]
             }
+        if task == "conversation_intent":
+            if self.conversation_payload is None:
+                raise AssertionError("conversation_intent payload not configured")
+            return dict(self.conversation_payload)
         raise AssertionError(f"unexpected task: {task}")
 
 

@@ -2,6 +2,7 @@
   "template-parser": {
     "name": "template-parser",
     "version": "0.1.0",
+    "agent": "curriculum-agent",
     "domain": "education",
     "description": "解析 DOCX/Markdown 模板与材料，生成 template_spec 与 materials",
     "status": "APPROVED",
@@ -12,7 +13,8 @@
     "requires": [],
     "produces": [
       "template_spec",
-      "materials"
+      "materials",
+      "skill_invocations"
     ],
     "optional_requires": [],
     "aliases": [],
@@ -43,6 +45,7 @@
   "requirements-builder": {
     "name": "requirements-builder",
     "version": "0.1.0",
+    "agent": "curriculum-agent",
     "domain": "education",
     "description": "由请求、模板与项目规则生成 Requirements Artifact",
     "status": "APPROVED",
@@ -87,6 +90,7 @@
   "learning-designer": {
     "name": "learning-designer",
     "version": "0.1.0",
+    "agent": "curriculum-agent",
     "domain": "education",
     "description": "Backwards Design：学习目标、知识类型、难点与评价证据",
     "status": "APPROVED",
@@ -133,6 +137,7 @@
   "claim-extractor": {
     "name": "claim-extractor",
     "version": "0.1.0",
+    "agent": "research-agent",
     "domain": "psychology",
     "description": "提取可核验的实证性 Claim（PENDING），排除教学惯例",
     "status": "APPROVED",
@@ -179,6 +184,7 @@
   "evidence-reviewer": {
     "name": "evidence-reviewer",
     "version": "0.1.0",
+    "agent": "research-agent",
     "domain": "psychology",
     "description": "检索用户材料与研究来源，基于可定位原文片段评估 Claim 支持关系；QUALIFY 自动限定改写并重审",
     "status": "APPROVED",
@@ -190,6 +196,10 @@
       "claims_set"
     ],
     "produces": [
+      "evidence_index"
+    ],
+    "emits": [
+      "claims_set",
       "evidence_index"
     ],
     "optional_requires": [
@@ -231,6 +241,7 @@
   "pck-developer": {
     "name": "pck-developer",
     "version": "0.1.0",
+    "agent": "pedagogy-agent",
     "domain": "education",
     "description": "PCK + UDL：按知识类型选策略（消费 SUPPORTED Evidence），输出 teaching_plan",
     "status": "APPROVED",
@@ -280,6 +291,7 @@
   "lesson-designer": {
     "name": "lesson-designer",
     "version": "0.1.0",
+    "agent": "pedagogy-agent",
     "domain": "education",
     "description": "生成教案（目标/重难点/教学过程/板书/作业）",
     "status": "APPROVED",
@@ -324,6 +336,7 @@
   "case-designer": {
     "name": "case-designer",
     "version": "0.1.0",
+    "agent": "pedagogy-agent",
     "domain": "education",
     "description": "设计教学案例（虚构须标注）；新增事实登记为 PENDING Claim",
     "status": "APPROVED",
@@ -336,6 +349,10 @@
     ],
     "produces": [
       "case"
+    ],
+    "emits": [
+      "case",
+      "claims_set"
     ],
     "optional_requires": [
       "requirements"
@@ -370,6 +387,7 @@
   "assessment-designer": {
     "name": "assessment-designer",
     "version": "0.1.0",
+    "agent": "pedagogy-agent",
     "domain": "education",
     "description": "形成性评价与 hinge question（题/答/干扰项/解析一致）",
     "status": "APPROVED",
@@ -414,6 +432,7 @@
   "worksheet-designer": {
     "name": "worksheet-designer",
     "version": "0.1.0",
+    "agent": "pedagogy-agent",
     "domain": "education",
     "description": "学习单（学生版不含答案）",
     "status": "APPROVED",
@@ -458,6 +477,7 @@
   "script-writer": {
     "name": "script-writer",
     "version": "0.1.0",
+    "agent": "pedagogy-agent",
     "domain": "education",
     "description": "课程脚本；仅 SUPPORTED Claim 作为事实，其余待核验占位",
     "status": "APPROVED",
@@ -510,6 +530,7 @@
   "media-router": {
     "name": "media-router",
     "version": "0.1.0",
+    "agent": "media-agent",
     "domain": "media",
     "description": "媒体选型（知识功能/时间依赖/对比依赖 → text/diagram/animation）",
     "status": "APPROVED",
@@ -556,6 +577,7 @@
   "diagram-designer": {
     "name": "diagram-designer",
     "version": "0.1.0",
+    "agent": "media-agent",
     "domain": "media",
     "description": "知识语义 → 视觉语法，生成通过校验的 SVG 图示",
     "status": "APPROVED",
@@ -602,6 +624,7 @@
   "load-reviewer": {
     "name": "load-reviewer",
     "version": "0.1.0",
+    "agent": "media-agent",
     "domain": "media",
     "description": "认知负荷分析 + 双重编码配对（禁止伪精确评分）",
     "status": "APPROVED",
@@ -648,6 +671,7 @@
   "animation-gate": {
     "name": "animation-gate",
     "version": "0.1.0",
+    "agent": "media-agent",
     "domain": "media",
     "description": "Educational Animation Gate（8 判据；静态替代足够即 REJECT）",
     "status": "APPROVED",
@@ -660,6 +684,10 @@
     ],
     "produces": [
       "animation_decisions"
+    ],
+    "emits": [
+      "animation_decisions",
+      "storyboard"
     ],
     "optional_requires": [
       "script"
@@ -696,6 +724,7 @@
   "storyboard-designer": {
     "name": "storyboard-designer",
     "version": "0.1.0",
+    "agent": "media-agent",
     "domain": "media",
     "description": "教学分镜与视频生成提示词；rendered 恒为 false（渲染前停止）",
     "status": "APPROVED",
@@ -707,6 +736,10 @@
       "animation_decisions"
     ],
     "produces": [
+      "storyboard"
+    ],
+    "emits": [
+      "animation_decisions",
       "storyboard"
     ],
     "optional_requires": [
@@ -742,6 +775,7 @@
   "evidence-indexer": {
     "name": "evidence-indexer",
     "version": "0.1.0",
+    "agent": "research-agent",
     "domain": "education",
     "description": "Evidence Index：材料/图示/证据评估 → 资产索引（role/clarity/relevance/risk）",
     "status": "APPROVED",
@@ -787,6 +821,7 @@
   "presentation-planner": {
     "name": "presentation-planner",
     "version": "0.1.0",
+    "agent": "qa-agent",
     "domain": "presentation",
     "description": "Production Planning Table：逐页 11 字段 + 引用/备注",
     "status": "APPROVED",
@@ -833,6 +868,7 @@
   "presentation-composer": {
     "name": "presentation-composer",
     "version": "0.1.0",
+    "agent": "qa-agent",
     "domain": "presentation",
     "description": "原生可编辑 PPTX（形状/表格/备注/幻灯片族/模板）+ 渲染缩略图 + 交付检查",
     "status": "APPROVED",
@@ -880,6 +916,7 @@
   "gate-runner": {
     "name": "gate-runner",
     "version": "0.1.0",
+    "agent": "qa-agent",
     "domain": "education",
     "description": "G1–G7 统一门禁（含自动修正两轮与冲突展示）",
     "status": "APPROVED",
@@ -929,6 +966,7 @@
   "preview-builder": {
     "name": "preview-builder",
     "version": "0.1.0",
+    "agent": "qa-agent",
     "domain": "education",
     "description": "Build Preview（草稿/待核验/门禁状态/媒体与 PPT 摘要）",
     "status": "APPROVED",
@@ -973,6 +1011,7 @@
   "docx-exporter": {
     "name": "docx-exporter",
     "version": "0.1.0",
+    "agent": "qa-agent",
     "domain": "education",
     "description": "导出 DOCX/Markdown/SVG/分镜/提示词/PPTX；草稿标注；正式导出需 G1–G8 与渲染器",
     "status": "APPROVED",
@@ -985,6 +1024,10 @@
     ],
     "produces": [
       "export_manifest"
+    ],
+    "emits": [
+      "export_manifest",
+      "gate_result"
     ],
     "optional_requires": [],
     "aliases": [

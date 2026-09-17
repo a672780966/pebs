@@ -157,8 +157,19 @@ def validate(skills: dict[str, Any] | None = None) -> list[str]:
         ):
             if artifact_type not in ARTIFACT_SCHEMAS:
                 errors.append(f"{name}: unknown artifact type '{artifact_type}'")
+        emits = list(record.get("emits", []))
+        for artifact_type in emits:
+            if artifact_type not in ARTIFACT_SCHEMAS:
+                errors.append(f"{name}: unknown emitted artifact type '{artifact_type}'")
+        missing_emits = [t for t in record.get("produces", []) if t not in (emits or record.get("produces", []))]
+        if emits and missing_emits:
+            errors.append(f"{name}: emits must include every produced type (missing {missing_emits})")
         if record.get("invocation", {}).get("auto") and record.get("status") not in ("APPROVED", "PATCHED"):
             errors.append(f"{name}: auto-invocable skill must be APPROVED/PATCHED (status={record.get('status')})")
+        from .agents.kinds import AGENT_NAMES
+
+        if record.get("agent") not in AGENT_NAMES:
+            errors.append(f"{name}: invalid or missing subagent '{record.get('agent')}'")
         from . import policies
 
         errors.extend(policies.check_skill_record(record))
@@ -172,6 +183,7 @@ def build_runtime_index(skills: dict[str, Any] | None = None) -> dict[str, Any]:
         index["skills"][name] = {
             "runtime": record.get("runtime"),
             "status": record.get("status"),
+            "agent": record.get("agent"),
             "handler": record.get("handler"),
             "requires": record.get("requires", []),
             "produces": record.get("produces", []),

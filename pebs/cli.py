@@ -98,6 +98,27 @@ def cmd_rerun(args: argparse.Namespace) -> int:
     return 0 if status["run"]["status"] == "succeeded" else 2
 
 
+def cmd_resume(args: argparse.Namespace) -> int:
+    engine = Engine(args.project)
+    try:
+        result = engine.resume(
+            args.run,
+            budgets={
+                "model_calls": args.max_model_calls,
+                "research_requests": args.max_research_requests,
+                "run_seconds": args.run_seconds,
+            },
+        )
+    except PlanEditRejected as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    status = engine.run_status(result["run_id"])
+    for step in status["steps"]:
+        print(f"{step['status']:<9} {step['step_id']:<16} {step.get('note') or step.get('error') or ''}")
+    print(f"resumed: {', '.join(result['resumed']) or '-'}")
+    return 0 if status["run"]["status"] == "succeeded" else 2
+
+
 def cmd_delete(args: argparse.Namespace) -> int:
     import shutil
 
@@ -226,6 +247,29 @@ def cmd_claim_review(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_conversation(args: argparse.Namespace) -> int:
+    engine = Engine(args.project)
+    try:
+        result = engine.conversation_edit(args.message, execute=not args.plan_only)
+    except PlanEditRejected as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    patch = {
+        "plan_id": result.get("plan_id"),
+        "intent": result.get("intent", {}).get("intent"),
+        "affected_artifacts": result.get("affected_artifacts", []),
+        "locked_artifacts": result.get("locked_artifacts", []),
+        "step_order": result.get("step_order", []),
+    }
+    print(json.dumps(patch, ensure_ascii=False, indent=2))
+    if args.plan_only:
+        print("仅生成 Patch Plan（未执行）；去掉 --plan-only 可执行局部重建")
+        return 0
+    print(f"run {result.get('run_id')} · {result.get('run_status')}")
+    print(f"changeset {result.get('changeset_id')}（用 decide 接受或拒绝）")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pebs", description="Psychology Education Build System (M0+M1)")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -286,6 +330,20 @@ def main(argv: list[str] | None = None) -> int:
     rerun.add_argument("--project", required=True)
     rerun.add_argument("--step", required=True)
     rerun.set_defaults(func=cmd_rerun)
+
+    resume = sub.add_parser("resume", help="调整预算并续跑被预算阻塞的步骤（规格 84 节）")
+    resume.add_argument("--project", required=True)
+    resume.add_argument("--run", required=True)
+    resume.add_argument("--max-model-calls", type=int, default=None)
+    resume.add_argument("--max-research-requests", type=int, default=None)
+    resume.add_argument("--run-seconds", type=int, default=None)
+    resume.set_defaults(func=cmd_resume)
+
+    conversation = sub.add_parser("conversation", help="用自然语言做局部修改（生成 Patch Plan 并只重建受影响产物）")
+    conversation.add_argument("--project", required=True)
+    conversation.add_argument("--message", required=True)
+    conversation.add_argument("--plan-only", action="store_true")
+    conversation.set_defaults(func=cmd_conversation)
 
     delete = sub.add_parser("delete", help="删除本机项目（托管数据）")
     delete.add_argument("--project", required=True)

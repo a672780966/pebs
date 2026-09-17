@@ -12,6 +12,93 @@ from typing import Any, Iterable
 
 TERMINAL_RUN_STATES = {"succeeded", "failed", "cancelled", "blocked"}
 
+
+class _Result:
+    """sqlite3 游标的安全替身：行已在锁内取完，允许跨线程/延后迭代。"""
+
+    def __init__(self, rows: list[Any], rowcount: int = -1) -> None:
+        self._rows = rows
+        self.rowcount = rowcount
+
+    def fetchall(self) -> list[Any]:
+        return list(self._rows)
+
+    def fetchone(self) -> Any | None:
+        return self._rows[0] if self._rows else None
+
+    def __iter__(self):
+        return iter(self._rows)
+
+    def __len__(self) -> int:
+        return len(self._rows)
+
+    def __getitem__(self, index: int) -> Any:
+        return self._rows[index]
+
+    def __bool__(self) -> bool:
+        return bool(self._rows)
+
+
+class SharedConnection:
+    """线程安全的 sqlite3 连接代理。
+
+    并行 DAG 中多个 Subagent / Skill 节点共享同一连接：所有语句与提交都在
+    同一把可重入锁下串行化，且行在锁内物化，避免共享游标被其他线程重置。
+    """
+
+    def __init__(self, conn: sqlite3.Connection, lock: threading.RLock) -> None:
+        self._conn = conn
+        self._lock = lock
+        self._closed = False
+        self.isolation_level = conn.isolation_level
+        self.row_factory = conn.row_factory
+
+    def _guard(self) -> None:
+        """Refuse cleanly once closed instead of raising from inside sqlite.
+
+        A worker thread that outlives the run reaches this after teardown; a
+        named error is diagnosable, whereas sqlite's `ProgrammingError` from a
+        closed connection surfaces as an unhandled thread exception.
+        """
+        if self._closed:
+            raise StoreError("store is closed")
+
+    def execute(self, sql: str, params: Iterable[Any] = ()) -> _Result:
+        with self._lock:
+            self._guard()
+            cursor = self._conn.execute(sql, tuple(params))
+            return _Result(cursor.fetchall(), cursor.rowcount)
+
+    def executemany(self, sql: str, rows: Iterable[Iterable[Any]]) -> _Result:
+        with self._lock:
+            self._guard()
+            cursor = self._conn.executemany(sql, [tuple(row) for row in rows])
+            return _Result(cursor.fetchall(), cursor.rowcount)
+
+    def executescript(self, script: str) -> _Result:
+        with self._lock:
+            self._guard()
+            cursor = self._conn.executescript(script)
+            return _Result(cursor.fetchall(), cursor.rowcount)
+
+    def commit(self) -> None:
+        with self._lock:
+            self._guard()
+            self._conn.commit()
+
+    def rollback(self) -> None:
+        with self._lock:
+            self._guard()
+            self._conn.rollback()
+
+    def close(self) -> None:
+        with self._lock:
+            if self._closed:
+                return
+            self._closed = True
+            self._conn.close()
+
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
   run_id TEXT PRIMARY KEY,
@@ -159,8 +246,11 @@ class Store:
         self.base_dir = Path(base_dir)
         self.base_dir.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
-        self.conn = sqlite3.connect(str(self.base_dir / "state.db"), check_same_thread=False)
-        self.conn.row_factory = sqlite3.Row
+        raw = sqlite3.connect(
+            str(self.base_dir / "state.db"), check_same_thread=False, isolation_level=None
+        )
+        raw.row_factory = sqlite3.Row
+        self.conn = SharedConnection(raw, self._lock)
         with self._lock:
             self.conn.executescript(SCHEMA)
             self._migrate()
@@ -211,6 +301,11 @@ class Store:
         digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
         with self._lock:
             self.ensure_artifact(artifact_id, artifact_type)
+            # A locked artifact is frozen for the whole edit window, not only at
+            # accept time: without this an edit run could write a revision that
+            # accept_changeset would then refuse, leaving a stranded revision.
+            if self.is_locked(artifact_id):
+                raise ConflictError(f"artifact locked: {artifact_id}")
             row = self._query(
                 "SELECT COALESCE(MAX(version), 0) AS v FROM revisions WHERE artifact_id = ? AND project_id = ?",
                 (artifact_id, self.project_id),
@@ -355,6 +450,10 @@ class Store:
         return changeset_id
 
     def add_changeset_item(self, changeset_id: str, revision_id: str, artifact_id: str) -> None:
+        # Same window as add_revision: a changeset must not be able to reference a
+        # locked artifact at all, so the refusal happens when the item is added.
+        if self.is_locked(artifact_id):
+            raise ConflictError(f"artifact locked: {artifact_id}")
         self._exec(
             "INSERT OR IGNORE INTO changeset_items (changeset_id, revision_id, artifact_id) VALUES (?, ?, ?)",
             (changeset_id, revision_id, artifact_id),
@@ -560,6 +659,39 @@ class Store:
         started = time.mktime(time.strptime(run["created_at"], "%Y-%m-%dT%H:%M:%S"))
         if time.time() - started > run["budget_seconds"]:
             raise BudgetExceeded("run time budget exhausted")
+
+    def set_budgets(self, run_id: str, budgets: dict[str, int]) -> dict[str, int]:
+        """Section 84 resume affordance: adjust a run's budget and report it.
+
+        A key left out (or set to None) keeps its current value; a zero budget is
+        honoured as given.
+        """
+        run = self.get_run(run_id)
+        requested = {key: value for key, value in budgets.items() if value is not None}
+        model_calls = int(requested.get("model_calls", run["budget_model_calls"]))
+        research = int(requested.get("research_requests", run["budget_research"]))
+        seconds = int(requested.get("run_seconds", run["budget_seconds"]))
+        self._exec(
+            "UPDATE runs SET budget_model_calls = ?, budget_research = ?, budget_seconds = ? WHERE run_id = ?",
+            (model_calls, research, seconds, run_id),
+        )
+        return {"model_calls": model_calls, "research_requests": research, "run_seconds": seconds}
+
+    def run_changeset_items(self, run_id: str) -> list[dict[str, Any]]:
+        """Revisions this run already produced, oldest first.
+
+        Resume primes the context with these so completed work is reused
+        instead of being executed a second time.
+        """
+        return [
+            dict(row)
+            for row in self._query(
+                "SELECT i.revision_id, i.artifact_id FROM changeset_items i "
+                "JOIN changesets c ON c.changeset_id = i.changeset_id "
+                "WHERE c.run_id = ? ORDER BY i.rowid",
+                (run_id,),
+            )
+        ]
 
     def cancel_run(self, run_id: str) -> None:
         self._exec("UPDATE runs SET status = 'cancelled', ended_at = ? WHERE run_id = ?", (now_iso(), run_id))

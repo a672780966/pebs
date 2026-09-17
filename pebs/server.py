@@ -109,6 +109,11 @@ class ClaimReviewIn(BaseModel):
     quote_location: str = ""
 
 
+class ConversationIn(BaseModel):
+    message: str
+    execute: bool = True
+
+
 @app.get("/api/registry")
 def registry_report() -> dict[str, Any]:
     return {"skills": skills_mgr.list_skills()}
@@ -249,6 +254,88 @@ def edit_plan(project_id: str, payload: PlanEditIn) -> dict[str, Any]:
         return get_engine(project_id).edit_plan(payload.op, payload.step_id, payload.index)
     except PlanEditRejected as exc:
         return JSONResponse(status_code=409, content={"ok": False, "reason": str(exc)})
+
+
+@app.post("/api/projects/{project_id}/conversation")
+def conversation(project_id: str, payload: ConversationIn) -> dict[str, Any]:
+    engine = get_engine(project_id)
+    try:
+        return engine.conversation_edit(payload.message, execute=payload.execute)
+    except PlanEditRejected as exc:
+        return JSONResponse(status_code=409, content={"ok": False, "reason": str(exc)})
+
+
+@app.get("/api/projects/{project_id}/patch-plan")
+def get_patch_plan(project_id: str) -> dict[str, Any]:
+    store = get_engine(project_id).store
+    content = store.accepted_content("patch_plan")
+    if not content:
+        raise HTTPException(status_code=404, detail="no patch plan")
+    return content
+
+
+@app.get("/api/projects/{project_id}/dynamic-plan")
+def get_dynamic_plan(project_id: str) -> dict[str, Any]:
+    store = get_engine(project_id).store
+    plan = store.accepted_content("build_plan_dynamic")
+    if not plan:
+        return {"mode": "static", "nodes": [], "human_steps": []}
+    return {
+        "mode": plan.get("mode", "dynamic"),
+        "plan_id": plan.get("plan_id"),
+        "goal": plan.get("goal"),
+        "nodes": plan.get("nodes", []),
+        "terminal_outputs": plan.get("terminal_outputs", []),
+        "reused_artifacts": plan.get("reused_artifacts", []),
+        "human_steps": human_steps(plan),
+    }
+
+
+def human_steps(plan: dict[str, Any]) -> list[dict[str, Any]]:
+    """把内部节点翻译成人话（§40），内部 node_id / skill 只在高级模式显示。"""
+    from . import registry
+
+    human_titles = {
+        "template-parser": "解析课程要求与模板",
+        "requirements-builder": "整理课程要求",
+        "learning-designer": "设计学习目标与难点",
+        "claim-extractor": "提取待核验的心理学事实",
+        "evidence-reviewer": "核验心理学事实",
+        "pck-developer": "设计教学策略",
+        "lesson-designer": "设计教学活动",
+        "assessment-designer": "设计评价方式",
+        "case-designer": "编写教学案例",
+        "worksheet-designer": "设计学习单",
+        "script-writer": "编写课程脚本",
+        "media-router": "选择媒体形式",
+        "load-reviewer": "检查认知负荷",
+        "diagram-designer": "生成图示",
+        "animation-gate": "审查动画必要性",
+        "storyboard-designer": "生成动画分镜",
+        "evidence-indexer": "整理证据索引",
+        "presentation-planner": "规划幻灯片",
+        "presentation-composer": "生成 PPT",
+        "gate-runner": "质量检查",
+        "preview-builder": "生成预览",
+        "docx-exporter": "导出正式文档",
+    }
+    steps = []
+    for node in plan.get("nodes", []):
+        skill = node.get("skill")
+        steps.append(
+            {
+                "title": human_titles.get(skill, node.get("title") or skill),
+                "status": "reuse" if node.get("reused") else "planned",
+                "advanced": {
+                    "node_id": node.get("node_id"),
+                    "skill": skill,
+                    "agent": (registry.get(skill) or {}).get("agent"),
+                    "depends_on": node.get("depends_on", []),
+                    "parallel_group": node.get("parallel_group"),
+                },
+            }
+        )
+    return steps
 
 
 @app.get("/api/projects/{project_id}/artifacts")

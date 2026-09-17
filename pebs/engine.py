@@ -53,6 +53,8 @@ class Engine:
         self.hooks = Hooks(self.store, self.evidence, self.permissions)
         self.llm = get_llm()
         self.research = get_research()
+        self._run_threads: list[threading.Thread] = []
+        self._thread_lock = threading.Lock()
         self._recover_interrupted()
 
     def _recover_interrupted(self) -> None:
@@ -67,8 +69,29 @@ class Engine:
                     )
             self.store.set_run_status(run["run_id"], "interrupted")
 
-    def close(self) -> None:
+    def close(self, *, join_timeout: float | None = 30.0) -> None:
+        """Join in-flight run threads before closing the store.
+
+        A worker still running when the connection closes would fail with an
+        unhandled thread exception and could leave a run record half-written, so
+        the teardown order is: stop accepting work, join, then close.
+        """
+        self._join_run_threads(join_timeout)
         self.store.close()
+
+    def _join_run_threads(self, timeout: float | None) -> None:
+        with self._thread_lock:
+            threads = [thread for thread in self._run_threads if thread.is_alive()]
+            self._run_threads = threads
+        for thread in threads:
+            thread.join(timeout)
+
+    def _track_run_thread(self, thread: threading.Thread) -> None:
+        """Start a run thread and keep it for the close-time join."""
+        thread.start()
+        with self._thread_lock:
+            self._run_threads = [item for item in self._run_threads if item.is_alive()]
+            self._run_threads.append(thread)
 
     # ------------------------------------------------------------------ context
 
@@ -154,7 +177,7 @@ class Engine:
             args=(run_id, changeset_id, request, template_path, material_paths, environment, dynamic_plan),
             daemon=True,
         )
-        thread.start()
+        self._track_run_thread(thread)
         return {
             "run_id": run_id,
             "changeset_id": changeset_id,
@@ -288,7 +311,7 @@ class Engine:
             args=(run_id, changeset_id, request, template_path, material_paths, environment),
             daemon=True,
         )
-        thread.start()
+        self._track_run_thread(thread)
         return {"run_id": run_id, "changeset_id": changeset_id}
 
     def _execute(
@@ -355,6 +378,8 @@ class Engine:
                 )
             except pipeline.StepBlocked as exc:
                 self.store.set_step(run_id, step_id, status="BLOCKED", error=str(exc))
+            except ConflictError as exc:
+                self.store.set_step(run_id, step_id, status="BLOCKED", error=f"preserve 契约阻止写入：{exc}")
             except pipeline.StepFailed as exc:
                 self.store.set_step(run_id, step_id, status="FAILED", error=str(exc))
             except BudgetExceeded as exc:
@@ -395,6 +420,63 @@ class Engine:
     def cancel(self, run_id: str) -> dict[str, Any]:
         self.store.cancel_run(run_id)
         return self.run_status(run_id)
+
+    def resume(self, run_id: str, *, budgets: dict[str, int] | None = None) -> dict[str, Any]:
+        """Section 84 resume: adjust the budget, then re-dispatch budget-blocked steps.
+
+        Only steps whose recorded failure is a budget abort are re-dispatched; a
+        step blocked for any other reason would fail the same way again. Work
+        this run already produced is primed into the context, so completed nodes
+        are reused rather than executed a second time.
+        """
+        run = self.store.get_run(run_id)
+        applied = self.store.set_budgets(run_id, budgets) if budgets else None
+        blocked = [
+            step["step_id"]
+            for step in self.store.get_steps(run_id)
+            if step["status"] == "BLOCKED" and "预算耗尽" in (step.get("error") or "")
+        ]
+        if not blocked:
+            self._finalize_run_status(run_id)
+            return {
+                "run_id": run_id,
+                "resumed": [],
+                "budgets": applied,
+                "reason": "没有预算阻塞的步骤",
+                "run_status": self.store.get_run(run_id)["status"],
+            }
+        inputs = run.get("inputs") or {}
+        changeset_id = self.store.create_changeset(
+            run_id, f"resume: {run_id}", self.store.current_baseline()
+        )
+        ctx = self._new_context(
+            run_id=run_id,
+            changeset_id=changeset_id,
+            request=run["request"],
+            template_path=Path(inputs["template_path"]) if inputs.get("template_path") else None,
+            material_paths=[Path(path) for path in inputs.get("material_paths", [])],
+            environment=run["environment"],
+            explicit_skills=inputs.get("explicit_skills") or [],
+        )
+        for item in self.store.run_changeset_items(run_id):
+            ctx.outputs.setdefault(item["artifact_id"], item["revision_id"])
+        self.store.set_run_status(run_id, "running")
+        if inputs.get("planner") == "dynamic":
+            plan = self.store.accepted_content("build_plan_dynamic") or {}
+            if not plan.get("nodes"):
+                raise PlanEditRejected("找不到可恢复的动态计划")
+            from .runtime import executor as executor_mod
+
+            executor_mod.execute_plan(engine=self, run_id=run_id, ctx=ctx, plan=plan)
+        else:
+            self._run_steps(ctx, run_id, step_ids=set(blocked))
+        return {
+            "run_id": run_id,
+            "resumed": sorted(blocked),
+            "budgets": applied,
+            "changeset_id": changeset_id,
+            "run_status": self.store.get_run(run_id)["status"],
+        }
 
     def rerun_from(self, step_id: str, *, environment: str | None = None) -> dict[str, Any]:
         plan = self.current_plan()
@@ -475,6 +557,7 @@ class Engine:
             result = self.store.accept_changeset(changeset_id)
         except ConflictError as exc:
             return {"ok": False, "reason": str(exc)}
+        self._release_patch_locks(changeset_id)
         result["published"] = self._publish_formal(changeset_id)
         memory.write_memory(self.store)
         return result
@@ -484,8 +567,34 @@ class Engine:
             result = self.store.reject_changeset(changeset_id)
         except ConflictError as exc:
             return {"ok": False, "reason": str(exc)}
+        self._release_patch_locks(changeset_id)
         self._discard_staging(changeset_id)
         return result
+
+    def _patch_locks(self, changeset_id: str) -> list[str]:
+        """Conversational Patch 的 preserve 集合：由 Store 强制执行（accept/reject 时释放）。"""
+        try:
+            changeset = self.store.get_changeset(changeset_id)
+            run = self.store.get_run(changeset["run_id"]) if changeset.get("run_id") else None
+        except Exception:  # noqa: BLE001 - 无 run 的 changeset 没有 patch 锁
+            return []
+        raw_inputs = (run or {}).get("inputs") or {}
+        if isinstance(raw_inputs, str):
+            try:
+                raw_inputs = json.loads(raw_inputs)
+            except json.JSONDecodeError:
+                raw_inputs = {}
+        plan_id = raw_inputs.get("patch_plan")
+        if not plan_id:
+            return []
+        content = self.store.accepted_content("patch_plan") or {}
+        if content.get("plan_id") != plan_id:
+            return []
+        return list(content.get("locked_artifacts", []))
+
+    def _release_patch_locks(self, changeset_id: str) -> None:
+        for artifact_id in self._patch_locks(changeset_id):
+            self.store.set_locked(artifact_id, False)
 
     def _staging_dir(self, changeset_id: str) -> Path:
         return Path(self.store.base_dir) / "outputs" / "staging" / changeset_id
@@ -715,6 +824,128 @@ class Engine:
 
     def review_claim(self, claim_id: str, version: int, **kwargs: Any) -> dict[str, Any]:
         return self.evidence.review_claim(claim_id, version, **kwargs)
+
+    def conversation_edit(self, message: str, *, execute: bool = True) -> dict[str, Any]:
+        from . import registry as skill_registry
+        from .conversation import impact as impact_mod
+        from .conversation import interpreter as interpreter_mod
+        from .conversation import patch_plan as patch_mod
+        from .conversation import resolver as resolver_mod
+
+        if not (message or "").strip():
+            raise PlanEditRejected("修改消息为空")
+        requirements = self.store.accepted_content("requirements") or {}
+        sections = requirements.get("sections", [])
+        artifacts = self.store.list_artifacts()
+        slides = (self.store.accepted_content("slide_plan") or {}).get("rows", [])
+        script_units: list[dict[str, Any]] = []
+        for section in sections:
+            script = self.store.accepted_content(f"script:{section['section_id']}") or {}
+            for unit in script.get("units", []):
+                script_units.append({"section_id": section["section_id"], "text": unit.get("text", "")})
+
+        intent = interpreter_mod.interpret(message, llm=self.llm, sections=sections)
+        resolved = resolver_mod.resolve(
+            message, intent, sections=sections, artifacts=artifacts, slides=slides, script_units=script_units
+        )
+        target_ids = list(resolved["artifact_ids"])
+        if not target_ids and resolved["section_ids"]:
+            for artifact in artifacts:
+                if not artifact.get("accepted_rev"):
+                    continue
+                parts = artifact["artifact_id"].split(":")[1:]
+                if any(section_id in parts for section_id in resolved["section_ids"]):
+                    target_ids.append(artifact["artifact_id"])
+        if not target_ids:
+            raise PlanEditRejected(f"无法定位修改目标：{message}")
+
+        impact_result = impact_mod.impact(self.store, target_ids)
+        write_types: set[str] = set()
+        for artifact_id in impact_result["affected"]:
+            type_name = artifact_id.split(":", 1)[0]
+            for producer in skill_registry.producers_of(type_name):
+                record = skill_registry.get(producer) or {}
+                write_types.update(record.get("emits") or record.get("produces", []))
+        affected = set(impact_result["affected"])
+        target_set = set(target_ids)
+        section_scope = set(resolved["section_ids"])
+        for artifact in artifacts:
+            if not artifact.get("accepted_rev") or artifact["artifact_type"] not in write_types:
+                continue
+            artifact_id = artifact["artifact_id"]
+            if ":" in artifact_id and section_scope:
+                parts = artifact_id.split(":")[1:]
+                if not any(part in section_scope for part in parts):
+                    continue
+            affected.add(artifact_id)
+        impact_result["affected"] = sorted(affected)
+        ordered = [artifact_id for artifact_id in impact_result["order"] if artifact_id in affected]
+        impact_result["order"] = ordered + sorted(affected - set(ordered))
+        step_filter = set()
+        # Producers are indexed by pointer artifact_type: a gate artifact is
+        # registered as `gate_result` while its id reads `gate:G1:script:sec2`.
+        # Resolve both, or the gate step is never re-run and a rebuilt section
+        # keeps the stale gate results of the previous revision.
+        producer_types = {artifact_id.split(":", 1)[0] for artifact_id in affected}
+        producer_types.update(
+            artifact["artifact_type"] for artifact in artifacts if artifact["artifact_id"] in affected
+        )
+        for type_name in producer_types:
+            for producer in skill_registry.producers_of(type_name):
+                record = skill_registry.get(producer) or {}
+                step_filter.update(record.get("handler", {}).get("steps", []))
+        locked = sorted(
+            artifact["artifact_id"]
+            for artifact in artifacts
+            if artifact.get("accepted_rev")
+            and artifact["artifact_id"] not in affected
+            and artifact["artifact_id"] not in target_set
+        )
+        patch = patch_mod.build(
+            message=message,
+            intent=intent,
+            resolved=resolved,
+            impact_result=impact_result,
+            accepted_artifacts={artifact["artifact_id"]: artifact for artifact in artifacts},
+            locked_artifacts=locked,
+        )
+        info = self.store.add_revision(
+            artifact_id="patch_plan",
+            artifact_type="patch_plan",
+            content=patch,
+            produced_by="conversation",
+            rules_version=config.RULES_VERSION,
+        )
+        self.store.set_accepted("patch_plan", info["revision_id"])
+        if not execute:
+            return patch
+
+        run_id = self.store.create_run(
+            request=message,
+            budgets=config.RULES.get("budgets", {}),
+            inputs={"conversation": True, "patch_plan": patch["plan_id"]},
+        )
+        changeset_id = self.store.create_changeset(
+            run_id, f"conversation: {message[:60]}", self.store.current_baseline()
+        )
+        ctx = self._new_context(
+            run_id=run_id,
+            changeset_id=changeset_id,
+            request=message,
+            template_path=None,
+            material_paths=[],
+            environment="production",
+        )
+        ctx.section_filter = resolved["section_ids"] or None
+        for artifact_id in locked:
+            self.store.set_locked(artifact_id, True)
+        self._run_steps(ctx, run_id, step_ids=step_filter)
+        return {
+            **patch,
+            "run_id": run_id,
+            "changeset_id": changeset_id,
+            "run_status": self.store.get_run(run_id)["status"],
+        }
 
     # ------------------------------------------------------------------ export on demand
 

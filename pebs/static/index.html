@@ -77,7 +77,20 @@ th { color:var(--muted); font-weight:600; }
       <span class="muted small" id="runLabel"></span>
       <span class="muted small" id="budgetLabel"></span>
     </div>
-    <h2 style="margin-top:14px">PLAN</h2>
+    <h2 style="margin-top:14px">CONVERSATION · 局部修改</h2>
+    <textarea id="conversation" placeholder="用自然语言说明要改什么，例如：第2节案例太理论了，换成大学宿舍里的情境，第1和第3节不要动。"></textarea>
+    <div class="row small">
+      <button class="primary" onclick="sendConversation(true)">执行局部修改</button>
+      <button onclick="sendConversation(false)">只生成 Patch Plan</button>
+      <span class="muted small">修改只重建受影响产物；被 preserve 的产物由 Store 锁定</span>
+    </div>
+    <div id="conversationResult"></div>
+    <h2 style="margin-top:14px">
+      PLAN
+      <label class="muted small" style="font-weight:normal">
+        <input type="checkbox" id="advancedMode" onchange="renderPlan(lastSteps)"> 高级模式（Skill / DAG / node）
+      </label>
+    </h2>
     <div id="plan"></div>
     <h2 style="margin-top:14px">变更集（候选）</h2>
     <div id="changesets"></div>
@@ -155,6 +168,8 @@ th { color:var(--muted); font-weight:600; }
 let project = "demo";
 let currentRun = null;
 let pollTimer = null;
+let lastSteps = [];
+let lastHumanPlan = [];
 
 async function api(path, options) {
   const res = await fetch(path, options);
@@ -240,7 +255,7 @@ async function pollRun() {
   document.getElementById("runLabel").textContent = `run ${currentRun} · ${status.run.status} · ${status.run.environment}`;
   if (status.run.status !== "running") {
     clearInterval(pollTimer); pollTimer = null;
-    loadChangesets(); loadPreview(); loadGates(); loadEvidence(); loadOutputs();
+    loadChangesets(); loadPreview(); loadGates(); loadEvidence(); loadOutputs(); loadHumanPlan();
   }
 }
 
@@ -252,15 +267,28 @@ async function cancelRun() {
 async function refreshPlan() {
   const plan = await api(`/api/projects/${encodeURIComponent(project)}/plan`);
   renderPlan((plan.steps || []).map(s => ({ ...s, status: s.status })));
+  loadHumanPlan();
 }
 
 function renderPlan(steps) {
+  lastSteps = steps || [];
   const el = document.getElementById("plan");
-  el.innerHTML = (steps || []).map(s => `
+  const advanced = document.getElementById("advancedMode")?.checked;
+  const human = (lastHumanPlan && lastHumanPlan.length) ? lastHumanPlan : [];
+  if (!advanced && human.length) {
+    el.innerHTML = human.map(s => `
+      <div class="step">
+        <span class="badge ${s.status === "reuse" ? "SUCCEEDED" : "PENDING"}">${s.status === "reuse" ? "复用" : "计划"}</span>
+        <span class="name">${esc(s.title)}</span>
+      </div>`).join("");
+    return;
+  }
+  el.innerHTML = lastSteps.map(s => `
     <div class="step">
       <span class="badge ${esc(s.status)}">${esc(s.status)}</span>
       <span class="name">${esc(s.title || s.step_id)}</span>
       <span class="note muted">${esc(s.note || s.error || "")}</span>
+      ${advanced ? `<span class="muted small">${esc(s.step_id)}</span>` : ""}
       ${s.kind !== "gate" && s.kind !== "export" ? `
         <button class="small" onclick="planEdit('${esc(s.step_id)}','${s.disabled ? "enable" : "disable"}')">${s.disabled ? "启用" : "禁用"}</button>
       ` : ""}
@@ -268,6 +296,36 @@ function renderPlan(steps) {
       <button class="small" onclick="rerunFrom('${esc(s.step_id)}')">重跑</button>
       <button class="small" onclick="planEdit('${esc(s.step_id)}','move',-1)">↑</button>
     </div>`).join("");
+}
+
+async function loadHumanPlan() {
+  const data = await api(`/api/projects/${encodeURIComponent(project)}/dynamic-plan`);
+  lastHumanPlan = data.human_steps || [];
+  renderPlan(lastSteps);
+}
+
+async function sendConversation(execute) {
+  const message = document.getElementById("conversation").value.trim();
+  const el = document.getElementById("conversationResult");
+  if (!message) { alert("请先用自然语言描述修改"); return; }
+  const result = await api(`/api/projects/${encodeURIComponent(project)}/conversation`, {
+    method:"POST", headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ message, execute })
+  });
+  if (result.reason) { el.innerHTML = `<p class="muted small">未执行：${esc(result.reason)}</p>`; return; }
+  const intent = result.intent || {};
+  const affected = (result.affected_artifacts || []).length;
+  const locked = (result.locked_artifacts || []).length;
+  el.innerHTML = `
+    <p class="small">意图 <b>${esc(intent.intent || "revise")}</b> · 影响 ${affected} 个产物 · 锁定 ${locked} 个产物
+      ${result.run_status ? `· 运行 ${esc(result.run_status)}` : "（未执行）"}</p>
+    ${result.changeset_id ? `<p class="small"><button onclick="decide('${esc(result.changeset_id)}','accept')">接受</button>
+      <button onclick="decide('${esc(result.changeset_id)}','reject')">拒绝</button>
+      <button onclick="loadDiff('${esc(result.changeset_id)}')">查看 Diff</button></p>` : ""}
+    <p class="muted small">影响：${esc((result.affected_artifacts || []).slice(0, 12).join("、"))}</p>
+    <p class="muted small">锁定：${esc((result.locked_artifacts || []).slice(0, 12).join("、"))}</p>`;
+  if (result.run_id) { currentRun = result.run_id; pollTimer = setInterval(pollRun, 1500); pollRun(); }
+  loadChangesets();
 }
 
 async function planEdit(stepId, op, index) {

@@ -132,6 +132,53 @@ def test_g_runtime_skill_calls_resolve_in_registry():
         assert record.get("status") in ("APPROVED", "PATCHED"), f"{name} used at runtime but status={record.get('status')}"
 
 
+def test_h_registry_declares_every_emitted_artifact_type():
+    """静态扫描 pipeline：Runtime 真正 emit 的 artifact 类型必须被 Registry 声明（emits）。"""
+    import ast
+
+    source = (Path(__file__).resolve().parent.parent / "pebs" / "pipeline.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    emitted: dict[str, set[str]] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        types: set[str] = set()
+        for sub in ast.walk(node):
+            if not isinstance(sub, ast.Call):
+                continue
+            func_name = getattr(sub.func, "attr", None) or getattr(sub.func, "id", None)
+            if func_name != "emit" or len(sub.args) < 2:
+                continue
+            arg = sub.args[1]
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                types.add(arg.value)
+        if types:
+            emitted[node.name] = types
+
+    skills = registry.load_skills()
+    for name, record in skills.items():
+        if record.get("runtime") != "builtin":
+            continue
+        declared = set(record.get("emits") or record.get("produces", []))
+        for step_id in record.get("handler", {}).get("steps", []):
+            handler = pipeline.STEPS.get(step_id)
+            if handler is None:
+                continue
+            runtime_types = emitted.get(handler.__name__, set())
+            undeclared = runtime_types - declared
+            assert not undeclared, (
+                f"{name} step '{step_id}' emits undeclared artifact types {sorted(undeclared)}; "
+                f"declared emits={sorted(declared)}"
+            )
+
+
+def test_i_every_skill_is_assigned_to_a_subagent():
+    from pebs.agents.kinds import AGENT_NAMES
+
+    for name, record in registry.load_skills().items():
+        assert record.get("agent") in AGENT_NAMES, f"{name} has no valid subagent: {record.get('agent')}"
+
+
 def test_denylist_blocks_skill():
     assert registry.is_denied("skills-mgr")
     assert not registry.is_denied("script-writer")

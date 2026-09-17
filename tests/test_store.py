@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from pebs.store import ConflictError, Store
+from conftest import REQUEST_2
+from pebs.store import ConflictError, Store, StoreError
 
 
 @pytest.fixture
@@ -72,15 +73,64 @@ def test_reject_leaves_accepted_untouched(store):
 
 
 def test_locked_artifact_cannot_be_modified(store):
+    """A changeset built before the lock must not be able to accept it."""
     rev1 = add(store, "doc", {"v": 1})
     accept(store, [(rev1["revision_id"], "doc")])
-    store.set_locked("doc", True)
     rev2 = add(store, "doc", {"v": 2})
     cs = store.create_changeset(None, "candidate", store.current_baseline())
     store.add_changeset_item(cs, rev2["revision_id"], "doc")
+    # The lock arrives after the changeset exists: accept still refuses.
+    store.set_locked("doc", True)
     with pytest.raises(ConflictError):
         store.accept_changeset(cs)
     assert store.accepted_rev_id("doc") == rev1["revision_id"]
+
+
+def test_locked_artifact_rejects_write_before_accept(store):
+    """The write window is closed too: no revision and no changeset item."""
+    rev1 = add(store, "doc", {"v": 1})
+    accept(store, [(rev1["revision_id"], "doc")])
+    store.set_locked("doc", True)
+
+    with pytest.raises(ConflictError):
+        add(store, "doc", {"v": 2})
+    with pytest.raises(ConflictError):
+        store.add_changeset_item("cs_absent", rev1["revision_id"], "doc")
+
+    # Nothing was written, and unlocking restores the ordinary path.
+    assert store.get_revision(rev1["revision_id"])["content"] == {"v": 1}
+    store.set_locked("doc", False)
+    rev2 = add(store, "doc", {"v": 2})
+    assert rev2["version"] == 2
+
+
+@pytest.mark.filterwarnings("error::pytest.PytestUnhandledThreadExceptionWarning")
+def test_run_teardown_leaves_no_thread_exception(engine):
+    """close() joins the run threads before closing the connection.
+
+    A worker that outlives teardown would touch a closed sqlite connection and
+    raise inside its own thread, which pytest reports as an unhandled thread
+    exception. Cancelling first makes the race real rather than theoretical.
+    """
+    start = engine.start_build(REQUEST_2, material_paths=[], planner_mode="dynamic")
+    engine.cancel(start["run_id"])
+
+    engine.close(join_timeout=30)
+
+    assert all(not thread.is_alive() for thread in engine._run_threads)
+    with pytest.raises(StoreError):
+        engine.store.list_artifacts()
+    # The joined worker left a terminal record on disk, not a half-written run.
+    reopened = Store("testproj", engine.base)
+    try:
+        assert reopened.get_run(start["run_id"])["status"] in {
+            "cancelled",
+            "blocked",
+            "succeeded",
+            "failed",
+        }
+    finally:
+        reopened.close()
 
 
 def test_accept_excludes_changeset_items_from_staleness(store):

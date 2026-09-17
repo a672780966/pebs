@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -40,6 +41,42 @@ class CancelledRun(Exception):
     pass
 
 
+class _ThreadSafeOutputs(dict):
+    """输出映射：迭代返回快照，允许并行 DAG 节点同时 emit。"""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._lock = threading.RLock()
+
+    def __setitem__(self, key: str, value: str) -> None:
+        with self._lock:
+            super().__setitem__(key, value)
+
+    def __delitem__(self, key: str) -> None:
+        with self._lock:
+            super().__delitem__(key)
+
+    def __iter__(self):
+        with self._lock:
+            return iter(list(super().keys()))
+
+    def keys(self) -> list[str]:
+        with self._lock:
+            return list(super().keys())
+
+    def values(self) -> list[str]:
+        with self._lock:
+            return list(super().values())
+
+    def items(self) -> list[tuple[str, str]]:
+        with self._lock:
+            return list(super().items())
+
+    def copy(self) -> dict[str, str]:
+        with self._lock:
+            return dict(super().items())
+
+
 @dataclass
 class PipelineContext:
     store: Store
@@ -55,7 +92,7 @@ class PipelineContext:
     environment: str = "production"
     template_path: Path | None = None
     material_paths: list[Path] = field(default_factory=list)
-    outputs: dict[str, str] = field(default_factory=dict)
+    outputs: dict[str, str] = field(default_factory=_ThreadSafeOutputs)
     section_filter: list[str] | None = None
     explicit_skills: list[str] = field(default_factory=list)
 
@@ -513,7 +550,7 @@ claim_type 取 descriptive/correlational/predictive/causal/mechanistic/theoretic
         claims.append({**record, "text": text, "claim_type": item.get("claim_type", "descriptive")})
     content = {"claims": claims, "unavailable": []}
     deps = [r for r in [ctx.rev(f"learning_design:{s['section_id']}") for s in ctx.sections()] if r]
-    ctx.emit("claims", "claims", content, "claim-extractor", deps=deps)
+    ctx.emit("claims", "claims_set", content, "claim-extractor", deps=deps)
     return {"notes": [f"登记 {len(claims)} 条待核验 Claim"]}
 
 
@@ -820,7 +857,7 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
     if updated:
         ctx.emit(
             "claims",
-            "claims",
+            "claims_set",
             {"claims": current_claims, "unavailable": []},
             "claim-extractor",
             deps=[r for r in [ctx.rev("claims")] if r],
@@ -988,7 +1025,7 @@ def step_cases(ctx: PipelineContext) -> dict[str, Any]:
             }
         ctx.emit(
             "claims",
-            "claims",
+            "claims_set",
             {"claims": list(merged.values()), "unavailable": claims_doc.get("unavailable", [])},
             "case-designer",
             deps=[r for r in [ctx.rev("claims")] if r],
@@ -1715,7 +1752,13 @@ def step_slide_plan(ctx: PipelineContext) -> dict[str, Any]:
         schemas.validate(data, "slide_plan")
     except schemas.SchemaError as exc:
         raise StepFailed(f"slide_plan schema: {exc}") from exc
-    deps = [r for r in [ctx.rev("evidence_assets")] if r]
+    deps = [
+        r
+        for r in [ctx.rev("evidence_assets")]
+        + [ctx.rev(f"script:{s['section_id']}") for s in _deck_sections(ctx)]
+        + [ctx.rev(f"diagrams:{s['section_id']}") for s in _deck_sections(ctx)]
+        if r
+    ]
     ctx.emit("slide_plan", "slide_plan", data, "presentation-planner", deps=deps)
     return {"notes": [f"规划 {len(data.get('rows', []))} 页"] + notes}
 
@@ -1890,7 +1933,13 @@ def step_pptx(ctx: PipelineContext) -> dict[str, Any]:
         schemas.validate(content, "pptx_deck")
     except schemas.SchemaError as exc:
         raise StepFailed(f"pptx_deck schema: {exc}") from exc
-    deps = [r for r in [ctx.rev("slide_plan")] if r]
+    deps = [
+        r
+        for r in [ctx.rev("slide_plan")]
+        + [ctx.rev(f"diagrams:{s['section_id']}") for s in _deck_sections(ctx)]
+        + [ctx.rev(f"storyboard:{s['section_id']}") for s in _deck_sections(ctx)]
+        if r
+    ]
     ctx.emit("pptx_deck", "pptx_deck", content, "presentation-composer", deps=deps)
     notes = [f"{built['stats']['slides']} 页，QA={status}，渲染器={renderer or '无'}，缩略图={len(thumbnails)}"]
     if built.get("template_used"):
@@ -2127,7 +2176,17 @@ def step_export(ctx: PipelineContext) -> dict[str, Any]:
     readiness = gates.export_readiness_with_overrides(gate_ctx)
     mode = "formal" if readiness["ready"] else "draft"
     manifest = export_mod.write_exports(ctx, mode=mode, gate_ctx=gate_ctx)
-    info = ctx.emit("export_manifest", "export_manifest", manifest, "docx-exporter")
+    export_deps = sorted(
+        {
+            rev
+            for rev in [ctx.rev(f"script:{s['section_id']}") for s in _deck_sections(ctx)]
+            + [ctx.rev(f"lesson_plan:{s['section_id']}") for s in _deck_sections(ctx)]
+            + [ctx.rev(f"worksheet:{s['section_id']}") for s in _deck_sections(ctx)]
+            + [ctx.rev("slide_plan"), ctx.rev("pptx_deck"), ctx.rev("preview")]
+            if rev
+        }
+    )
+    info = ctx.emit("export_manifest", "export_manifest", manifest, "docx-exporter", deps=export_deps)
     gate_ctx.overrides["export_manifest"] = info["revision_id"]
     g8 = gates.g8_artifact(gate_ctx, "export_manifest")
     if mode == "formal" and g8["status"] != "PASS":

@@ -4,6 +4,7 @@
     "animation-gate": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "media-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_storyboard",
         "steps": [
@@ -37,6 +38,7 @@
     "assessment-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "pedagogy-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_assessments",
         "steps": [
@@ -66,6 +68,7 @@
     "case-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "pedagogy-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_cases",
         "steps": [
@@ -97,6 +100,7 @@
     "claim-extractor": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "research-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_claims",
         "steps": [
@@ -128,6 +132,7 @@
     "diagram-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "media-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_diagrams",
         "steps": [
@@ -159,6 +164,7 @@
     "docx-exporter": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "qa-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_export",
         "steps": [
@@ -190,6 +196,7 @@
     "evidence-indexer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "research-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_evidence_assets",
         "steps": [
@@ -222,6 +229,7 @@
     "evidence-reviewer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "research-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_evidence",
         "steps": [
@@ -258,6 +266,7 @@
     "gate-runner": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "qa-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_gates",
         "steps": [
@@ -294,6 +303,7 @@
     "learning-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "curriculum-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_learning_design",
         "steps": [
@@ -325,6 +335,7 @@
     "lesson-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "pedagogy-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_lesson_plans",
         "steps": [
@@ -354,6 +365,7 @@
     "load-reviewer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "media-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_load_review",
         "steps": [
@@ -385,6 +397,7 @@
     "media-router": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "media-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_media_plan",
         "steps": [
@@ -416,6 +429,7 @@
     "pck-developer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "pedagogy-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_teaching_plan",
         "steps": [
@@ -450,6 +464,7 @@
     "presentation-composer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "qa-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_pptx",
         "steps": [
@@ -482,6 +497,7 @@
     "presentation-planner": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "qa-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_slide_plan",
         "steps": [
@@ -513,6 +529,7 @@
     "preview-builder": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "qa-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_preview",
         "steps": [
@@ -544,6 +561,7 @@
     "requirements-builder": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "curriculum-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_requirements",
         "steps": [
@@ -575,6 +593,7 @@
     "script-writer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "pedagogy-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_scripts",
         "steps": [
@@ -612,6 +631,7 @@
     "storyboard-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "media-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_storyboard",
         "steps": [
@@ -643,6 +663,7 @@
     "template-parser": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "curriculum-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_parse_inputs",
         "steps": [
@@ -652,7 +673,8 @@
       "requires": [],
       "produces": [
         "template_spec",
-        "materials"
+        "materials",
+        "skill_invocations"
       ],
       "optional_requires": [],
       "invocation": {
@@ -671,6 +693,7 @@
     "worksheet-designer": {
       "runtime": "builtin",
       "status": "APPROVED",
+      "agent": "pedagogy-agent",
       "handler": {
         "builtin_function": "pebs.pipeline:step_worksheets",
         "steps": [

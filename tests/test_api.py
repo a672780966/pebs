@@ -85,3 +85,19 @@ def test_build_with_unknown_explicit_skill_rejected(client):
         json={"request": "/not-a-real-skill 写一节课程"},
     )
     assert res.status_code == 409
+
+
+def test_dynamic_plan_and_conversation_endpoints(client):
+    client.post("/api/projects", json={"project_id": "plantest"})
+    res = client.get("/api/projects/plantest/dynamic-plan")
+    assert res.status_code == 200
+    assert res.json()["mode"] == "static"
+
+    res = client.post(
+        "/api/projects/plantest/conversation",
+        json={"message": "\u8ba9\u6574\u4f53\u6c1b\u56f4\u66f4\u6d3b\u6cfc\u4e00\u70b9"},
+    )
+    assert res.status_code == 409
+    assert "reason" in res.json()
+
+    assert client.get("/api/projects/plantest/patch-plan").status_code == 404
