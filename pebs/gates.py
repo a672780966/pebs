@@ -14,6 +14,58 @@ ALL_GATES = GATE_ORDER + ["G8"]
 # script (run_section_gates), G8 is the export manifest gate. This is the single
 # source for "what does this gate evaluate", used by plan validation.
 GATE_SCOPE = {**{gate_id: "script" for gate_id in GATE_ORDER}, "G8": "export_manifest"}
+
+
+# Deliverable outputs that make the script-targeted gates (G1-G7) applicable.
+# requirements.outputs is the schema-required deliverable contract
+# (config/schemas/requirements.schema.json) and is already the source G1 uses for
+# its output-dependent checks, so no second fact source is introduced here.
+SCRIPT_OUTPUTS = {"script", "lesson_script"}
+
+
+@dataclass(frozen=True)
+class Applicability:
+    """Whether a gate applies to the current deliverable contract."""
+
+    applicable: bool
+    reason: str
+
+
+def deliverable_outputs(store: Store) -> set[str] | None:
+    """The requested deliverable contract, or None when none is published yet.
+
+    None keeps the legacy behaviour (script gates required), which is the
+    fail-closed choice for projects that never declared a contract.
+    """
+    try:
+        content = store.accepted_content("requirements") or {}
+    except StoreError:
+        return None
+    outputs = content.get("outputs")
+    if not isinstance(outputs, list) or not outputs:
+        return None
+    return {str(item) for item in outputs}
+
+
+def gate_applicability(gate_id: str, outputs: set[str] | None) -> Applicability:
+    """Decide statically whether a gate is required for this contract.
+
+    Applicability only; the gate's own verdict is never inferred here. An
+    inapplicable gate is reported as NOT_APPLICABLE with a deterministic reason
+    rather than PASS, because it was not actually evaluated.
+    """
+    scope = GATE_SCOPE.get(gate_id)
+    if scope == "script":
+        if outputs is None or (outputs & SCRIPT_OUTPUTS):
+            return Applicability(True, "")
+        listed = "、".join(sorted(outputs))
+        return Applicability(
+            False,
+            f"当前正式交付契约（{listed}）不包含课程脚本；脚本级 {gate_id} 不适用",
+        )
+    # G8 evaluates the export manifest itself and stays required for a formal
+    # package; readiness does not aggregate it (the export step hard-gates it).
+    return Applicability(True, "")
 PASSING = {"PASS", "NOT_APPLICABLE"}
 LABEL_CHECK_ROLES = {"lesson_script", "lesson_plan", "worksheet", "worksheet_teacher"}
 COLUMN_KIND_MAP = {
@@ -1019,13 +1071,38 @@ def latest_gate_results(store: Store, overrides: dict[str, str] | None = None) -
     return results
 
 
-def export_readiness(store: Store, overrides: dict[str, str] | None = None) -> dict[str, Any]:
+def export_readiness(
+    store: Store, overrides: dict[str, str] | None = None, *, outputs: set[str] | None = None
+) -> dict[str, Any]:
+    """Aggregate gate results into a formal-readiness verdict.
+
+    Applicability comes from the deliverable contract (requirements.outputs),
+    never from whether an artifact or a gate result happens to exist. An
+    applicable gate with no result blocks; an inapplicable one is reported as
+    NOT_APPLICABLE with a deterministic reason. Readiness never re-runs or
+    re-judges a gate.
+    """
     artifacts = store.list_artifacts()
-    scripts = [a for a in artifacts if a["artifact_type"] == "script"]
+    if outputs is None:
+        outputs = deliverable_outputs(store)
+    script_applicable = gate_applicability(GATE_ORDER[0], outputs).applicable
+    scripts = [a for a in artifacts if a["artifact_type"] == "script"] if script_applicable else []
     results = latest_gate_results(store, overrides)
     blocking: list[str] = []
     summary: list[dict[str, Any]] = []
-    if not scripts:
+    if not script_applicable:
+        for gate_id in GATE_ORDER:
+            decision = gate_applicability(gate_id, outputs)
+            summary.append(
+                {
+                    "gate_id": gate_id,
+                    "artifact_id": None,
+                    "status": "NOT_APPLICABLE",
+                    "current": False,
+                    "not_applicable_reason": decision.reason,
+                }
+            )
+    elif not scripts:
         blocking.append("尚无脚本产物")
     for script in scripts:
         artifact_id = script["artifact_id"]
