@@ -343,7 +343,18 @@ def step_parse_inputs(ctx: PipelineContext) -> dict[str, Any]:
             )
     if blocked:
         notes.append("以下材料含可识别学生资料，已在外部发送前排除（请脱敏后重新上传）：" + "；".join(blocked))
-    ctx.emit("materials", "materials", {"files": files}, "template-parser")
+    # M6 §60：输入预算记账；超限按 on_exceed 处理（默认 reject，禁止静默截断）
+    from . import input_budget
+
+    try:
+        budget_report = input_budget.enforce(
+            input_budget.measure(materials=files, template_spec=template_spec)
+        )
+    except input_budget.InputBudgetExceeded as exc:
+        raise StepFailed(f"输入超出预算：{exc}；请精简材料/模板后重试（系统不会静默截断）") from exc
+    if budget_report["decision"] == "summarize":
+        notes.append("输入超出预算：已按规则标记 summarize（需在后续步骤显式摘要，未静默截断）")
+    ctx.emit("materials", "materials", {"files": files, "budget_report": budget_report}, "template-parser")
     from . import registry as skill_registry
 
     explicit_map = skill_registry.explicit_skill_map()
@@ -471,6 +482,19 @@ def step_requirements(ctx: PipelineContext) -> dict[str, Any]:
         terminology.update(template_spec.get("terminology_rules", []))
         requirements["terminology"] = sorted(t for t in terminology if t)
     notes = _apply_project_rules(ctx, requirements, template_spec)
+    # M6 §60：章节数同样受输入预算约束（超限显式失败，不静默裁剪）
+    from . import input_budget as budget_mod
+
+    try:
+        budget_mod.enforce(
+            budget_mod.measure(
+                materials=(ctx.content("materials") or {}).get("files", []),
+                template_spec=template_spec,
+                sections=requirements.get("sections", []),
+            )
+        )
+    except budget_mod.InputBudgetExceeded as exc:
+        raise StepFailed(f"输入超出预算：{exc}；请减少章节或拆分任务（系统不会静默裁剪）") from exc
     try:
         schemas.validate(requirements, "requirements")
     except schemas.SchemaError as exc:

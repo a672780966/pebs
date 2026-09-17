@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import shutil
 from dataclasses import asdict
@@ -115,6 +116,21 @@ class ClaimReviewIn(BaseModel):
 class ConversationIn(BaseModel):
     message: str
     execute: bool = True
+
+
+class HumanEvalIn(BaseModel):
+    reviewer: str
+    role: str = "teacher"
+    run_id: str = ""
+    mode: str = ""
+    scores: dict[str, float] = Field(default_factory=dict)
+    comment: str = ""
+    must_fix: list[str] = Field(default_factory=list)
+    nice_to_have: list[str] = Field(default_factory=list)
+    evidence_errors: int = 0
+    routing_errors: int = 0
+    plan_errors: int = 0
+    edits: dict[str, Any] = Field(default_factory=dict)
 
 
 @app.get("/api/registry")
@@ -361,6 +377,76 @@ def human_steps(plan: dict[str, Any]) -> list[dict[str, Any]]:
             }
         )
     return steps
+
+
+@app.get("/api/projects/{project_id}/trace")
+def get_trace(project_id: str, run_id: str | None = None) -> dict[str, Any]:
+    """§39/§63：Skill Trace（绑定版本/provider/patch）+ 选择解释。"""
+    from .benchmark import trace as trace_mod
+
+    engine = get_engine(project_id)
+    run = engine.store.get_run(run_id) if run_id else engine.store.latest_run()
+    if not run:
+        raise HTTPException(status_code=404, detail="no run")
+    plan = engine.store.accepted_content("build_plan_dynamic") or {}
+    return {
+        "trace": trace_mod.build_trace(engine, run["run_id"]),
+        "selection_trace": plan.get("selection_trace", []),
+        "plan_mode": plan.get("mode", "static"),
+    }
+
+
+@app.get("/api/projects/{project_id}/evaluation")
+def get_evaluation(project_id: str) -> dict[str, Any]:
+    """§62：Evaluation Tab 数据（Run/Skills/Human Scores/Edit Ratio/Issues/Comparison）。"""
+    from .benchmark import evaluation as evaluation_mod
+    from .benchmark import report as report_mod
+
+    engine = get_engine(project_id)
+    run = engine.store.latest_run()
+    trace = {}
+    if run:
+        from .benchmark import trace as trace_mod
+
+        trace = trace_mod.build_trace(engine, run["run_id"])
+    summary_path = Path(benchmark_reports_dir()) / "benchmark_summary.json"
+    comparison = None
+    if summary_path.exists():
+        try:
+            comparison = json.loads(summary_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            comparison = None
+    return {
+        "run": {"run_id": run["run_id"], "status": run["status"]} if run else None,
+        "trace": trace,
+        "human_eval": evaluation_mod.latest(engine),
+        "performance": benchmark_performance(),
+        "comparison": comparison,
+    }
+
+
+@app.post("/api/projects/{project_id}/evaluation")
+def record_evaluation(project_id: str, payload: HumanEvalIn) -> dict[str, Any]:
+    from .benchmark import evaluation as evaluation_mod
+
+    engine = get_engine(project_id)
+    try:
+        content = evaluation_mod.record(engine, payload.model_dump())
+    except ValueError as exc:
+        return JSONResponse(status_code=409, content={"ok": False, "reason": str(exc)})
+    return content
+
+
+def benchmark_reports_dir() -> str:
+    from . import config
+
+    return str(Path(config.BENCHMARKS_DIR) / "reports")
+
+
+def benchmark_performance() -> dict[str, Any]:
+    from .benchmark import performance as performance_mod
+
+    return performance_mod.load_performance().get("skills", {})
 
 
 @app.get("/api/projects/{project_id}/artifacts")

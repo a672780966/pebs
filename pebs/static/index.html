@@ -106,6 +106,7 @@ th { color:var(--muted); font-weight:600; }
       <button data-tab="diff" onclick="showTab('diff')">Diff / 接受</button>
       <button data-tab="case" onclick="showTab('case')">案例替换</button>
       <button data-tab="export" onclick="showTab('export')">导出</button>
+      <button data-tab="evaluation" onclick="showTab('evaluation')">评估</button>
     </div>
     <div id="tab-preview">
       <div class="row"><button onclick="loadPreview()">刷新预览</button><span class="muted small">预览始终显示草稿与检查状态</span></div>
@@ -152,6 +153,13 @@ th { color:var(--muted); font-weight:600; }
         <button class="primary" onclick="replaceCase()">替换案例</button>
       </div>
       <p class="muted small">替换后只重建依赖该案例的脚本段落、门禁、预览与导出；无关产物版本不变。</p>
+    </div>
+    <div id="tab-evaluation" class="hidden">
+      <div class="row">
+        <button onclick="loadEvaluation()">刷新评估</button>
+        <span class="muted small">评估 = Skill Trace + 人工评分 + Teacher Edit Ratio + 自动检查问题 + Benchmark 对比</span>
+      </div>
+      <div id="evaluation"></div>
     </div>
     <div id="tab-export" class="hidden">
       <div class="row">
@@ -460,7 +468,7 @@ async function loadOutputs() {
 
 function showTab(name) {
   document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-  ["preview","gates","media","evidence","requirements","registry","diff","case","export"].forEach(t => {
+  ["preview","gates","media","evidence","requirements","registry","diff","case","export","evaluation"].forEach(t => {
     document.getElementById("tab-" + t).classList.toggle("hidden", t !== name);
   });
   if (name === "gates") loadGates();
@@ -470,6 +478,47 @@ function showTab(name) {
   if (name === "registry") loadRegistry();
   if (name === "case") fillCaseSelect();
   if (name === "export") loadOutputs();
+  if (name === "evaluation") loadEvaluation();
+}
+
+async function loadEvaluation() {
+  const data = await api(`/api/projects/${encodeURIComponent(project)}/evaluation`);
+  const el = document.getElementById("evaluation");
+  const trace = data.trace || {};
+  const human = data.human_eval;
+  const advanced = document.getElementById("advancedMode")?.checked;
+  const skills = (trace.skills || []).map(s => `
+    <tr><td>${esc(s.skill)}</td><td>${esc(s.version || "")}</td><td>${esc(s.provider || "builtin")}</td>
+    <td>${esc(s.patch || "")}</td><td>${esc(s.agent || "")}</td>
+    <td><span class="badge ${esc(s.status)}">${esc(s.status)}</span></td>
+    <td class="small">${esc(s.reason || s.error || "")}</td></tr>`).join("");
+  const selection = (data.trace?.selection_trace || []);
+  const selectionRows = selection.map(item => `
+    <tr><td>${esc(item.artifact)}</td><td><b>${esc(item.selected)}</b>（${esc(item.selected_score ?? "")}）</td>
+    <td class="small">${esc(item.reason)}</td>
+    <td class="small">${esc((item.rejected_candidates || []).map(c => `${c.candidate}(${c.score})`).join("、"))}</td></tr>`).join("");
+  const perf = Object.entries(data.performance || {}).filter(([name]) => (trace.skills || []).some(s => s.skill === name));
+  const perfRows = perf.map(([name, rec]) => `
+    <tr><td>${esc(name)}</td><td>${rec.runs}</td><td>${rec.success_rate}</td>
+    <td>${rec.human_score ?? ""}</td><td>${rec.teacher_edit_ratio ?? ""}</td>
+    <td>${esc((rec.known_failure_modes || []).join("；"))}</td></tr>`).join("");
+  el.innerHTML = `
+    <p class="small">Run：<b>${esc(data.run?.run_id || "—")}</b> · 状态 ${esc(data.run?.status || "—")} ·
+      模式 ${esc(trace.mode || trace.plan?.mode || "static")}</p>
+    ${human ? `<p class="small">人工评分（${esc(human.reviewer)}）：<b>${human.overall ?? "—"}</b> ·
+      Edit Ratio ${human.edit_ratio ?? "—"} · Evidence Errors ${human.evidence_errors ?? 0} ·
+      Routing Errors ${human.routing_errors ?? 0} · 文字备注：${esc(human.comment || "")}</p>`
+      : '<p class="muted small">尚无人工评分（POST /evaluation 记录；至少一位真实教师）</p>'}
+    <h3>Skills</h3>
+    <table><thead><tr><th>Skill</th><th>版本</th><th>Provider</th><th>Patch</th><th>Agent</th><th>结果</th><th>说明</th></tr></thead>
+    <tbody>${skills || '<tr><td colspan="7" class="muted small">无 trace</td></tr>'}</tbody></table>
+    ${advanced ? `<h3>Skill 选择解释（高级）</h3>
+    <table><thead><tr><th>产物</th><th>选中</th><th>原因</th><th>被拒候选</th></tr></thead>
+    <tbody>${selectionRows || '<tr><td colspan="4" class="muted small">无</td></tr>'}</tbody></table>` : ""}
+    ${perfRows ? `<h3>Skill Performance（绑定版本）</h3>
+    <table><thead><tr><th>Skill</th><th>Runs</th><th>Success</th><th>Human</th><th>Edit Ratio</th><th>Known Failures</th></tr></thead>
+    <tbody>${perfRows}</tbody></table>` : ""}
+    ${data.comparison ? `<h3>Benchmark 对比</h3><pre class="small">${esc(JSON.stringify(data.comparison.cases || [], null, 1))}</pre>` : ""}`;
 }
 
 async function loadMedia() {

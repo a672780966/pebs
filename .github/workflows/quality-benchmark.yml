@@ -1,0 +1,67 @@
+name: Quality Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "smoke = 离线 golden 检查；full = 真实三模式 benchmark（消耗模型配额）"
+        type: choice
+        options: [smoke, full]
+        default: smoke
+  pull_request:
+    paths:
+      - "benchmarks/**"
+      - "pebs/benchmark/**"
+      - "registry/skills.json"
+      - "providers/**"
+
+jobs:
+  smoke:
+    name: benchmark smoke (hermetic)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Golden benchmark smoke (no model calls, no network)
+        run: python -m pytest tests -q -m benchmark_smoke
+      - name: Upload benchmark reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-smoke-reports
+          path: benchmarks/reports/
+          if-no-files-found: ignore
+
+  full:
+    name: full benchmark (real providers)
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'full'
+    runs-on: ubuntu-latest
+    environment: quality
+    env:
+      PEBS_BENCH_FULL: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run A–G x Direct/Builtin/Dynamic
+        run: |
+          python -m pebs.cli benchmark --cases A,B,C,D,E,F,G --modes direct_codex,builtin,dynamic
+      - name: Generate comparison report
+        if: always()
+        run: python -m pebs.cli benchmark --report
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-full-reports
+          path: benchmarks/reports/
+          if-no-files-found: error

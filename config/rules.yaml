@@ -25,6 +25,14 @@ limits:
   max_files_per_import: 20
   max_file_mib: 25
   max_total_mib: 100
+# M6 §60：进入 LLM 的输入预算。超过时必须在产物里显式记账并 summarize/chunk/reject，
+# 禁止静默截断（模板截断会破坏格式约束，材料截断会丢失证据）。
+input_budget:
+  max_material_chars: 120000
+  max_template_chars: 60000
+  max_sections: 40
+  max_files: 20
+  on_exceed: reject
 concurrency:
   max_parallel_steps: 2
 planner:

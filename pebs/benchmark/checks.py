@@ -101,6 +101,28 @@ def content_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
     return issues
 
 
+def safety_fixture_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
+    """§49–§52：对抗性 fixtures 的 forbidden/required 自动检查（硬门）。"""
+    case_ids = expect.get("safety_cases") or []
+    if not case_ids:
+        return []
+    from . import cases as cases_mod
+    from . import safety as safety_mod
+
+    fixture = safety_mod.load_safety_cases(cases_mod.benchmark_dir())
+    by_id = {case["id"]: case for case in fixture.get("cases", [])}
+    texts = list(_artifact_texts(store, tuple()).values())
+    issues: list[dict[str, Any]] = []
+    for case_id in case_ids:
+        case = by_id.get(case_id)
+        if case is None:
+            issues.append({"kind": "SAFETY", "detail": f"未找到安全 fixture：{case_id}"})
+            continue
+        for text in texts:
+            issues.extend(safety_mod.safety_checks(text, case))
+    return issues
+
+
 def animation_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
     """§56：用户要求"每页都加动画"时，只允许被 Animation Gate 批准的部分。"""
     expectation = expect.get("animation") or {}
@@ -125,6 +147,7 @@ def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None 
         plan_checks(plan or {}, expect)
         + routing_checks(route or {}, expect)
         + content_checks(store, expect)
+        + safety_fixture_checks(store, expect)
         + animation_checks(store, expect)
     )
     counts: dict[str, int] = {}

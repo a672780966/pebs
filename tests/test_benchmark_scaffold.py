@@ -1,4 +1,6 @@
-from __future__ import annotations
+﻿from __future__ import annotations
+
+pytestmark = __import__('pytest').mark.benchmark_smoke
 
 import json
 from pathlib import Path

@@ -15,7 +15,41 @@
 - **fix**: (1) 冻结 baseline tag；(2) Stage C 提交经独立审查（CI run 35240731768 全绿）后保留在 master，成为 M6 Security Track 的起点；(3) 当前未提交的 `preconditions` WIP 保持不动、不混入 M6 开发，`git add` 仅暂存 M6 自有文件
 - **regression_test**: `tests/test_registry_consistency.py`、`tests/test_input_limits.py`、`tests/test_pii_no_leak.py`（Stage C 自带）；M6 侧由 `tests/test_benchmark_scaffold.py` 固定 fixture / case 完整性
 
+## 2026-09-17 — PII 扫描误报阻断合法教学请求（Gate False Positive）
+
+- **date**: 2026-09-17
+- **task**: Golden Benchmark D/E 请求在发送前被 PII 门拦下
+- **symptom**: `PiiBlocked: 请求文本包含可识别学生资料`，但请求句为"不得把群体统计写成对具体学生的判断"、"避免儿童标签化表达"等纯教学指令
+- **root_cause**: `named_student` 正则把"学生/儿童"之后的任意 2–3 个汉字当作姓名（"的判断"、"标签"），且缺少虚词/通用名词过滤
+- **skill**: n/a（安全层）
+- **artifact**: `pebs/pii.py`
+- **fix**: 增加 `_looks_like_name`（虚词、通用名词、名词后缀三类过滤），正则改为惰性 2–3 字 + 常见谓语前瞻；`mask_text` 使用同一判定，避免误改正文
+- **regression_test**: `tests/test_pii.py`（误报句不命中；"学生：小明"/"同学王芳"仍命中）
+
+## 2026-09-17 — audit-only 路由被否定式生产指令击穿（Routing Error）
+
+- **date**: 2026-09-17
+- **task**: Golden Benchmark E（已有讲稿审阅）
+- **symptom**: 请求"只审核……不要重写"被判为生产任务，Planner 生成完整 Authoring 链（含 script-writer）
+- **root_cause**: `PRODUCTION_PATTERN` 命中"重写"里的"写"，覆盖了 `AUDIT_PATTERN`
+- **skill**: `gate-runner` / `claim-extractor`（计划层）
+- **artifact**: `pebs/routing/intent.py`、`pebs/planner/planner.py`
+- **fix**: 先剥离否定式生产短语（`NEGATED_PRODUCTION_PATTERN`）再判定生产意图；审阅任务据此走 `audit_only` 终端（gate_result/export_manifest）
+- **regression_test**: `tests/test_golden_benchmark_plan.py::test_benchmark_case_e_is_review_only`
+
+## 2026-09-17 — 脚本类课程静默产出 PPT（Unnecessary Regeneration / Plan Error）
+
+- **date**: 2026-09-17
+- **task**: Golden Benchmark C（托育四节脚本，未要求 PPT）
+- **symptom**: Plan 与 Changeset 中出现 `slide_plan` / `pptx_deck`，成本与产物超出用户要求
+- **root_cause**: `gate-runner` 与 `preview-builder` 把 `pptx_deck` 声明为 optional_requires，任何含门禁/预览的计划都会顺带生产 deck
+- **skill**: `presentation-planner` / `presentation-composer`
+- **artifact**: `registry/skills.json`
+- **fix**: 从二者 optional_requires 中移除 `pptx_deck`；同时 Planner 对"已存在的可选输入"直接复用为零成本节点（§27）
+- **regression_test**: `tests/test_golden_benchmark_plan.py`（A/C 的 Plan 不含 pptx；G 显式请求时才生成）
+
 ## 2026-09-17 — CI 曾长期为红（M5.1–M5.3）
+
 
 - **date**: 2026-09-17
 - **task**: M5 CI

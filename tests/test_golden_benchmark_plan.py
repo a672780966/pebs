@@ -1,4 +1,4 @@
-"""M6 Golden Benchmark A–G 的 Plan 层可执行性（§20–§27, Acceptance 3 的离线部分）。
+﻿"""M6 Golden Benchmark A–G 的 Plan 层可执行性（§20–§27, Acceptance 3 的离线部分）。
 
 不调用真实模型：用不可用的 LLM 强制确定性路由 + 动态 Planner，
 验证每个 Golden Case 都能形成正确的 DAG（该跳过的能力不进入 Plan）。
@@ -6,6 +6,8 @@
 """
 
 from __future__ import annotations
+
+pytestmark = __import__('pytest').mark.benchmark_smoke
 
 import time
 

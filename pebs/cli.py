@@ -270,6 +270,35 @@ def cmd_conversation(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_benchmark(args: argparse.Namespace) -> int:
+    from .benchmark import report as report_mod
+    from .benchmark import runner
+
+    if args.report:
+        path = report_mod.write_report()
+        print(path)
+        return 0
+    case_ids = [item.strip() for item in (args.cases or "A,B,C,D,E,F,G,H").split(",") if item.strip()]
+    modes = [item.strip() for item in (args.modes or "dynamic").split(",") if item.strip()]
+    failures = 0
+    for case_id in case_ids:
+        for mode in modes:
+            try:
+                record = runner.run_case(case_id, mode=mode, accept=not args.no_accept)
+            except Exception as exc:  # noqa: BLE001 - benchmark harness reports and continues
+                failures += 1
+                print(f"{case_id}/{mode}: ERROR {exc}", file=sys.stderr)
+                continue
+            issues = (record.get("automatic_issues") or {}).get("issues", [])
+            status = record.get("run_status")
+            if status != "succeeded" or issues:
+                failures += 1
+            print(f"{case_id}/{mode}: {status} · issues={len(issues)} · {record.get('run_dir', '')}")
+    path = report_mod.write_report()
+    print(f"report: {path}（{len(case_ids)} cases × {len(modes)} modes，异常 {failures}）")
+    return 1 if failures and args.strict else 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="pebs", description="Psychology Education Build System (M0+M1)")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -344,6 +373,14 @@ def main(argv: list[str] | None = None) -> int:
     conversation.add_argument("--message", required=True)
     conversation.add_argument("--plan-only", action="store_true")
     conversation.set_defaults(func=cmd_conversation)
+
+    bench = sub.add_parser("benchmark", help="M6 Golden Benchmark：A–G/H × direct/builtin/dynamic 并生成对比报告")
+    bench.add_argument("--cases", default="A,B,C,D,E,F,G,H")
+    bench.add_argument("--modes", default="dynamic")
+    bench.add_argument("--no-accept", action="store_true")
+    bench.add_argument("--report", action="store_true", help="只根据已有 runs 生成对比报告")
+    bench.add_argument("--strict", action="store_true", help="存在失败/自动问题时以非零退出")
+    bench.set_defaults(func=cmd_benchmark)
 
     delete = sub.add_parser("delete", help="删除本机项目（托管数据）")
     delete.add_argument("--project", required=True)

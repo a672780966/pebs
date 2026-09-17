@@ -75,6 +75,16 @@ def _all_revisions(store: Any) -> list[dict[str, Any]]:
     return revisions
 
 
+def _run_inputs(run: dict[str, Any]) -> dict[str, Any]:
+    raw = run.get("inputs") or {}
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw)
+        except json.JSONDecodeError:
+            return {}
+    return raw if isinstance(raw, dict) else {}
+
+
 def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", reproduce: dict[str, Any] | None = None) -> dict[str, Any]:
     """从 Store 里重建一次运行的 Skill Trace（不依赖内存状态）。"""
     store = engine.store
@@ -148,7 +158,7 @@ def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", 
     return {
         "run_id": run_id,
         "case_id": case_id,
-        "mode": mode or str(json.loads(run.get("inputs") or "{}").get("planner", "static")),
+        "mode": mode or str(_run_inputs(run).get("planner", "static")),
         "run_status": run["status"],
         "request": run.get("request", ""),
         "route": {

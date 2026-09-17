@@ -166,6 +166,8 @@ def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[st
     plan = engine.store.accepted_content("build_plan_dynamic") or {}
     route = engine.store.accepted_content("router_result") or {}
     automatic = checks.evaluate(engine.store, case.get("expect") or {}, plan=plan, route=route)
+    from . import safety as safety_mod
+
     return {
         "run_id": run_id,
         "changeset_id": start["changeset_id"],
@@ -178,6 +180,7 @@ def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[st
         },
         "artifact_hashes": hashes,
         "automatic_issues": automatic,
+        "quality_metrics": safety_mod.content_metrics(engine.store),
         "trace": skill_trace,
     }
 
