@@ -44,7 +44,9 @@ def expand_graph(
                     steps = list(record.get("handler", {}).get("steps", []))
                     node = PlanNode(
                         node_id=skill_name,
-                        title=node_title(skill_name, steps),
+                        title=node_title(skill_name, steps)
+                        if steps
+                        else str(record.get("description") or skill_name)[:24],
                         skill=skill_name,
                         steps=steps,
                         inputs=list(record.get("requires", [])),
@@ -70,7 +72,9 @@ def expand_graph(
             steps = list(record.get("handler", {}).get("steps", []))
             node = PlanNode(
                 node_id=node_id,
-                title=node_title(skill_name, steps),
+                title=node_title(skill_name, steps)
+                if steps
+                else str(record.get("description") or skill_name)[:24],
                 skill=skill_name,
                 steps=steps,
                 inputs=list(record.get("requires", [])) + list(record.get("optional_requires", [])),

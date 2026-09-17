@@ -65,10 +65,13 @@ def candidates(
         record = registry.get(name)
         if record is None:
             continue
-        if record.get("runtime") != "builtin":
-            continue
         if record.get("status") not in ("APPROVED", "PATCHED"):
             continue
+        runtime_kind = record.get("runtime")
+        if runtime_kind != "builtin":
+            artifact_ids = (record.get("handler") or {}).get("artifact_ids") or {}
+            if artifact_type not in artifact_ids:
+                continue
         results.append({"name": name, "record": record, "score": _score(record, artifact_type, task_type, risk, scores)})
     results.sort(key=lambda item: item["score"], reverse=True)
     return results

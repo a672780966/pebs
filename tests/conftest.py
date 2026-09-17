@@ -35,6 +35,8 @@ class FakeLLM:
         weird_enums: bool = False,
         semantic_route_bad: bool = False,
         route_payload: dict | None = None,
+        external_skill_payloads: list | None = None,
+        privacy_payload: dict | None = None,
     ):
         self.word_range = word_range
         self.undershoot_first = undershoot_first
@@ -55,6 +57,8 @@ class FakeLLM:
         self.weird_enums = weird_enums
         self.semantic_route_bad = semantic_route_bad
         self.route_payload = route_payload
+        self.external_skill_payloads = list(external_skill_payloads or [])
+        self.privacy_payload = privacy_payload
         self.calls: dict[str, int] = {}
         self.prompts: list[str] = []
 
@@ -469,6 +473,40 @@ class FakeLLM:
                 "confidence": 0.82,
                 "uncertainties": [],
             }
+        if task == "privacy_review":
+            if self.privacy_payload is not None:
+                return dict(self.privacy_payload)
+            return {"risk": "LOW", "reidentifiable": False, "reasons": [], "suggestions": []}
+        if task.startswith("external_skill"):
+            self._bump(task)
+            if self.external_skill_payloads:
+                payload = self.external_skill_payloads.pop(0)
+                if payload is not None:
+                    return payload
+            return {
+                "strategies": [
+                    {
+                        "goal_ref": "g1",
+                        "knowledge_type": "concept",
+                        "strategy": "explicit-instruction",
+                        "rationale": "外部 Skill 选择明确讲解",
+                    }
+                ],
+                "pck_notes": ["外部 Skill 提供的教学说明"],
+                "udl": {
+                    "barriers": ["术语抽象"],
+                    "options": [
+                        {
+                            "barrier": "术语抽象",
+                            "option": "提供对比表",
+                            "same_goal_ref": "g1",
+                            "core_demand_preserved": True,
+                            "representation": "对比表",
+                        }
+                    ],
+                    "support_review_flags": [],
+                },
+            }
         if task == "slide_plan":
             return {
                 "rows": [
@@ -639,6 +677,56 @@ def run_build(engine: Engine, request: str, *, template_path=None, material_path
     return run_id, changeset_id
 
 
+def make_skill_package(
+    tmp_path,
+    name: str,
+    *,
+    produces: list[str],
+    requires: list[str] | None = None,
+    artifact_ids: dict | None = None,
+    with_scripts: bool = False,
+    skill_md: str | None = None,
+    inline_schema: dict | None = None,
+):
+    import io
+    import tarfile
+
+    archive = tmp_path / f"{name}.tar.gz"
+    files: dict[str, str] = {
+        "SKILL.md": skill_md or f"# {name}\n\n用于测试的提示型外部 Skill。",
+        "skill.yaml": "\n".join(
+            [
+                f"name: {name}",
+                f"description: {name} 测试技能",
+                "requires:",
+                *[f"  - {item}" for item in (requires or [])],
+                "produces:",
+                *[f"  - {item}" for item in produces],
+                "artifact_ids:",
+                *[f'  {key}: "{value}"' for key, value in (artifact_ids or {}).items()],
+                "provider: []",
+                "tools: []",
+                "network: false",
+                "filesystem: none",
+                "risk_level: low",
+            ]
+        ),
+    }
+    if inline_schema:
+        import json as _json
+
+        files["schema.json"] = _json.dumps(inline_schema, ensure_ascii=False)
+    if with_scripts:
+        files["scripts/run.py"] = "print('external skill script')"
+    with tarfile.open(archive, "w:gz") as tar:
+        for relative, content in files.items():
+            data = content.encode("utf-8")
+            info = tarfile.TarInfo(f"{name}/{relative}")
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+    return archive
+
+
 def run_dynamic_build(
     engine: Engine,
     request: str,
@@ -668,9 +756,18 @@ def run_dynamic_build(
 
 @pytest.fixture
 def registry_env(tmp_path, monkeypatch):
+    import json as _json
+    from pathlib import Path as _Path
+
+    repo_registry = _Path(config.REGISTRY_DIR)
     registry_dir = tmp_path / "registry"
     registry_dir.mkdir()
-    (registry_dir / "skills.json").write_text("{}", encoding="utf-8")
+    for filename in ("skills.json", "allowlist.json", "denylist.json", "versions.json", "runtime_index.json"):
+        source = repo_registry / filename
+        if source.exists():
+            (registry_dir / filename).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    if not (registry_dir / "skills.json").exists():
+        (registry_dir / "skills.json").write_text("{}", encoding="utf-8")
     monkeypatch.setattr(config, "REGISTRY_DIR", registry_dir)
     monkeypatch.setattr(config, "SKILLS_DIR", tmp_path / "skills")
     monkeypatch.setattr(config, "QUARANTINE_DIR", tmp_path / "skills" / "quarantine")

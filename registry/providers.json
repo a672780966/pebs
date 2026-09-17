@@ -1,0 +1,27 @@
+{
+  "format": 1,
+  "providers": {
+    "education-agent-skills": {
+      "kind": "external_provider",
+      "description": "已审查的教育 Agent Skills 提供方；不复制其名册到本仓库 Pipeline，按需导入 → 审查 → pin → 运行",
+      "initial_allowlist": [
+        "backwards-design-unit-planner",
+        "learning-progression-builder",
+        "discipline-specific-critical-thinking-task-designer",
+        "cognitive-load-analyser",
+        "dual-coding-designer",
+        "worked-example-fading-designer",
+        "explicit-instruction-sequence-builder",
+        "experiential-learning-cycle-designer",
+        "hinge-question-designer",
+        "checking-for-understanding-protocol-designer",
+        "criterion-referenced-rubric-generator",
+        "udl-barrier-anticipator",
+        "udl-options-designer",
+        "udl-lesson-auditor"
+      ],
+      "status": "allowlist_only",
+      "note": "allowlist 只表示允许导入与审查，不表示已接入运行时；导入后仍需 review/pin"
+    }
+  }
+}

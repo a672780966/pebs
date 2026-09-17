@@ -1,0 +1,28 @@
+profile: psychology
+description: 心理学 / 教育场景的研究来源 Profile；实际可用性取决于已配置连接器
+sources:
+  - id: crossref
+    status: implemented
+    kind: metadata_abstract
+  - id: openalex
+    status: implemented
+    kind: metadata_abstract_fulltext_link
+  - id: semantic_scholar
+    status: implemented
+    kind: metadata_abstract
+  - id: pubmed
+    status: implemented
+    kind: metadata_abstract
+  - id: eric
+    status: planned
+    kind: metadata
+  - id: psycinfo
+    status: planned
+    kind: metadata
+    note: 需要机构访问
+  - id: cnki
+    status: optional
+    kind: metadata_fulltext
+    note: 可选中文连接器；不作为默认闭环前置依赖
+required_notes:
+  - 只有摘要/片段时必须标注核验层级，不得声称核验全文方法或机制

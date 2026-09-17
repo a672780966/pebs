@@ -16,8 +16,11 @@ PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("address", re.compile(r"[\u4e00-\u9fff]{2,8}(?:街道|小区|号楼|单元|门牌)")),
 ]
 
-PII_TYPES_ZH = {
-    "id_card": "身份证号",
+LAYER_L1 = "L1_deterministic"
+LAYER_L2 = "L2_semantic_reidentification"
+LAYER_L3 = "L3_manual_review"
+
+PII_TYPES_ZH = {    "id_card": "身份证号",
     "phone": "手机号",
     "student_id": "学号",
     "email": "邮箱",
@@ -69,3 +72,37 @@ def summarize(hits: list[dict[str, Any]]) -> str:
         if label not in labels:
             labels.append(label)
     return "、".join(labels[:6])
+
+
+SEMANTIC_SYSTEM = (
+    "你是隐私复核器，只输出 JSON。判断文本是否存在可重识别风险："
+    "小样本班级+地点+特殊经历、罕见个人属性组合、能指向具体学生的真实线索。"
+    "不判断内容对错，只判断隐私风险。"
+)
+
+
+def semantic_review_prompt(text: str, *, context: str = "") -> str:
+    return f"""任务：对下面的课程材料做可重识别风险复核（L2 语义层）。
+材料（截断）：{text[:6000]}
+补充背景：{context or '无'}
+输出 JSON：{{"risk": "LOW|MEDIUM|HIGH", "reidentifiable": true, "reasons": ["..."], "suggestions": ["..."]}}"""
+
+
+def semantic_review(llm: Any, text: str, *, context: str = "") -> dict[str, Any] | None:
+    availability = llm.availability() if hasattr(llm, "availability") else {"available": False}
+    if not availability.get("available"):
+        return None
+    try:
+        data = llm.generate_json(task="privacy_review", system=SEMANTIC_SYSTEM, prompt=semantic_review_prompt(text, context=context))
+    except Exception:  # noqa: BLE001 - provider failure must not fabricate a privacy verdict
+        return None
+    if not isinstance(data, dict):
+        return None
+    risk = str(data.get("risk", "")).upper()
+    if risk not in ("LOW", "MEDIUM", "HIGH"):
+        return None
+    data["risk"] = risk
+    data["reidentifiable"] = bool(data.get("reidentifiable", risk != "LOW"))
+    data["reasons"] = [str(item) for item in (data.get("reasons") or []) if str(item).strip()]
+    data["suggestions"] = [str(item) for item in (data.get("suggestions") or []) if str(item).strip()]
+    return data

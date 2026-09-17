@@ -18,6 +18,16 @@ class PlanEditRejected(Exception):
     pass
 
 
+def _pinned_skill_names() -> list[str]:
+    from . import registry
+
+    names = []
+    for name, record in registry.load_skills().items():
+        if record.get("pinned_version") and record.get("status") in ("APPROVED", "PATCHED"):
+            names.append(name)
+    return sorted(names)
+
+
 class PiiBlocked(Exception):
     pass
 
@@ -106,6 +116,8 @@ class Engine:
             goal=request,
             existing_artifacts=artifacts,
             budgets=budgets,
+            prefer=explicit_skills,
+            pinned=_pinned_skill_names(),
         )
         for artifact_id, artifact_type, content in (
             ("router_result", "router_result", route),

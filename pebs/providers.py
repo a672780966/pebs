@@ -824,6 +824,19 @@ def get_research() -> CompositeResearch:
 
 
 def provider_status() -> dict[str, Any]:
+    from . import profiles
+
     llm = get_llm().availability()
     research = get_research().availability()
+    profile = profiles.load_research_profile("psychology")
+    implemented = profiles.implemented_sources(profile)
+    unimplemented = profiles.unimplemented_sources(profile)
+    configured = list(research.get("allowed_sources", []))
+    unsupported = profiles.validate_configured_sources(profile, configured)
+    research["profile"] = {
+        "name": profile.get("profile", "psychology"),
+        "implemented": implemented,
+        "unimplemented": [item.get("id") for item in unimplemented],
+        "unsupported_configured": unsupported,
+    }
     return {"llm": llm, "research": research}

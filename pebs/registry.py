@@ -159,6 +159,9 @@ def validate(skills: dict[str, Any] | None = None) -> list[str]:
                 errors.append(f"{name}: unknown artifact type '{artifact_type}'")
         if record.get("invocation", {}).get("auto") and record.get("status") not in ("APPROVED", "PATCHED"):
             errors.append(f"{name}: auto-invocable skill must be APPROVED/PATCHED (status={record.get('status')})")
+        from . import policies
+
+        errors.extend(policies.check_skill_record(record))
     return errors
 
 

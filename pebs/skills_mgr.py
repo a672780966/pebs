@@ -151,6 +151,48 @@ def _derive_name(url: str) -> str:
     return basename.removesuffix(".tar.gz").removesuffix(".tgz") or "skill"
 
 
+def _read_skill_manifest(root: Path) -> dict[str, Any]:
+    import yaml
+
+    for candidate in root.rglob("skill.yaml"):
+        try:
+            data = yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
+        except (OSError, yaml.YAMLError):
+            continue
+        if isinstance(data, dict) and data.get("name"):
+            data["_manifest_path"] = str(candidate)
+            return data
+    return {}
+
+
+def _has_scripts(root: Path) -> bool:
+    for path in root.rglob("scripts"):
+        if path.is_dir() and any(child.is_file() for child in path.iterdir()):
+            return True
+    return False
+
+
+def derive_contract(quarantine: Path) -> dict[str, Any]:
+    manifest = _read_skill_manifest(quarantine)
+    runtime_kind = "sandbox_skill" if _has_scripts(quarantine) else "prompt_skill"
+    return {
+        "description": str(manifest.get("description") or ""),
+        "requires": [str(item) for item in (manifest.get("requires") or []) if str(item)],
+        "produces": [str(item) for item in (manifest.get("produces") or []) if str(item)],
+        "optional_requires": [str(item) for item in (manifest.get("optional_requires") or []) if str(item)],
+        "provider": [str(item) for item in (manifest.get("provider") or []) if str(item)],
+        "tools": [str(item) for item in (manifest.get("tools") or []) if str(item)],
+        "network": bool(manifest.get("network", False)),
+        "filesystem": str(manifest.get("filesystem", "none")),
+        "risk_level": str(manifest.get("risk_level", "unknown")),
+        "runtime": runtime_kind,
+        "entrypoint": manifest.get("entrypoint"),
+        "artifact_ids": manifest.get("artifact_ids") or {},
+        "outputs": manifest.get("outputs") or [],
+        "manifest": manifest,
+    }
+
+
 def import_candidate(
     url: str,
     *,
@@ -209,31 +251,37 @@ def import_candidate(
     )
     registry = _load_registry()
     existing = registry.get(name, {})
+    contract = derive_contract(quarantine)
     record = {
         "name": name,
         "version": existing.get("version", "0.0.0"),
         "domain": "external",
-        "description": existing.get("description", "未审查的外部 Skill 候选"),
+        "description": contract["description"] or existing.get("description", "未审查的外部 Skill 候选"),
         "status": "REFERENCE_ONLY",
-        "invocation": {"auto": False, "explicit": False},
-        "requires": [],
-        "produces": [],
-        "optional_requires": [],
+        "invocation": {"auto": True, "explicit": True},
+        "requires": contract["requires"],
+        "produces": contract["produces"],
+        "optional_requires": contract["optional_requires"],
         "aliases": [],
         "input_schema": None,
         "output_schema": None,
-        "provider": [],
-        "tools": [],
-        "risk_level": "unknown",
-        "network": False,
-        "filesystem": "none",
+        "provider": contract["provider"],
+        "tools": contract["tools"],
+        "risk_level": contract["risk_level"],
+        "network": contract["network"],
+        "filesystem": contract["filesystem"] or "none",
         "external_side_effects": False,
-        "runtime": "external_skill",
-        "handler": {"skill_path": str(quarantine), "entrypoint": existing.get("handler", {}).get("entrypoint")},
+        "runtime": contract["runtime"],
+        "handler": {
+            "skill_path": str(quarantine),
+            "entrypoint": contract["entrypoint"],
+            "artifact_ids": contract["artifact_ids"],
+            "outputs": contract["outputs"],
+        },
         "gates_before": [],
         "gates_after": [],
         "parallelizable": False,
-        "estimated_cost": {"model_calls": 0, "research_calls": 0},
+        "estimated_cost": {"model_calls": int(contract["manifest"].get("estimated_model_calls", 1) or 1), "research_calls": 0},
         "self_implemented": False,
         "user_invocable": False,
         "auto_invocable": False,
@@ -538,6 +586,13 @@ def list_skills() -> list[dict[str, Any]]:
     return items
 
 
+def _count_pytest(output: str, keyword: str) -> int:
+    import re as _re
+
+    match = _re.search(rf"(\d+)\s+{keyword}", output or "")
+    return int(match.group(1)) if match else 0
+
+
 def verify_skill(name: str, python_exe: str | None = None) -> dict[str, Any]:
     import subprocess
     import sys
@@ -556,9 +611,20 @@ def verify_skill(name: str, python_exe: str | None = None) -> dict[str, Any]:
         "version": record.get("pinned_version") or record.get("version"),
         "rules_version": config.RULES_VERSION,
         "run_at": now_iso(),
+        "last_verified": now_iso(),
         "command": cmd,
         "returncode": proc.returncode,
         "passed": proc.returncode == 0,
+        "tests_passed": _count_pytest(proc.stdout, "passed"),
+        "tests_failed": _count_pytest(proc.stdout, "failed"),
+        "domains": [record.get("domain")] if record.get("domain") else [],
+        "quality": {
+            "schema": bool(record.get("output_schema")),
+            "safety": bool(record.get("risk_level")),
+            "evidence": bool(record.get("gates_before") or record.get("requires")),
+            "stability": proc.returncode == 0,
+        },
+        "known_failures": [] if proc.returncode == 0 else [(proc.stdout or proc.stderr or "")[-400:]],
         "output_tail": (proc.stdout or proc.stderr or "")[-2000:],
     }
     regression_path = Path(config.REGISTRY_DIR) / "regression.json"

@@ -1,0 +1,28 @@
+{
+  "format": 1,
+  "policies": {
+    "trauma-informed": {
+      "status": "DISABLED",
+      "enabled_by_default": false,
+      "reason": "容易神经科学过度简化、把行为直接归因 trauma、越过教师教学边界；仅可显式人工启用且输出必须过 Safety QA"
+    },
+    "cognitive-load-analyser": {
+      "forbid_numeric_load_score": true,
+      "require_levels": ["LOW", "MEDIUM", "HIGH"],
+      "reason": "禁止伪精确 4–7 元素规则与数字化认知负荷评分；只输出等级 + 原因 + 不确定性"
+    },
+    "hinge-question-designer": {
+      "quarantine_upstream_examples": true,
+      "reason": "上游示例不作为可信 few-shot；题目、答案、干扰项与解析必须共同 QA"
+    },
+    "pck-developer": {
+      "requires_supported_evidence": true,
+      "reason": "必须消费 SUPPORTED Evidence；禁止自行创造心理学机制事实"
+    },
+    "udl-barrier-anticipator": {
+      "forbid_specialist_referral": true,
+      "flags_field": "individual_support_review_flags",
+      "reason": "禁止自动 specialist referral；只能写 individual_support_review_flags"
+    }
+  }
+}

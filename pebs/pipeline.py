@@ -68,6 +68,27 @@ class PipelineContext:
             return self.store.get_revision(rev)["content"]
         return self.store.accepted_content(artifact_id)
 
+    def artifact_ids_of_type(self, artifact_type: str) -> list[str]:
+        ids: set[str] = set()
+        for artifact_id, revision_id in self.outputs.items():
+            try:
+                revision = self.store.get_revision(revision_id)
+            except StoreError:
+                continue
+            if revision["artifact_type"] == artifact_type:
+                ids.add(artifact_id)
+        for item in self.store.list_artifacts():
+            if item["artifact_type"] == artifact_type and item.get("accepted_rev"):
+                ids.add(item["artifact_id"])
+        return sorted(ids)
+
+    def content_by_type(self, artifact_type: str) -> Any | None:
+        for artifact_id in self.artifact_ids_of_type(artifact_type):
+            content = self.content(artifact_id)
+            if content is not None:
+                return content
+        return None
+
     def emit(
         self,
         artifact_id: str,
@@ -241,9 +262,28 @@ def step_parse_inputs(ctx: PipelineContext) -> dict[str, Any]:
             raise StepFailed(str(exc)) from exc
         hits = pii.scan(str(entry.get("text", "")))
         entry["sensitive"] = bool(hits)
+        entry["pii_layer"] = pii.LAYER_L1 if hits else "none"
         if hits:
             entry["pii_types"] = sorted({hit["type"] for hit in hits})
+            entry["pii_reasons"] = [pii.PII_TYPES_ZH.get(hit["type"], hit["type"]) for hit in hits]
             blocked.append(f"{path.name}：{pii.summarize(hits)}")
+        else:
+            review = pii.semantic_review(
+                ctx.llm,
+                pii.mask_text(str(entry.get("text", ""))),
+                context=f"项目：{ctx.project_id}",
+            )
+            if review and review.get("risk") in ("HIGH", "MEDIUM"):
+                entry["sensitive"] = True
+                entry["pii_layer"] = pii.LAYER_L2
+                entry["pii_types"] = ["reidentification"]
+                entry["pii_reasons"] = review.get("reasons") or ["语义层判定存在可重识别风险"]
+                entry["manual_review_required"] = True
+                blocked.append(
+                    f"{path.name}：语义隐私复核 {review['risk']}（{'；'.join(entry['pii_reasons'][:2])}）"
+                )
+            elif review and review.get("risk") == "LOW":
+                entry["pii_review"] = "LOW"
         files.append(entry)
         if entry.get("warnings"):
             notes.extend(f"{path.name}: {w}" for w in entry["warnings"])

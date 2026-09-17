@@ -3,23 +3,77 @@
   "$id": "pebs/materials",
   "title": "Materials",
   "type": "object",
-  "required": ["files"],
+  "required": [
+    "files"
+  ],
   "properties": {
     "files": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["path", "kind", "sha256"],
+        "required": [
+          "path",
+          "kind",
+          "sha256"
+        ],
         "properties": {
-          "path": { "type": "string" },
-          "kind": { "enum": ["txt", "markdown", "docx", "pdf"] },
-          "text": { "type": "string" },
-          "sha256": { "type": "string" },
-          "chars": { "type": "integer" },
-          "content_level": { "enum": ["full_text", "user_excerpt", "metadata"] },
-          "sensitive": { "type": "boolean" },
-          "pii_types": { "type": "array", "items": { "type": "string" } },
-          "warnings": { "type": "array", "items": { "type": "string" } }
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "txt",
+              "markdown",
+              "docx",
+              "pdf"
+            ]
+          },
+          "text": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "chars": {
+            "type": "integer"
+          },
+          "content_level": {
+            "enum": [
+              "full_text",
+              "user_excerpt",
+              "metadata"
+            ]
+          },
+          "sensitive": {
+            "type": "boolean"
+          },
+          "pii_types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pii_layer": {
+            "type": "string"
+          },
+          "pii_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "pii_review": {
+            "type": "string"
+          },
+          "manual_review_required": {
+            "type": "boolean"
+          }
         }
       }
     }

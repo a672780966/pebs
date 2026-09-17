@@ -16,14 +16,19 @@ def validate_plan(plan: dict[str, Any]) -> list[str]:
     for node in nodes:
         node_id = node.get("node_id")
         steps = node.get("steps") or []
-        if not steps:
-            errors.append(f"{node_id}: 没有可执行步骤")
         skill = node.get("skill")
         record = registry.get(skill) if skill else None
         if record is None:
             errors.append(f"{node_id}: 未注册的 skill {skill}")
-        elif set(steps) != set(record.get("handler", {}).get("steps", [])):
-            errors.append(f"{node_id}: steps 与注册表不一致")
+        else:
+            runtime_kind = record.get("runtime", "builtin")
+            if runtime_kind == "builtin":
+                if not steps:
+                    errors.append(f"{node_id}: 没有可执行步骤")
+                elif set(steps) != set(record.get("handler", {}).get("steps", [])):
+                    errors.append(f"{node_id}: steps 与注册表不一致")
+            elif not (record.get("handler") or {}).get("skill_path"):
+                errors.append(f"{node_id}: 外部 Skill 缺少 skill_path")
         for dep in node.get("depends_on", []):
             if dep not in by_id:
                 errors.append(f"{node_id}: 依赖不存在 {dep}")
