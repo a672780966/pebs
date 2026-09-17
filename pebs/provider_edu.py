@@ -324,6 +324,12 @@ def status_for(alias: str, *, provider: dict[str, Any] | None = None) -> dict[st
         {},
     )
     patches = record.get("patches") or []
+    runtime_path = ""
+    try:
+        resolved = skills_mgr.resolve_runtime(alias)
+        runtime_path = str(resolved.get("path") or "")
+    except Exception:  # noqa: BLE001 - 未安装/未 pin/目录缺失都意味着运行时不可用
+        runtime_path = ""
     return {
         "skill": alias,
         "upstream_name": entry.get("upstream_name", alias),
@@ -333,6 +339,8 @@ def status_for(alias: str, *, provider: dict[str, Any] | None = None) -> dict[st
         "patch": record["patches"][-1]["patch_version"] if patches else "",
         "produces": record.get("produces", []),
         "requires": record.get("requires", []),
+        "runtime_path": runtime_path,
+        "runtime_files_present": bool(runtime_path) and Path(runtime_path).exists(),
     }
 
 
@@ -369,6 +377,8 @@ def verify(*, provider: dict[str, Any] | None = None) -> dict[str, Any]:
             problems.append("无 produces 契约")
         if info["skill"] not in allowed:
             problems.append("未加入 allowlist")
+        if not info["runtime_files_present"]:
+            problems.append("运行时文件缺失（本机需运行 provider install）")
         info["problems"] = problems
         report["ok"] = report["ok"] and not problems
         report["skills"].append(info)
