@@ -101,3 +101,23 @@ def test_dynamic_plan_and_conversation_endpoints(client):
     assert "reason" in res.json()
 
     assert client.get("/api/projects/plantest/patch-plan").status_code == 404
+
+
+def test_human_steps_translate_internal_nodes():
+    """§40: the default Plan view is human language; node_id/skill live under advanced."""
+    from pebs import server as server_mod
+
+    plan = {
+        "mode": "dynamic",
+        "nodes": [
+            {"node_id": "requirements-builder", "skill": "requirements-builder", "title": "整理课程要求", "depends_on": []},
+            {"node_id": "evidence-reviewer", "skill": "evidence-reviewer", "depends_on": ["requirements-builder"]},
+            {"node_id": "docx-exporter", "skill": "docx-exporter", "depends_on": [], "reused": True},
+        ],
+    }
+    steps = server_mod.human_steps(plan)
+    assert [step["title"] for step in steps] == ["整理课程要求", "核验心理学事实", "导出正式文档"]
+    assert steps[2]["status"] == "reuse"
+    assert steps[1]["advanced"]["node_id"] == "evidence-reviewer"
+    assert steps[1]["advanced"]["agent"] == "research-agent"
+    assert "node_id" not in steps[1]
