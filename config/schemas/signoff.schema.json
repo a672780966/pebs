@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/signoff",
+  "title": "Signoff",
+  "type": "object",
+  "required": [
+    "changeset_id",
+    "reviewer",
+    "basis",
+    "artifact_versions",
+    "created_at"
+  ],
+  "properties": {
+    "changeset_id": {
+      "type": "string"
+    },
+    "reviewer": {
+      "type": "string"
+    },
+    "basis": {
+      "type": "string"
+    },
+    "changes": {
+      "type": "string"
+    },
+    "artifact_versions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "items": {
+      "type": "integer"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

@@ -518,12 +518,14 @@
       "explicit": false
     },
     "requires": [
-      "script"
+      "teaching_plan"
     ],
     "produces": [
       "media_plan"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "script"
+    ],
     "aliases": [],
     "input_schema": null,
     "output_schema": "media_plan",
@@ -608,13 +610,14 @@
       "explicit": false
     },
     "requires": [
-      "diagrams",
-      "script"
+      "diagrams"
     ],
     "produces": [
       "load_review"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "script"
+    ],
     "aliases": [],
     "input_schema": null,
     "output_schema": "load_review",
@@ -658,7 +661,9 @@
     "produces": [
       "animation_decisions"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "script"
+    ],
     "aliases": [],
     "input_schema": null,
     "output_schema": "animation_decisions",
@@ -699,13 +704,14 @@
       "explicit": false
     },
     "requires": [
-      "animation_decisions",
-      "script"
+      "animation_decisions"
     ],
     "produces": [
       "storyboard"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "script"
+    ],
     "aliases": [],
     "input_schema": null,
     "output_schema": "storyboard",
@@ -750,7 +756,9 @@
     "produces": [
       "evidence_assets"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "script"
+    ],
     "aliases": [],
     "input_schema": null,
     "output_schema": "evidence_assets",
@@ -787,13 +795,14 @@
       "explicit": false
     },
     "requires": [
-      "evidence_assets",
-      "script"
+      "evidence_assets"
     ],
     "produces": [
       "slide_plan"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "script"
+    ],
     "aliases": [],
     "input_schema": null,
     "output_schema": "slide_plan",
@@ -879,12 +888,17 @@
       "explicit": false
     },
     "requires": [
-      "script"
+      "script",
+      "evidence_index"
     ],
     "produces": [
       "gate_result"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "claims_set",
+      "load_review",
+      "pptx_deck"
+    ],
     "aliases": [
       "psychology-safety"
     ],
@@ -922,13 +936,15 @@
       "auto": true,
       "explicit": false
     },
-    "requires": [
-      "gate_result"
-    ],
+    "requires": [],
     "produces": [
       "preview"
     ],
-    "optional_requires": [],
+    "optional_requires": [
+      "gate_result",
+      "script",
+      "pptx_deck"
+    ],
     "aliases": [],
     "input_schema": null,
     "output_schema": "preview",

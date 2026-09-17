@@ -62,6 +62,119 @@ class Engine:
 
     # ------------------------------------------------------------------ context
 
+    def _start_dynamic_build(
+        self,
+        request: str,
+        *,
+        template_path: Path | None,
+        material_paths: list[Path],
+        environment: str,
+        explicit_skills: list[str],
+        budgets: dict[str, int],
+    ) -> dict[str, Any]:
+        from . import planner, router_v2
+
+        template_spec = self.store.accepted_content("template_spec")
+        rules_path = Path(self.base) / "PROJECT_RULES.md"
+        project_rules = rules_path.read_text(encoding="utf-8") if rules_path.exists() else ""
+        artifacts = self.store.list_artifacts()
+        route = router_v2.route(
+            request,
+            llm=self.llm,
+            template_spec=template_spec if isinstance(template_spec, dict) else None,
+            materials=[str(path) for path in material_paths],
+            explicit_skills=explicit_skills,
+            existing_artifacts=artifacts,
+            project_rules=project_rules,
+        )
+        errors = router_v2.validate(route)
+        if errors:
+            from .routing import fallback as routing_fallback
+            from .routing import intent as routing_intent
+
+            route = routing_fallback.fallback_route(
+                routing_intent.extract_deterministic(
+                    request,
+                    template_spec=template_spec if isinstance(template_spec, dict) else None,
+                    materials=[str(path) for path in material_paths],
+                    explicit_skills=explicit_skills,
+                )
+            )
+            route["uncertainties"].extend(errors)
+        dynamic_plan = planner.plan(
+            route=route,
+            goal=request,
+            existing_artifacts=artifacts,
+            budgets=budgets,
+        )
+        for artifact_id, artifact_type, content in (
+            ("router_result", "router_result", route),
+            ("build_plan_dynamic", "build_plan_v2", dynamic_plan),
+        ):
+            info = self.store.add_revision(
+                artifact_id=artifact_id,
+                artifact_type=artifact_type,
+                content=content,
+                produced_by="dynamic-planner",
+                rules_version=config.RULES_VERSION,
+            )
+            self.store.set_accepted(artifact_id, info["revision_id"])
+
+        run_id = self.store.create_run(
+            environment=environment,
+            request=request,
+            budgets=budgets,
+            inputs={
+                "template_path": str(template_path) if template_path else None,
+                "material_paths": [str(p) for p in material_paths],
+                "explicit_skills": explicit_skills,
+                "planner": "dynamic",
+                "plan_id": dynamic_plan.get("plan_id"),
+            },
+        )
+        changeset_id = self.store.create_changeset(
+            run_id, f"dynamic build: {request[:60]}", self.store.current_baseline()
+        )
+        for node in dynamic_plan.get("nodes", []):
+            self.store.add_step(run_id, node["node_id"], node["title"])
+        thread = threading.Thread(
+            target=self._execute_dynamic,
+            args=(run_id, changeset_id, request, template_path, material_paths, environment, dynamic_plan),
+            daemon=True,
+        )
+        thread.start()
+        return {
+            "run_id": run_id,
+            "changeset_id": changeset_id,
+            "planner": "dynamic",
+            "plan_id": dynamic_plan.get("plan_id"),
+            "terminals": dynamic_plan.get("terminal_outputs"),
+            "degraded": dynamic_plan.get("degraded"),
+        }
+
+    def _execute_dynamic(
+        self,
+        run_id: str,
+        changeset_id: str,
+        request: str,
+        template_path: Path | None,
+        material_paths: list[Path],
+        environment: str,
+        dynamic_plan: dict[str, Any],
+    ) -> None:
+        from .runtime.executor import execute_plan
+
+        ctx = self._new_context(
+            run_id=run_id,
+            changeset_id=changeset_id,
+            request=request,
+            template_path=template_path,
+            material_paths=material_paths,
+            environment=environment,
+            explicit_skills=pipeline.parse_explicit_skills(request),
+        )
+        execute_plan(engine=self, run_id=run_id, ctx=ctx, plan=dynamic_plan)
+
     def _new_context(
         self,
         *,
@@ -117,6 +230,7 @@ class Engine:
         material_paths: list[Path] | None = None,
         environment: str = "production",
         budgets: dict[str, int] | None = None,
+        planner_mode: str | None = None,
     ) -> dict[str, Any]:
         material_paths = material_paths or []
         hits = pii.scan(request)
@@ -130,6 +244,19 @@ class Engine:
                 self.permissions.skill(name)
             except PermissionDenied as exc:
                 raise ExplicitSkillDenied(f"显式调用被拒绝：/{name}（{exc}）") from exc
+        effective_budgets = budgets or config.RULES.get("budgets", {})
+        mode = str(
+            planner_mode or config.RULES.get("planner", {}).get("mode", "static")
+        ).strip().lower()
+        if mode == "dynamic":
+            return self._start_dynamic_build(
+                request,
+                template_path=template_path,
+                material_paths=material_paths,
+                environment=environment,
+                explicit_skills=explicit_skills,
+                budgets=effective_budgets,
+            )
         plan = self.current_plan()
         run_id = self.store.create_run(
             environment=environment,
@@ -227,15 +354,22 @@ class Engine:
             except Exception as exc:  # noqa: BLE001 - unexpected failures must be recorded
                 self.store.set_step(run_id, step_id, status="FAILED", error=f"未预期错误：{exc}")
         statuses = [s["status"] for s in self.store.get_steps(run_id)]
-        if "FAILED" in statuses:
-            final = "failed"
-        elif "BLOCKED" in statuses:
-            final = "blocked"
-        elif "CANCELLED" in statuses and "PENDING" not in statuses and "RUNNING" not in statuses:
-            final = "cancelled"
-        else:
-            final = "succeeded"
+        final = self._compute_run_status(statuses)
         self.store.set_run_status(run_id, final)
+
+    @staticmethod
+    def _compute_run_status(statuses: list[str]) -> str:
+        if "FAILED" in statuses:
+            return "failed"
+        if "BLOCKED" in statuses:
+            return "blocked"
+        if "CANCELLED" in statuses and "PENDING" not in statuses and "RUNNING" not in statuses:
+            return "cancelled"
+        return "succeeded"
+
+    def _finalize_run_status(self, run_id: str) -> None:
+        statuses = [s["status"] for s in self.store.get_steps(run_id)]
+        self.store.set_run_status(run_id, self._compute_run_status(statuses))
 
     def _step_status(self, run_id: str, step_id: str) -> str:
         rows = [s for s in self.store.get_steps(run_id) if s["step_id"] == step_id]

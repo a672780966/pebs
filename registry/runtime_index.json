@@ -16,7 +16,9 @@
       "produces": [
         "animation_decisions"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "script"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false
@@ -201,7 +203,9 @@
       "produces": [
         "evidence_assets"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "script"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false
@@ -261,12 +265,17 @@
         ]
       },
       "requires": [
-        "script"
+        "script",
+        "evidence_index"
       ],
       "produces": [
         "gate_result"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "claims_set",
+        "load_review",
+        "pptx_deck"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false
@@ -352,13 +361,14 @@
         ]
       },
       "requires": [
-        "diagrams",
-        "script"
+        "diagrams"
       ],
       "produces": [
         "load_review"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "script"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false
@@ -382,12 +392,14 @@
         ]
       },
       "requires": [
-        "script"
+        "teaching_plan"
       ],
       "produces": [
         "media_plan"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "script"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false
@@ -477,13 +489,14 @@
         ]
       },
       "requires": [
-        "evidence_assets",
-        "script"
+        "evidence_assets"
       ],
       "produces": [
         "slide_plan"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "script"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false
@@ -506,13 +519,15 @@
           "preview"
         ]
       },
-      "requires": [
-        "gate_result"
-      ],
+      "requires": [],
       "produces": [
         "preview"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "gate_result",
+        "script",
+        "pptx_deck"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false
@@ -604,13 +619,14 @@
         ]
       },
       "requires": [
-        "animation_decisions",
-        "script"
+        "animation_decisions"
       ],
       "produces": [
         "storyboard"
       ],
-      "optional_requires": [],
+      "optional_requires": [
+        "script"
+      ],
       "invocation": {
         "auto": true,
         "explicit": false

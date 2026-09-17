@@ -129,8 +129,9 @@ def _skill(ctx: PipelineContext, name: str, schema_name: str | None = None, outp
 
 
 def parse_explicit_skills(request: str) -> list[str]:
-    found = re.findall(r"(?:^|\s)/([a-z][a-z0-9\-]{2,40})(?![\w/\-])", request or "")
-    return sorted(dict.fromkeys(found))
+    from .registry import parse_explicit_skills as _registry_parse
+
+    return _registry_parse(request)
 
 
 def _materials_excerpt(ctx: PipelineContext, limit: int = 6000) -> str:

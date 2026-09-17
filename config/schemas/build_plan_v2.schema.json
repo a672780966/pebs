@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/build_plan_v2",
+  "title": "BuildPlanV2",
+  "type": "object",
+  "required": ["plan_id", "goal", "nodes", "edges", "terminal_outputs", "estimated", "created_at"],
+  "properties": {
+    "plan_id": { "type": "string" },
+    "goal": { "type": "string" },
+    "mode": { "enum": ["dynamic"] },
+    "route_source": { "type": "string" },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["node_id", "title", "skill", "steps", "inputs", "outputs", "depends_on", "optional", "reused"],
+        "properties": {
+          "node_id": { "type": "string" },
+          "title": { "type": "string" },
+          "skill": { "type": "string" },
+          "steps": { "type": "array", "items": { "type": "string" } },
+          "inputs": { "type": "array", "items": { "type": "string" } },
+          "outputs": { "type": "array", "items": { "type": "string" } },
+          "depends_on": { "type": "array", "items": { "type": "string" } },
+          "optional": { "type": "boolean" },
+          "parallel_group": { "type": "integer" },
+          "gate_before": { "type": "array", "items": { "type": "string" } },
+          "gate_after": { "type": "array", "items": { "type": "string" } },
+          "reason": { "type": "string" },
+          "reused": { "type": "boolean" },
+          "degraded": { "type": "boolean" }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from_artifact", "to_node"],
+        "properties": {
+          "from_artifact": { "type": "string" },
+          "to_node": { "type": "string" },
+          "input": { "type": "boolean" }
+        }
+      }
+    },
+    "terminal_outputs": { "type": "array", "items": { "type": "string" } },
+    "estimated": {
+      "type": "object",
+      "required": ["model_calls", "research_calls"],
+      "properties": {
+        "model_calls": { "type": "integer" },
+        "research_calls": { "type": "integer" },
+        "cost_class": { "type": "string" }
+      }
+    },
+    "degraded": { "type": "boolean" },
+    "degradation_reasons": { "type": "array", "items": { "type": "string" } },
+    "created_at": { "type": "string" }
+  }
+}

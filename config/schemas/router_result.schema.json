@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/router_result",
+  "title": "RouterResult",
+  "type": "object",
+  "required": [
+    "task_intent",
+    "primary_outputs",
+    "delivery_mode",
+    "knowledge_types",
+    "research_need",
+    "media_need",
+    "requested_outputs",
+    "constraints",
+    "confidence",
+    "source"
+  ],
+  "properties": {
+    "task_intent": {
+      "type": "string"
+    },
+    "primary_outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "secondary_outputs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "delivery_mode": {
+      "enum": [
+        "asynchronous_video",
+        "live_class",
+        "workshop",
+        "blended",
+        "document_only"
+      ]
+    },
+    "learner_profile": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string"
+        },
+        "discipline": {
+          "type": "string"
+        },
+        "prior_knowledge": {
+          "type": "string"
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "knowledge_types": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "concept",
+          "distinction",
+          "principle",
+          "procedure",
+          "skill",
+          "observation",
+          "case_analysis",
+          "reflection",
+          "attitude",
+          "critical_thinking",
+          "research_literacy",
+          "transfer"
+        ]
+      }
+    },
+    "research_need": {
+      "enum": [
+        "NONE",
+        "VERIFY",
+        "LITERATURE",
+        "DEEP"
+      ]
+    },
+    "media_need": {
+      "enum": [
+        "NONE",
+        "STATIC",
+        "DIAGRAM",
+        "ANIMATION_CANDIDATE"
+      ]
+    },
+    "assessment_need": {
+      "type": "boolean"
+    },
+    "requested_outputs": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "script",
+          "lesson_plan",
+          "worksheet",
+          "case",
+          "assessment",
+          "pptx",
+          "docx",
+          "markdown",
+          "diagram",
+          "storyboard"
+        ]
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "word_min": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "word_max": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "terminology": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disallowed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "no_animation": {
+          "type": "boolean"
+        },
+        "needs_ppt": {
+          "type": "boolean"
+        },
+        "language": {
+          "type": "string"
+        },
+        "explicit_skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "template_present": {
+          "type": "boolean"
+        },
+        "audit_only": {
+          "type": "boolean"
+        }
+      }
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source": {
+      "enum": [
+        "hybrid",
+        "deterministic_fallback",
+        "llm_only"
+      ]
+    },
+    "provenance": {
+      "type": "object"
+    }
+  }
+}

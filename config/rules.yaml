@@ -27,6 +27,12 @@ limits:
   max_total_mib: 100
 concurrency:
   max_parallel_steps: 2
+planner:
+  mode: static
+runtime:
+  max_parallel_llm: 3
+  max_parallel_research: 2
+  max_parallel_sandbox: 1
 m4:
   pptx: true
   pptx_renderer_required_for_formal: true

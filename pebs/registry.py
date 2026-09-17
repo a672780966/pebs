@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -60,6 +61,10 @@ ARTIFACT_SCHEMAS: dict[str, str] = {
     "preview": "preview",
     "export_manifest": "export_manifest",
     "skill_invocations": "skill_invocations",
+    "build_plan": "build_plan",
+    "build_plan_v2": "build_plan_v2",
+    "router_result": "router_result",
+    "review_record": "signoff",
 }
 
 
@@ -242,3 +247,8 @@ def consumers_of(artifact_type: str) -> list[str]:
         for name, record in load_skills().items()
         if artifact_type in record.get("requires", []) or artifact_type in record.get("optional_requires", [])
     )
+
+
+def parse_explicit_skills(request: str) -> list[str]:
+    found = re.findall(r"(?:^|\s)/([a-z][a-z0-9\-]{2,40})(?![\w/\-])", request or "")
+    return sorted(dict.fromkeys(found))

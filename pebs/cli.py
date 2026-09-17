@@ -45,6 +45,7 @@ def cmd_build(args: argparse.Namespace) -> int:
                 if value
             }
             or None,
+            planner_mode=args.planner,
         )
     except (PiiBlocked, ExplicitSkillDenied) as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -244,6 +245,7 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--max-model-calls", type=int)
     build.add_argument("--max-research", type=int)
     build.add_argument("--max-seconds", type=int)
+    build.add_argument("--planner", choices=["static", "dynamic"])
     build.set_defaults(func=cmd_build)
 
     signoff = sub.add_parser("signoff", help="教师复核签署（记录依据与被复核版本）")

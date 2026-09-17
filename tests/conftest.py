@@ -33,6 +33,8 @@ class FakeLLM:
         load_null_fields: bool = False,
         case_new_facts: bool = False,
         weird_enums: bool = False,
+        semantic_route_bad: bool = False,
+        route_payload: dict | None = None,
     ):
         self.word_range = word_range
         self.undershoot_first = undershoot_first
@@ -51,6 +53,8 @@ class FakeLLM:
         self.load_null_fields = load_null_fields
         self.case_new_facts = case_new_facts
         self.weird_enums = weird_enums
+        self.semantic_route_bad = semantic_route_bad
+        self.route_payload = route_payload
         self.calls: dict[str, int] = {}
         self.prompts: list[str] = []
 
@@ -445,6 +449,26 @@ class FakeLLM:
                 "reflection_questions": ["你最容易把哪类判断写成事实？"],
                 "student_version_note": "学生版不含答案",
             }
+        if task == "semantic_route":
+            if self.semantic_route_bad:
+                return {"nonsense": True}
+            if self.route_payload is not None:
+                return dict(self.route_payload)
+            return {
+                "task_intent": "制作在线课程脚本与课件",
+                "primary_outputs": ["script", "pptx"],
+                "secondary_outputs": [],
+                "delivery_mode": "asynchronous_video",
+                "learner_profile": {"level": "高职师范生", "discipline": "心理学", "prior_knowledge": "无"},
+                "knowledge_types": ["concept", "observation"],
+                "research_need": "VERIFY",
+                "media_need": "DIAGRAM",
+                "assessment_need": True,
+                "requested_outputs": ["script", "docx", "markdown", "pptx"],
+                "risk_flags": [],
+                "confidence": 0.82,
+                "uncertainties": [],
+            }
         if task == "slide_plan":
             return {
                 "rows": [
@@ -613,6 +637,33 @@ def run_build(engine: Engine, request: str, *, template_path=None, material_path
     )
     engine._run_steps(ctx, run_id)
     return run_id, changeset_id
+
+
+def run_dynamic_build(
+    engine: Engine,
+    request: str,
+    *,
+    template_path=None,
+    material_paths=(),
+    environment: str = "production",
+    budgets: dict | None = None,
+):
+    import time as _time
+
+    start = engine.start_build(
+        request,
+        template_path=template_path,
+        material_paths=list(material_paths),
+        environment=environment,
+        budgets=budgets,
+        planner_mode="dynamic",
+    )
+    deadline = _time.time() + 120
+    status = engine.run_status(start["run_id"])
+    while _time.time() < deadline and status["run"]["status"] == "running":
+        _time.sleep(0.05)
+        status = engine.run_status(start["run_id"])
+    return start, status
 
 
 @pytest.fixture

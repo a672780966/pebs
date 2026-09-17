@@ -40,6 +40,7 @@ class BuildIn(BaseModel):
     template_path: str | None = None
     material_paths: list[str] = Field(default_factory=list)
     environment: str = "production"
+    planner: str | None = None
 
 
 class PlanEditIn(BaseModel):
@@ -213,7 +214,11 @@ def build(project_id: str, payload: BuildIn) -> dict[str, Any]:
         raise HTTPException(status_code=400, detail="非法 environment")
     try:
         return engine.start_build(
-            payload.request, template_path=template, material_paths=materials, environment=payload.environment
+            payload.request,
+            template_path=template,
+            material_paths=materials,
+            environment=payload.environment,
+            planner_mode=payload.planner,
         )
     except (PiiBlocked, ExplicitSkillDenied) as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
