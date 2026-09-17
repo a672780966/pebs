@@ -13,6 +13,8 @@ ARTIFACTS = [
     {"artifact_id": "storyboard:sec1", "artifact_type": "storyboard", "accepted_rev": "storyboard:sec1@r1"},
     {"artifact_id": "storyboard:sec2", "artifact_type": "storyboard", "accepted_rev": "storyboard:sec2@r1"},
     {"artifact_id": "script:sec2", "artifact_type": "script", "accepted_rev": "script:sec2@r1"},
+    {"artifact_id": "lesson_plan:sec1", "artifact_type": "lesson_plan", "accepted_rev": "lesson_plan:sec1@r1"},
+    {"artifact_id": "lesson_plan:sec2", "artifact_type": "lesson_plan", "accepted_rev": "lesson_plan:sec2@r1"},
 ]
 SLIDES = [{"slide": 7, "section_id": "sec2"}, {"slide": 9, "section_id": "sec2"}]
 SCRIPT_UNITS = [
@@ -60,6 +62,13 @@ def test_unmapped_target_is_reported_not_guessed():
     assert resolved["section_ids"] == []
     assert "第9节" in resolved["unmapped"]
     assert resolved["artifact_ids"] == []
+
+
+def test_activity_ordinal_resolves_to_lesson_plan():
+    resolved = _resolve("第二个活动不够有冲击力，换一个，但心理学理论部分不要改")
+    assert resolved["artifact_kinds"] == ["lesson_plan"]
+    assert resolved["activity_index"] == [2]
+    assert resolved["artifact_ids"] == ["lesson_plan:sec1"]
 
 
 def test_preserve_clause_is_parsed_deterministically():

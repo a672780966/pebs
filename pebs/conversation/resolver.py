@@ -27,6 +27,16 @@ def _section_ordinals(message: str) -> list[int]:
     return sorted({value for value in found if value})
 
 
+def _activity_ordinals(message: str) -> list[int]:
+    found: list[int] = []
+    for match in re.finditer(r"第\s*([0-9]+|[一二两三四五六七八九十])\s*(?:个)?活动", message):
+        raw = match.group(1)
+        found.append(int(raw) if raw.isdigit() else ORDINAL_CN.get(raw, 0))
+    for match in re.finditer(r"活动\s*([0-9]+)", message):
+        found.append(int(match.group(1)))
+    return sorted({value for value in found if value})
+
+
 def _slide_numbers(message: str) -> list[int]:
     return sorted({int(match.group(1)) for match in re.finditer(r"第\s*(\d+)\s*页", message)})
 
@@ -120,12 +130,20 @@ def resolve(
         if kind and kind not in kinds:
             kinds.append(kind)
     resolved["artifact_kinds"] = kinds
+    activity_ordinals = _activity_ordinals(message)
+    llm_activity = intent.get("targets", {}).get("activity_index")
+    if isinstance(llm_activity, int) and llm_activity not in activity_ordinals:
+        activity_ordinals.append(llm_activity)
+    resolved["activity_index"] = activity_ordinals or None
 
     if ordinals and not resolved["section_ids"]:
         resolved["match_reasons"].append("序数越界，未定位到章节；不猜测其它章节")
         return resolved
 
     scope_sections = resolved["section_ids"] or [section["section_id"] for section in sections]
+    if resolved["activity_index"] and not resolved["section_ids"] and "lesson_plan" in kinds and sections:
+        scope_sections = [sections[0]["section_id"]]
+        resolved["match_reasons"].append("活动序数 → 默认定位第 1 节教案")
     candidates: list[tuple[str, str]] = []
     for artifact in artifacts:
         if not artifact.get("accepted_rev"):
