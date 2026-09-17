@@ -98,9 +98,11 @@ def expand_graph(
                 continue
             queue.append((required, node_id, optional_chain))
         for optional in record.get("optional_requires", []):
-            if optional in exclude_artifacts or optional not in include_optional:
+            if optional in exclude_artifacts:
                 continue
-            queue.append((optional, node_id, True))
+            # M6 §27：已存在的可选输入直接复用（零成本，且保留 provenance）
+            if optional in include_optional or optional in existing_satisfied:
+                queue.append((optional, node_id, True))
 
     produced: dict[str, str] = {}
     for node in nodes.values():

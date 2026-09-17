@@ -43,6 +43,51 @@ def _terminals(route: dict[str, Any]) -> list[str]:
     return sorted(terminals)
 
 
+def _selection_trace(
+    nodes: list[dict[str, Any]], *, prefer: list[str] | None, pinned: list[str] | None
+) -> list[dict[str, Any]]:
+    """§64 Resolver Explainability：记录每个节点为什么被选中、有哪些候选被拒。"""
+    from . import resolver as resolver_mod
+
+    trace: list[dict[str, Any]] = []
+    for node in nodes:
+        outputs = list(node.get("outputs") or [])
+        if not outputs:
+            continue
+        ranked = resolver_mod.rank_report(outputs[0])
+        if not ranked:
+            continue
+        selected = next((item for item in ranked if item["name"] == node["skill"]), None)
+        rejected = [
+            {
+                "candidate": item["name"],
+                "score": item["score"],
+                "status": item["status"],
+                "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分",
+            }
+            for item in ranked
+            if item["name"] != node["skill"]
+        ]
+        reasons: list[str] = []
+        if node["skill"] in list(prefer or []):
+            reasons.append("用户显式指定（Explicit User Choice）")
+        if node["skill"] in list(pinned or []):
+            reasons.append("项目 pin")
+        reasons.append(f"为产出 {outputs[0]}")
+        if selected and rejected:
+            reasons.append(f"综合分 {selected['score']} 高于次优 {rejected[0]['candidate']}（{rejected[0]['score']}）")
+        trace.append(
+            {
+                "artifact": outputs[0],
+                "selected": node["skill"],
+                "selected_score": (selected or {}).get("score"),
+                "reason": "；".join(reasons),
+                "rejected_candidates": rejected[:5],
+            }
+        )
+    return trace
+
+
 def _estimate(nodes: list[dict[str, Any]]) -> dict[str, Any]:
     model_calls = 0
     research_calls = 0
@@ -153,6 +198,7 @@ def plan(
     data["nodes"] = node_dicts
     data["edges"] = filtered_edges
     data["reused_artifacts"] = reuse
+    data["selection_trace"] = _selection_trace(node_dicts, prefer=prefer, pinned=pinned)
 
     errors = validation.validate_plan(data)
     if errors:

@@ -24,11 +24,13 @@ def _artifact_texts(store: Any, artifact_types: tuple[str, ...]) -> dict[str, st
 
 def plan_checks(plan: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
     plan_expect = expect.get("plan") or {}
-    skills = [str(node.get("skill")) for node in plan.get("nodes", [])]
-    steps = [step for node in plan.get("nodes", []) for step in (node.get("steps") or [])]
+    executed = [node for node in plan.get("nodes", []) if not node.get("reused")]
+    reused = [node for node in plan.get("nodes", []) if node.get("reused")]
+    skills = [str(node.get("skill")) for node in executed]
+    steps = [step for node in executed for step in (node.get("steps") or [])]
     issues: list[dict[str, Any]] = []
     for required in plan_expect.get("must_include_skills", []):
-        if required not in skills:
+        if required not in [str(node.get("skill")) for node in plan.get("nodes", [])]:
             issues.append({"kind": "PLANNING", "detail": f"缺少必需 Skill：{required}"})
     for forbidden in plan_expect.get("must_exclude_skills", []):
         if forbidden in skills:

@@ -936,8 +936,7 @@
     ],
     "optional_requires": [
       "claims_set",
-      "load_review",
-      "pptx_deck"
+      "load_review"
     ],
     "aliases": [
       "psychology-safety"
@@ -983,8 +982,7 @@
     ],
     "optional_requires": [
       "gate_result",
-      "script",
-      "pptx_deck"
+      "script"
     ],
     "aliases": [],
     "input_schema": null,

@@ -553,8 +553,7 @@
       ],
       "optional_requires": [
         "claims_set",
-        "load_review",
-        "pptx_deck"
+        "load_review"
       ],
       "invocation": {
         "auto": true,
@@ -895,8 +894,7 @@
       ],
       "optional_requires": [
         "gate_result",
-        "script",
-        "pptx_deck"
+        "script"
       ],
       "invocation": {
         "auto": true,

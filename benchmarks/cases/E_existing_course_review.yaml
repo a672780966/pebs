@@ -8,6 +8,12 @@ request: |
 material_fixtures:
   - fixtures/lecture/existing_psychology_lecture.md
 template_fixture: ""
+seed_artifacts:
+  - artifact_id: script:sec1
+    artifact_type: script
+    section_id: sec1
+    title: 已有讲稿（待审——注意力）
+    from_markdown: fixtures/lecture/existing_psychology_lecture.md
 expect:
   routing:
     requested_outputs: [review]

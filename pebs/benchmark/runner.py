@@ -37,6 +37,51 @@ def direct_baseline_prompt(case: dict[str, Any]) -> str:
     )
 
 
+def seed_case_artifacts(engine: Engine, case: dict[str, Any]) -> list[str]:
+    """把 case 声明的"既有产物"（如已有讲稿）以 accepted revision 写入 Store。
+
+    这是 benchmark harness 的输入准备（§25 "输入一份已有心理学讲稿"），
+    不新增任何 pipeline 能力；真实产品中的导入能力由 M7 评估。
+    """
+    from .. import config
+
+    seeded: list[str] = []
+    for entry in case.get("seed_artifacts") or []:
+        artifact_id = entry["artifact_id"]
+        artifact_type = entry["artifact_type"]
+        if entry.get("from_markdown"):
+            path = cases.benchmark_dir() / str(entry["from_markdown"])
+            text = path.read_text(encoding="utf-8")
+            section_id = str(entry.get("section_id") or "sec1")
+            paragraphs = [line.strip() for line in text.splitlines() if line.strip() and not line.startswith(("#", ">"))]
+            units = [
+                {"unit_id": f"u{index}", "kind": "narration", "text": paragraph, "claim_refs": []}
+                for index, paragraph in enumerate(paragraphs, start=1)
+            ]
+            content = {
+                "section_id": section_id,
+                "title": str(entry.get("title") or "已有讲稿"),
+                "units": units,
+                "word_count": {
+                    "count": sum(len(unit["text"]) for unit in units),
+                    "min": 0,
+                    "max": 99999,
+                },
+            }
+        else:
+            content = dict(entry.get("content") or {})
+        info = engine.store.add_revision(
+            artifact_id=artifact_id,
+            artifact_type=artifact_type,
+            content=content,
+            produced_by=str(entry.get("produced_by") or "benchmark-seed"),
+            rules_version=config.RULES_VERSION,
+        )
+        engine.store.set_accepted(artifact_id, info["revision_id"])
+        seeded.append(artifact_id)
+    return seeded
+
+
 def run_dir(case_id: str, mode: str) -> Path:
     stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime())
     return cases.runs_dir() / f"{stamp}-{case_id}-{mode}"
@@ -90,6 +135,7 @@ def run_case(case_id: str, *, mode: str = "dynamic", project_id: str | None = No
 
 def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[str, int] | None, accept: bool) -> dict[str, Any]:
     engine = Engine(project)
+    seed_case_artifacts(engine, case)
     request = case["request"]
     template_path = cases.fixture_path(case, "template_fixture")
     material_paths = [cases.benchmark_dir() / name for name in case.get("material_fixtures") or []]

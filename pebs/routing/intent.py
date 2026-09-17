@@ -31,6 +31,10 @@ CASE_PATTERN = re.compile(r"至少\s*(\d+)\s*个案例|包含案例|每个?案�
 INTERACTION_PATTERN = re.compile(r"互动|课堂活动|讨论|提问环节")
 AUDIT_PATTERN = re.compile(r"审核|审查|复核|查错|理论错误|事实错误|检查.{0,6}(错误|问题)")
 PRODUCTION_PATTERN = re.compile(r"写|生成|制作|设计|做一节|产出一节|开发")
+# M6 §25/§36：否定式生产指令（"不要重写/无需改写"）不能被当成生产意图。
+NEGATED_PRODUCTION_PATTERN = re.compile(
+    r"不(?:要|需要|必|用)?\s*(?:重新)?\s*(?:重写|改写|编写|写|生成|制作|设计|开发|产出)"
+)
 DISALLOWED_PATTERNS = [r"禁用词[:：]\s*([^\n。；]+)", r"不要出现[:：]?\s*([^\n。；]{2,20})", r"避免使用[:：]?\s*([^\n。；]{2,20})"]
 QUOTE_PATTERN = re.compile(r"[「“\"]([^」”\"]{1,20})[」”\"]")
 
@@ -102,7 +106,9 @@ def extract_deterministic(
             break
 
     language = "zh-CN" if re.search(r"[\u4e00-\u9fff]", text) else "en"
-    audit_only = bool(AUDIT_PATTERN.search(text)) and not PRODUCTION_PATTERN.search(text)
+    audit_only = bool(AUDIT_PATTERN.search(text)) and not PRODUCTION_PATTERN.search(
+        NEGATED_PRODUCTION_PATTERN.sub("", text)
+    )
 
     return {
         "word_min": word_min,
