@@ -14,6 +14,13 @@ budgets:
   model_calls: 40
   research_requests: 20
   run_seconds: 1800
+# M6 §13/§48：PCK 前置条件允许消费的 Claim 状态（默认只允许 SUPPORTED）。
+# 生产"实践型"课程（如"观察记录应区分事实与判断"）时，真实文献往往只支持到
+# QUALIFY_REQUIRED（文本已带限定语）。如需放行，必须在此显式声明并保留限定语，
+# 不得改写为确定结论；默认值保持最严格。
+evidence:
+  pck_claim_statuses:
+    - SUPPORTED
 timeouts:
   read_seconds: 60
   model_seconds: 180
