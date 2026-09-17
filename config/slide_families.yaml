@@ -1,0 +1,36 @@
+slide_families:
+  cover:
+    title_size: 40
+    body_size: 20
+    accent: "2B3D7A"
+  section:
+    title_size: 32
+    body_size: 18
+    accent: "2B3D7A"
+  title_content:
+    title_size: 28
+    body_size: 20
+    accent: "2B3D7A"
+  comparison:
+    title_size: 28
+    body_size: 18
+    accent: "1F6F5C"
+  process:
+    title_size: 28
+    body_size: 18
+    accent: "7A4A2B"
+  data_table:
+    title_size: 26
+    body_size: 14
+    accent: "3A3F8F"
+  summary:
+    title_size: 30
+    body_size: 20
+    accent: "2B3D7A"
+archetype_defaults:
+  cover: cover
+  section_title: section
+  bullets: title_content
+  diagram: comparison
+  table: data_table
+  closing: summary

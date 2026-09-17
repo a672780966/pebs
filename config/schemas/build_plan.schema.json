@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/build_plan",
+  "title": "BuildPlan",
+  "type": "object",
+  "required": ["plan_id", "project_id", "created_at", "steps"],
+  "properties": {
+    "plan_id": { "type": "string" },
+    "project_id": { "type": "string" },
+    "created_at": { "type": "string" },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step_id", "title", "kind", "depends_on", "required", "status"],
+        "properties": {
+          "step_id": { "type": "string" },
+          "title": { "type": "string" },
+          "kind": { "enum": ["user_visible", "gate", "export"] },
+          "depends_on": { "type": "array", "items": { "type": "string" } },
+          "required": { "type": "boolean" },
+          "locked": { "type": "boolean" },
+          "disabled": { "type": "boolean" },
+          "status": { "enum": ["PENDING", "RUNNING", "SUCCEEDED", "FAILED", "BLOCKED", "CANCELLED", "STALE"] },
+          "note": { "type": "string" }
+        }
+      }
+    }
+  }
+}

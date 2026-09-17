@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/learning_design",
+  "title": "LearningDesign",
+  "type": "object",
+  "required": ["section_id", "title", "goals", "difficulties", "assessment_evidence", "sequence"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "title": { "type": "string" },
+    "goals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["goal_id", "text", "knowledge_type"],
+        "properties": {
+          "goal_id": { "type": "string" },
+          "text": { "type": "string" },
+          "knowledge_type": { "type": "string" },
+          "cognitive_demand": { "type": "string" }
+        }
+      }
+    },
+    "prior_knowledge": { "type": "array", "items": { "type": "string" } },
+    "difficulties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "basis"],
+        "properties": {
+          "text": { "type": "string" },
+          "basis": { "enum": ["evidence_supported", "source_derived", "instructor_provided", "model_hypothesis"] }
+        }
+      }
+    },
+    "transfer_goal": { "type": "string" },
+    "assessment_evidence": { "type": "array", "items": { "type": "string" } },
+    "sequence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["unit_id", "title"],
+        "properties": {
+          "unit_id": { "type": "string" },
+          "title": { "type": "string" },
+          "goal_ref": { "type": "string" },
+          "strategy_refs": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

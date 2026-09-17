@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/source",
+  "title": "Source",
+  "type": "object",
+  "required": ["source_id", "version", "source_type", "title", "content_level"],
+  "properties": {
+    "source_id": { "type": "string" },
+    "version": { "type": "integer" },
+    "source_type": { "enum": ["user_material", "web", "journal_article", "review", "guideline", "book", "report", "other"] },
+    "title": { "type": "string" },
+    "identifiers": { "type": "object", "additionalProperties": { "type": ["string", "null"] } },
+    "publish_date": { "type": ["string", "null"] },
+    "publish_date_unknown": { "type": "boolean" },
+    "fetched_at": { "type": "string" },
+    "content_level": { "enum": ["metadata", "abstract", "full_text", "user_excerpt"] },
+    "snapshot_path": { "type": ["string", "null"] },
+    "sha256": { "type": ["string", "null"] },
+    "retrieval_note": { "type": "string" }
+  }
+}

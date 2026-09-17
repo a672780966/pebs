@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/evidence_assessment",
+  "title": "EvidenceAssessment",
+  "type": "object",
+  "required": ["assessment_id", "claim_id", "claim_version", "source_id", "source_version", "quote", "quote_location", "support", "result", "method", "method_version", "verified_at"],
+  "properties": {
+    "assessment_id": { "type": "string" },
+    "claim_id": { "type": "string" },
+    "claim_version": { "type": "integer" },
+    "source_id": { "type": "string" },
+    "source_version": { "type": "integer" },
+    "quote": { "type": "string" },
+    "quote_location": { "type": "string" },
+    "support": { "enum": ["direct", "indirect", "contextual", "contradictory", "insufficient"] },
+    "design_note": { "type": "string" },
+    "scope": { "type": "string" },
+    "limitations": { "type": "string" },
+    "uncertainty": { "type": "string" },
+    "method": { "type": "string" },
+    "method_version": { "type": "string" },
+    "verified_at": { "type": "string" },
+    "result": { "enum": ["PENDING", "SUPPORTED", "QUALIFY_REQUIRED", "UNSUPPORTED", "DISPUTED", "HUMAN_REVIEW_REQUIRED"] },
+    "note": { "type": "string" }
+  }
+}

@@ -1,0 +1,32 @@
+ruleset: v1
+word_counting:
+  scope_include:
+    - narration_body
+    - case_within_narration
+  scope_exclude:
+    - title
+    - visual_instruction
+    - citation_index
+    - standalone_notes
+  method: unicode_non_whitespace_chars
+  include_punctuation: true
+budgets:
+  model_calls: 40
+  research_requests: 20
+  run_seconds: 1800
+timeouts:
+  read_seconds: 60
+  model_seconds: 180
+  export_seconds: 120
+retries:
+  read_transient: 2
+  qa_fix_rounds: 2
+limits:
+  max_files_per_import: 20
+  max_file_mib: 25
+  max_total_mib: 100
+concurrency:
+  max_parallel_steps: 2
+m4:
+  pptx: true
+  pptx_renderer_required_for_formal: true

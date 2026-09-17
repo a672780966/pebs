@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/evidence_assets",
+  "title": "EvidenceAssets",
+  "type": "object",
+  "required": ["assets"],
+  "properties": {
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["asset_id", "source", "content_summary", "role", "risk"],
+        "properties": {
+          "asset_id": { "type": "string" },
+          "source": { "type": "string" },
+          "figure_or_table": { "type": "string" },
+          "content_summary": { "type": "string" },
+          "clarity": { "enum": ["high", "medium", "low", "unknown"] },
+          "teaching_relevance": { "enum": ["high", "medium", "low"] },
+          "role": { "enum": ["primary", "support", "unused"] },
+          "resolution": { "type": "string" },
+          "risk": { "type": "string" }
+        }
+      }
+    }
+  }
+}

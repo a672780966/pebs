@@ -1,0 +1,25 @@
+sources:
+  - id: github
+    prefixes:
+      - "https://github.com/"
+      - "https://codeload.github.com/"
+      - "https://raw.githubusercontent.com/"
+    enabled: true
+  - id: local_archive
+    prefixes:
+      - "file://"
+    enabled: true
+limits:
+  max_files: 20000
+  max_file_mib: 20
+  max_total_mib: 120
+review:
+  require_reviewer: true
+  require_evidence: true
+sandbox:
+  docker_image: "alpine:3.20"
+  required_controls:
+    - filesystem
+    - network_off
+    - memory_limit
+  docker_timeout_seconds: 120

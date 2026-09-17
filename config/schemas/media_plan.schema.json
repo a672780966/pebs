@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/media_plan",
+  "title": "MediaPlan",
+  "type": "object",
+  "required": ["section_id", "items"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item_id",
+          "knowledge_function",
+          "temporal_dependency",
+          "spatial_dependency",
+          "comparison_dependency",
+          "persistence_need",
+          "learner_interaction_need",
+          "recommended_medium"
+        ],
+        "properties": {
+          "item_id": { "type": "string" },
+          "goal_ref": { "type": "string" },
+          "knowledge_function": { "enum": ["structure", "comparison", "sequence", "causality", "spatial_relation", "state_change", "hierarchy", "example", "counterexample"] },
+          "temporal_dependency": { "type": "boolean" },
+          "spatial_dependency": { "type": "boolean" },
+          "comparison_dependency": { "type": "boolean" },
+          "persistence_need": { "type": "boolean" },
+          "learner_interaction_need": { "type": "boolean" },
+          "recommended_medium": { "enum": ["text", "diagram", "animation"] },
+          "rationale": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/animation_decisions",
+  "title": "AnimationDecisions",
+  "type": "object",
+  "required": ["section_id", "decisions"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["item_id", "decision", "criteria", "rationale"],
+        "properties": {
+          "item_id": { "type": "string" },
+          "decision": { "enum": ["ANIMATION", "STATIC", "TEXT"] },
+          "criteria": {
+            "type": "object",
+            "required": [
+              "knowledge_function",
+              "temporal_necessity",
+              "static_alternative",
+              "cognitive_load",
+              "narration_synchrony",
+              "persistence_need",
+              "generation_feasibility",
+              "teaching_value"
+            ],
+            "properties": {
+              "knowledge_function": { "type": "string" },
+              "temporal_necessity": { "type": "boolean" },
+              "static_alternative": { "type": "boolean" },
+              "cognitive_load": { "type": "string" },
+              "narration_synchrony": { "type": "string" },
+              "persistence_need": { "type": "boolean" },
+              "generation_feasibility": { "type": "string" },
+              "teaching_value": { "type": "string" }
+            }
+          },
+          "rationale": { "type": "string" },
+          "static_alternative_desc": { "type": "string" },
+          "enforced": { "type": "string" }
+        }
+      }
+    }
+  }
+}

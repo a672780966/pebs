@@ -1,0 +1,378 @@
+{
+  "template-parser": {
+    "name": "template-parser",
+    "description": "解析 DOCX 表格模板或 Markdown 模板，提取栏目、顺序、术语与字数规则",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "low",
+    "user_invocable": false,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "template_spec",
+    "requires": [],
+    "produces": [
+      "template_spec",
+      "materials"
+    ],
+    "allowed_providers": [],
+    "allowed_tools": [
+      "file_read"
+    ],
+    "network_access": false,
+    "filesystem_access": "project_inputs_read",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_template.py"
+    ]
+  },
+  "requirements-builder": {
+    "name": "requirements-builder",
+    "description": "由用户请求、模板与材料生成 Requirements Artifact",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "low",
+    "user_invocable": false,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "requirements",
+    "requires": [
+      "template_spec"
+    ],
+    "produces": [
+      "requirements"
+    ],
+    "allowed_providers": [
+      "default-llm"
+    ],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_rules.py"
+    ]
+  },
+  "learning-designer": {
+    "name": "learning-designer",
+    "description": "生成学习目标、知识类型、理解难点与评价证据（Backwards Design）",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "medium",
+    "user_invocable": true,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "learning_design",
+    "requires": [
+      "requirements"
+    ],
+    "produces": [
+      "learning_design"
+    ],
+    "allowed_providers": [
+      "default-llm"
+    ],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_pipeline.py"
+    ]
+  },
+  "claim-extractor": {
+    "name": "claim-extractor",
+    "description": "从需求/材料中提取待核验心理学 Claim，写入 Evidence Store（PENDING）",
+    "version": "0.1.0",
+    "domain": "psychology",
+    "risk_level": "high",
+    "user_invocable": false,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "claims",
+    "requires": [
+      "learning_design"
+    ],
+    "produces": [
+      "claims"
+    ],
+    "allowed_providers": [
+      "default-llm"
+    ],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_qualify.py"
+    ]
+  },
+  "evidence-reviewer": {
+    "name": "evidence-reviewer",
+    "description": "基于可定位原文片段评估 Claim 与来源的支持关系，产出 Evidence Assessment",
+    "version": "0.1.0",
+    "domain": "psychology",
+    "risk_level": "high",
+    "user_invocable": true,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "evidence_assessment",
+    "requires": [
+      "claims"
+    ],
+    "produces": [],
+    "allowed_providers": [
+      "default-llm",
+      "default-research"
+    ],
+    "allowed_tools": [
+      "web_read"
+    ],
+    "network_access": true,
+    "filesystem_access": "project_snapshots_write",
+    "external_side_effects": false,
+    "requires_evidence_gate": true,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_evidence.py",
+      "tests/test_research.py"
+    ]
+  },
+  "pck-developer": {
+    "name": "pck-developer",
+    "description": "教学设计：按知识类型选择教学策略，消费有效 Evidence，输出 Teaching Plan 与 UDL 方案",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "high",
+    "user_invocable": true,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "teaching_plan",
+    "requires": [
+      "learning_design",
+      "evidence"
+    ],
+    "produces": [
+      "teaching_plan"
+    ],
+    "allowed_providers": [
+      "default-llm"
+    ],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": true,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_gates.py"
+    ]
+  },
+  "case-designer": {
+    "name": "case-designer",
+    "description": "设计教学案例，虚构案例明确标注，新增事实登记为待核验 Claim",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "medium",
+    "user_invocable": false,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "case",
+    "requires": [
+      "teaching_plan"
+    ],
+    "produces": [
+      "case"
+    ],
+    "allowed_providers": [
+      "default-llm"
+    ],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_locality.py"
+    ]
+  },
+  "assessment-designer": {
+    "name": "assessment-designer",
+    "description": "生成形成性评价与 hinge question，题、答、干扰项与解析联动校验",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "medium",
+    "user_invocable": false,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "assessment",
+    "requires": [
+      "teaching_plan"
+    ],
+    "produces": [
+      "assessment"
+    ],
+    "allowed_providers": [
+      "default-llm"
+    ],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_autofix.py"
+    ]
+  },
+  "script-writer": {
+    "name": "script-writer",
+    "description": "生成课程脚本；仅 SUPPORTED Claim 可作为事实，其余显示待核验占位",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "high",
+    "user_invocable": true,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "script",
+    "requires": [
+      "teaching_plan",
+      "evidence"
+    ],
+    "produces": [
+      "script"
+    ],
+    "allowed_providers": [
+      "default-llm"
+    ],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": true,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "REASONING_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_autofix.py",
+      "tests/test_qualify.py"
+    ]
+  },
+  "psychology-safety": {
+    "name": "psychology-safety",
+    "description": "心理学安全扫描（G4）：诊断措辞、标签化、单因果、神经过度简化等",
+    "version": "0.1.0",
+    "domain": "psychology",
+    "risk_level": "high",
+    "user_invocable": false,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "gate_result",
+    "requires": [
+      "script"
+    ],
+    "produces": [
+      "gate_result"
+    ],
+    "allowed_providers": [],
+    "allowed_tools": [],
+    "network_access": false,
+    "filesystem_access": "none",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "ACTION_SKILL",
+    "execution_policy": "NO_CODE",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_gates.py"
+    ]
+  },
+  "docx-exporter": {
+    "name": "docx-exporter",
+    "description": "导出 DOCX/Markdown；正式导出前核对统一 Gate 清单；草稿明确标注未通过 QA",
+    "version": "0.1.0",
+    "domain": "education",
+    "risk_level": "medium",
+    "user_invocable": true,
+    "auto_invocable": true,
+    "input_schema": null,
+    "output_schema": "export_manifest",
+    "requires": [
+      "script"
+    ],
+    "produces": [
+      "export_manifest"
+    ],
+    "allowed_providers": [],
+    "allowed_tools": [
+      "file_write"
+    ],
+    "network_access": false,
+    "filesystem_access": "project_outputs_write",
+    "external_side_effects": false,
+    "requires_evidence_gate": false,
+    "review_status": "APPROVED",
+    "adoption_decision": "ADOPT",
+    "role": "ACTION_SKILL",
+    "execution_policy": "TRUSTED_RUNNER",
+    "enabled_by_default": true,
+    "self_implemented": true,
+    "tests": [
+      "tests/test_pipeline.py"
+    ]
+  }
+}

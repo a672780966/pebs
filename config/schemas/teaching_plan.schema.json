@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/teaching_plan",
+  "title": "TeachingPlan",
+  "type": "object",
+  "required": ["section_id", "strategies", "pck_notes"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "strategies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["goal_ref", "knowledge_type", "strategy", "rationale"],
+        "properties": {
+          "goal_ref": { "type": "string" },
+          "knowledge_type": { "type": "string" },
+          "strategy": { "type": "string" },
+          "rationale": { "type": "string" },
+          "allowed_set": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "pck_notes": { "type": "array", "items": { "type": "string" } },
+    "udl": {
+      "type": "object",
+      "properties": {
+        "barriers": { "type": "array", "items": { "type": "string" } },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["barrier", "option", "same_goal_ref", "core_demand_preserved"],
+            "properties": {
+              "barrier": { "type": "string" },
+              "option": { "type": "string" },
+              "same_goal_ref": { "type": "string" },
+              "core_demand_preserved": { "type": "boolean" },
+              "representation": { "type": "string" },
+              "action_expression": { "type": "string" },
+              "engagement": { "type": "string" }
+            }
+          }
+        },
+        "support_review_flags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

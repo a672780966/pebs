@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/script",
+  "title": "Script",
+  "type": "object",
+  "required": ["section_id", "title", "units", "word_count"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "title": { "type": "string" },
+    "template_ref": { "type": "string" },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["unit_id", "kind", "text"],
+        "properties": {
+          "unit_id": { "type": "string" },
+          "kind": { "enum": ["narration", "visual", "case", "interaction", "title", "note"] },
+          "text": { "type": "string" },
+          "case_ref": { "type": ["string", "null"] },
+          "claim_refs": { "type": "array", "items": { "type": "string" } },
+          "placeholder": { "type": "boolean" },
+          "visual_function": { "type": "string" }
+        }
+      }
+    },
+    "word_count": {
+      "type": "object",
+      "required": ["method", "count", "min", "max", "in_range"],
+      "properties": {
+        "method": { "type": "string" },
+        "count": { "type": "integer" },
+        "min": { "type": "integer" },
+        "max": { "type": "integer" },
+        "in_range": { "type": "boolean" },
+        "scope_note": { "type": "string" }
+      }
+    }
+  }
+}

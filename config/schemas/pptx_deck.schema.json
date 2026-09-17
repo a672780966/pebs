@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/pptx_deck",
+  "title": "PptxDeck",
+  "type": "object",
+  "required": ["path", "sha256", "slides", "stats", "qa"],
+  "properties": {
+    "path": { "type": "string" },
+    "sha256": { "type": "string" },
+    "engine": { "type": "string" },
+    "renderer": { "type": "string" },
+    "template_used": { "type": "string" },
+    "thumbnails": { "type": "array", "items": { "type": "string" } },
+    "families": { "type": "array", "items": { "type": "string" } },
+    "delivery_check": { "type": "object" },
+    "stats": { "type": "object" },
+    "slides": { "type": "array", "items": { "type": "object" } },
+    "qa": {
+      "type": "object",
+      "required": ["status", "checks", "issues"],
+      "properties": {
+        "status": { "enum": ["PASS", "NEEDS_REVIEW", "FAIL"] },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "check": { "type": "string" },
+              "status": { "type": "string" },
+              "detail": { "type": "string" }
+            }
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "location": { "type": "string" },
+              "reason": { "type": "string" },
+              "next_step": { "type": "string" }
+            }
+          }
+        },
+        "overflow_suspects": { "type": "array", "items": { "type": "object" } },
+        "jargon_hits": { "type": "array", "items": { "type": "object" } }
+      }
+    }
+  }
+}

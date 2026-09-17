@@ -1,0 +1,25 @@
+high_risk_knowledge_types:
+  - attitude
+  - reflection
+safety_patterns:
+  - id: diagnosis_wording
+    pattern: "(诊断为|确诊为|患有[^。；\\n]{0,12}(症|障碍))"
+    reason: 心理诊断措辞
+  - id: student_labeling
+    pattern: "(多动症学生|自闭症学生|抑郁症学生|焦虑症学生|ADHD学生|问题学生)"
+    reason: 标签化
+  - id: referral_directive
+    pattern: "(该学生需要转介|建议转介|必须转介|应当转介)"
+    reason: 不恰当的特别转介
+  - id: treatment_claim
+    pattern: "(可以治疗|能够治愈|疗效等同于|替代治疗|代替治疗)"
+    reason: 把自助策略说成治疗
+  - id: single_cause
+    pattern: "(完全由[^。]{0,14}导致|就是因为[^。]{0,14})"
+    reason: 单因果解释
+  - id: neuro_overclaim
+    pattern: "(杏仁核启动后必然|神经机制已证明|大脑决定了|由大脑硬件决定)"
+    reason: 神经科学过度简化
+individual_inference:
+  pattern: "(这个学生|该学生|这名学生)"
+  reason: 涉及个体推断，须标注为教学假设或人工复核

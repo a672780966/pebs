@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/gate_result",
+  "title": "GateResult",
+  "type": "object",
+  "required": ["gate_id", "check_version", "target", "rules_version", "status", "issues", "run_id", "created_at"],
+  "properties": {
+    "gate_id": { "enum": ["G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"] },
+    "check_version": { "type": "string" },
+    "target": {
+      "type": "object",
+      "required": ["artifact_id", "revision_id", "content_hash"],
+      "properties": {
+        "artifact_id": { "type": "string" },
+        "revision_id": { "type": "string" },
+        "content_hash": { "type": "string" }
+      }
+    },
+    "dep_versions": { "type": "object", "additionalProperties": { "type": "string" } },
+    "rules_version": { "type": "string" },
+    "status": { "enum": ["PASS", "FAIL", "NEEDS_REVIEW", "NOT_APPLICABLE"] },
+    "not_applicable_reason": { "type": "string" },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["location", "reason"],
+        "properties": {
+          "location": { "type": "string" },
+          "reason": { "type": "string" },
+          "next_step": { "type": "string" }
+        }
+      }
+    },
+    "run_id": { "type": "string" },
+    "run_environment": { "enum": ["production", "test_fixture"] },
+    "renderer": { "type": "string" },
+    "created_at": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "NOT_APPLICABLE" } }, "required": ["status"] },
+      "then": { "required": ["not_applicable_reason"] }
+    }
+  ]
+}

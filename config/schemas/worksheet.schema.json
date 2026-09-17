@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/worksheet",
+  "title": "Worksheet",
+  "type": "object",
+  "required": ["section_id", "title", "instructions", "tasks"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "title": { "type": "string" },
+    "instructions": { "type": "string" },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["task_id", "kind", "prompt"],
+        "properties": {
+          "task_id": { "type": "string" },
+          "kind": { "enum": ["record_table", "sorting", "rewrite", "reflection", "practice"] },
+          "prompt": { "type": "string" },
+          "fields": { "type": "array", "items": { "type": "string" } },
+          "answer": { "type": "string" },
+          "answer_notes": { "type": "string" }
+        }
+      }
+    },
+    "reflection_questions": { "type": "array", "items": { "type": "string" } },
+    "student_version_note": { "type": "string" }
+  }
+}

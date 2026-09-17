@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/slide_plan",
+  "title": "SlidePlan",
+  "type": "object",
+  "required": ["rows"],
+  "properties": {
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "slide",
+          "title",
+          "narrative_section",
+          "communication_task",
+          "core_message",
+          "layout_archetype",
+          "density",
+          "risk"
+        ],
+        "properties": {
+          "slide": { "type": "integer" },
+          "title": { "type": "string" },
+          "narrative_section": { "type": "string" },
+          "communication_task": { "type": "string" },
+          "source_asset": { "type": "string" },
+          "asset_geometry": { "type": "string" },
+          "core_message": { "type": "string" },
+          "layout_archetype": { "enum": ["cover", "section_title", "bullets", "diagram", "table", "closing"] },
+          "density": { "enum": ["low", "medium", "high"] },
+          "asset_handling": { "type": "string" },
+          "risk": { "type": "string" },
+          "section_id": { "type": "string" },
+          "points": { "type": "array", "items": { "type": "string" } },
+          "table": {
+            "type": "object",
+            "properties": {
+              "headers": { "type": "array", "items": { "type": "string" } },
+              "rows": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } }
+            }
+          },
+          "diagram_id": { "type": "string" },
+          "claim_refs": { "type": "array", "items": { "type": "string" } },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

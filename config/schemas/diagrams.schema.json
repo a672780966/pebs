@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/diagrams",
+  "title": "Diagrams",
+  "type": "object",
+  "required": ["section_id", "diagrams"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "diagrams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["diagram_id", "item_id", "diagram_type", "title", "semantics", "svg_path", "svg_sha256"],
+        "properties": {
+          "diagram_id": { "type": "string" },
+          "item_id": { "type": "string" },
+          "diagram_type": {
+            "enum": [
+              "concept_relationship",
+              "comparison",
+              "sequence",
+              "causality",
+              "timeline",
+              "hierarchy",
+              "state",
+              "part_whole",
+              "evidence_map",
+              "case_flow",
+              "observation_flow"
+            ]
+          },
+          "title": { "type": "string" },
+          "semantics": {
+            "type": "object",
+            "required": ["nodes", "edges"],
+            "properties": {
+              "nodes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "label"],
+                  "properties": {
+                    "id": { "type": "string" },
+                    "label": { "type": "string" },
+                    "kind": { "type": "string" }
+                  }
+                }
+              },
+              "edges": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["from", "to"],
+                  "properties": {
+                    "from": { "type": "string" },
+                    "to": { "type": "string" },
+                    "label": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "svg_path": { "type": "string" },
+          "svg_sha256": { "type": "string" },
+          "alt_text": { "type": "string" }
+        }
+      }
+    }
+  }
+}

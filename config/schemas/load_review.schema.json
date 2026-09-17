@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/load_review",
+  "title": "LoadReview",
+  "type": "object",
+  "required": ["section_id", "cognitive_load", "dual_coding"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "cognitive_load": {
+      "type": "object",
+      "required": ["level", "reasons"],
+      "properties": {
+        "level": { "enum": ["LOW", "MEDIUM", "HIGH"] },
+        "reasons": { "type": "array", "items": { "type": "string" } },
+        "uncertainties": { "type": "array", "items": { "type": "string" } },
+        "improvements": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "dual_coding": {
+      "type": "object",
+      "required": ["pairings"],
+      "properties": {
+        "pairings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["goal_ref", "verbal", "visual", "knowledge_function", "pairing_ok"],
+            "properties": {
+              "goal_ref": { "type": "string" },
+              "verbal": { "type": "string" },
+              "visual": { "type": "string" },
+              "knowledge_function": {
+                "enum": ["structure", "comparison", "sequence", "causality", "spatial_relation", "state_change", "hierarchy", "example", "counterexample"]
+              },
+              "diagram_id": { "type": "string" },
+              "pairing_ok": { "type": "boolean" },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

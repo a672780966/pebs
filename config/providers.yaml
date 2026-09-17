@@ -1,0 +1,36 @@
+llm:
+  # kind: codex_exec（本机已登录的 Codex CLI，无需 API Key）| openai_compatible（任意兼容端点）
+  id: default-llm
+  kind: codex_exec
+  enabled: true
+  base_url: ""
+  api_key_env: PEBS_LLM_API_KEY
+  require_api_key: false
+  model: ""
+  reasoning_effort: low
+  timeout_seconds: 240
+  temperature: 0.2
+  send_scope:
+    - 用户需求文本
+    - 已解析模板结构
+    - 用户材料文本
+    - 待核验 Claim 文本
+    - 证据片段（仅引用原文）
+research:
+  id: default-research
+  kind: crossref_openalex
+  enabled: true
+  api_key_env: PEBS_RESEARCH_API_KEY
+  require_api_key: false
+  contact_email: "your-email@example.com"
+  allowed_sources:
+    - crossref
+    - openalex
+    - semantic_scholar
+    - pubmed
+  use_unpaywall: true
+  assess_sources_per_claim: 3
+  fetch_open_fulltext: true
+  fulltext_per_claim: 1
+  fulltext_max_mib: 5
+  timeout_seconds: 60

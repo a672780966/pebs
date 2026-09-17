@@ -1,0 +1,76 @@
+tasks:
+  - research
+  - curriculum
+  - lesson-design
+  - script
+  - case
+  - assessment
+  - diagram
+  - animation
+  - presentation
+  - review
+knowledge_types:
+  - concept
+  - distinction
+  - principle
+  - procedure
+  - skill
+  - observation
+  - case-analysis
+  - reflection
+  - attitude
+  - critical-thinking
+  - research-literacy
+  - transfer
+strategy_map:
+  concept:
+    - explicit-instruction
+    - dual-coding
+    - hinge-question
+    - retrieval
+  distinction:
+    - contrast-cases
+    - error-cases
+    - hinge-question
+  principle:
+    - explicit-instruction
+    - worked-example
+    - hinge-question
+  procedure:
+    - worked-example-fading
+    - practice
+    - feedback
+  skill:
+    - worked-example-fading
+    - practice
+    - feedback
+  observation:
+    - worked-example
+    - fact-vs-judgment
+    - case-analysis
+    - error-analysis
+  case-analysis:
+    - case-analysis
+    - worked-example
+    - structured-discussion
+  reflection:
+    - guided-reflection
+    - perspective-taking
+    - structured-discussion
+  attitude:
+    - guided-reflection
+    - case-analysis
+    - structured-discussion
+  critical-thinking:
+    - contrast-cases
+    - structured-discussion
+    - argument-mapping
+  research-literacy:
+    - worked-example
+    - contrast-cases
+    - practice
+  transfer:
+    - case-analysis
+    - practice
+    - guided-reflection
+fallback_strategy: explicit-instruction

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/skill_invocations",
+  "title": "SkillInvocations",
+  "type": "object",
+  "required": ["requested", "resolved"],
+  "properties": {
+    "requested": { "type": "array", "items": { "type": "string" } },
+    "resolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["skill", "source"],
+        "properties": {
+          "skill": { "type": "string" },
+          "steps": { "type": "array", "items": { "type": "string" } },
+          "source": { "enum": ["user_explicit", "auto"] }
+        }
+      }
+    }
+  }
+}

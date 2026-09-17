@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/case",
+  "title": "Case",
+  "type": "object",
+  "required": ["case_id", "section_id", "title", "kind", "text", "linked_goal"],
+  "properties": {
+    "case_id": { "type": "string" },
+    "section_id": { "type": "string" },
+    "title": { "type": "string" },
+    "kind": { "enum": ["fictional", "adapted", "user_material"] },
+    "text": { "type": "string" },
+    "difficulty": { "type": "string" },
+    "linked_goal": { "type": "string" },
+    "claim_refs": { "type": "array", "items": { "type": "string" } },
+    "new_factual_claims": { "type": "array", "items": { "type": "string" } }
+  }
+}

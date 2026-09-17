@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/storyboard",
+  "title": "Storyboard",
+  "type": "object",
+  "required": ["section_id", "shots", "video_prompt", "static_terminal_state", "rendered"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "shots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "shot_id",
+          "learning_goal",
+          "narration",
+          "visual_state_start",
+          "visual_change",
+          "visual_state_end",
+          "on_screen_text",
+          "duration",
+          "knowledge_function",
+          "continuity_from"
+        ],
+        "properties": {
+          "shot_id": { "type": "string" },
+          "item_id": { "type": "string" },
+          "learning_goal": { "type": "string" },
+          "narration": { "type": "string" },
+          "visual_state_start": { "type": "string" },
+          "visual_change": { "type": "string" },
+          "visual_state_end": { "type": "string" },
+          "labels": { "type": "array", "items": { "type": "string" } },
+          "on_screen_text": { "type": "string" },
+          "duration": { "type": "number", "exclusiveMinimum": 0 },
+          "knowledge_function": { "type": "string" },
+          "cognitive_load_note": { "type": "string" },
+          "continuity_from": { "type": "string" },
+          "continuity_to": { "type": "string" }
+        }
+      }
+    },
+    "video_prompt": { "type": "string" },
+    "static_terminal_state": { "type": "string" },
+    "rendered": { "type": "boolean", "const": false }
+  }
+}

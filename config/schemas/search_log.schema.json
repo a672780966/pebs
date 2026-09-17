@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/search_log",
+  "title": "SearchLog",
+  "type": "object",
+  "required": ["database", "query", "date", "results_count", "outcome"],
+  "properties": {
+    "database": { "type": "string" },
+    "query": { "type": "string" },
+    "filters": { "type": "object" },
+    "date": { "type": "string" },
+    "results_count": { "type": "integer" },
+    "included": { "type": "array", "items": { "type": "string" } },
+    "excluded": { "type": "array", "items": { "type": "string" } },
+    "reason": { "type": "string" },
+    "outcome": { "enum": ["ok", "unavailable", "error"] },
+    "note": { "type": "string" }
+  }
+}

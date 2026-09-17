@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/export_manifest",
+  "title": "ExportManifest",
+  "type": "object",
+  "required": ["project_id", "mode", "files", "created_at"],
+  "properties": {
+    "project_id": { "type": "string" },
+    "mode": { "enum": ["draft", "formal"] },
+    "draft_label": { "type": ["string", "null"] },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "kind", "sha256", "label"],
+        "properties": {
+          "path": { "type": "string" },
+          "kind": { "enum": ["docx", "markdown", "svg", "json", "txt", "pptx"] },
+          "sha256": { "type": "string" },
+          "label": { "type": "string" },
+          "role": { "enum": ["lesson_script", "diagram", "storyboard", "prompt", "presentation", "lesson_plan", "worksheet", "worksheet_teacher"] }
+        }
+      }
+    },
+    "gate_summary": { "type": "array", "items": { "type": "object" } },
+    "signoffs": { "type": "array", "items": { "type": "object" } },
+    "created_at": { "type": "string" }
+  }
+}

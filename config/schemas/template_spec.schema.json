@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/template_spec",
+  "title": "TemplateSpec",
+  "type": "object",
+  "required": ["kind", "sha256", "columns"],
+  "properties": {
+    "kind": { "enum": ["docx_table", "markdown", "none"] },
+    "path": { "type": "string" },
+    "sha256": { "type": "string" },
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "order": { "type": "integer" },
+          "required": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "word_min": { "type": "integer" },
+    "word_max": { "type": "integer" },
+    "section_headings": { "type": "array", "items": { "type": "string" } },
+    "terminology_rules": { "type": "array", "items": { "type": "string" } },
+    "parse_warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

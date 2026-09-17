@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/materials",
+  "title": "Materials",
+  "type": "object",
+  "required": ["files"],
+  "properties": {
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "kind", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "kind": { "enum": ["txt", "markdown", "docx", "pdf"] },
+          "text": { "type": "string" },
+          "sha256": { "type": "string" },
+          "chars": { "type": "integer" },
+          "content_level": { "enum": ["full_text", "user_excerpt", "metadata"] },
+          "sensitive": { "type": "boolean" },
+          "pii_types": { "type": "array", "items": { "type": "string" } },
+          "warnings": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/requirements",
+  "title": "Requirements",
+  "type": "object",
+  "required": ["project_id", "course", "language", "outputs", "sections", "items"],
+  "properties": {
+    "project_id": { "type": "string" },
+    "course": { "type": "string" },
+    "language": { "type": "string" },
+    "outputs": { "type": "array", "items": { "enum": ["script", "lesson_plan", "assessment", "worksheet", "docx", "markdown", "ppt"] } },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section_id", "title"],
+        "properties": {
+          "section_id": { "type": "string" },
+          "title": { "type": "string" },
+          "word_min": { "type": "integer" },
+          "word_max": { "type": "integer" },
+          "required_case_count": { "type": "integer" },
+          "required_components": { "type": "array", "items": { "enum": ["case", "animation", "diagram", "assessment", "interaction"] } }
+        }
+      }
+    },
+    "word_rules": {
+      "type": "object",
+      "properties": {
+        "scope": { "type": "string" },
+        "min": { "type": "integer" },
+        "max": { "type": "integer" },
+        "counting": { "type": "string" }
+      }
+    },
+    "terminology": { "type": "array", "items": { "type": "string" } },
+    "template_constraints": { "type": "object" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["req_id", "text", "source", "status"],
+        "properties": {
+          "req_id": { "type": "string" },
+          "text": { "type": "string" },
+          "source": { "enum": ["user_explicit", "material_extracted", "template_extracted", "system_default"] },
+          "scope": { "type": "string" },
+          "status": { "enum": ["confirmed", "proposed", "conflicted"] },
+          "conflict": { "type": "string" }
+        }
+      }
+    },
+    "disallowed": { "type": "array", "items": { "type": "string" } },
+    "user_prompt": { "type": "string" },
+    "template_ref": { "type": ["string", "null"] }
+  }
+}

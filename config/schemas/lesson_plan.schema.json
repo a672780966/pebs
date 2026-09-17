@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/lesson_plan",
+  "title": "LessonPlan",
+  "type": "object",
+  "required": ["section_id", "title", "objectives", "key_points", "difficult_points", "process"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "title": { "type": "string" },
+    "objectives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["goal_ref", "text"],
+        "properties": {
+          "goal_ref": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "key_points": { "type": "array", "items": { "type": "string" } },
+    "difficult_points": { "type": "array", "items": { "type": "string" } },
+    "preparation": { "type": "array", "items": { "type": "string" } },
+    "process": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage", "minutes", "teacher_activity", "student_activity"],
+        "properties": {
+          "stage": { "type": "string" },
+          "minutes": { "type": "number", "exclusiveMinimum": 0 },
+          "teacher_activity": { "type": "string" },
+          "student_activity": { "type": "string" },
+          "intent": { "type": "string" }
+        }
+      }
+    },
+    "board_design": { "type": "string" },
+    "homework": { "type": "array", "items": { "type": "string" } }
+  }
+}

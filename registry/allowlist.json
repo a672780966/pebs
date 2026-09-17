@@ -1,0 +1,18 @@
+{
+  "skills": [
+    "template-parser",
+    "requirements-builder",
+    "learning-designer",
+    "claim-extractor",
+    "evidence-reviewer",
+    "pck-developer",
+    "case-designer",
+    "assessment-designer",
+    "script-writer",
+    "psychology-safety",
+    "docx-exporter"
+  ],
+  "tools": ["file_read", "file_write", "web_read"],
+  "network_hosts": ["api.crossref.org", "api.openalex.org", "api.semanticscholar.org", "localhost", "127.0.0.1"],
+  "providers": ["default-llm", "default-research"]
+}

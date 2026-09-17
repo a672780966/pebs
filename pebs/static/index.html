@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Psychology Education Build System</title>
+<style>
+:root { --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --text:#e6e8ee; --muted:#8b93a7; --accent:#7c9cff; --ok:#3ecf8e; --warn:#f2c94c; --bad:#ff6b6b; --border:#2a2f3a; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif; background:var(--bg); color:var(--text); font-size:14px; }
+header { display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--panel); position:sticky; top:0; z-index:5; flex-wrap:wrap; }
+h1 { font-size:15px; margin:0; font-weight:600; }
+.chip { border:1px solid var(--border); border-radius:999px; padding:2px 10px; color:var(--muted); font-size:12px; }
+.chip.ok { color:var(--ok); border-color:#245c41; }
+.chip.bad { color:var(--bad); border-color:#5c2424; }
+input, textarea, select, button { font:inherit; color:var(--text); background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:6px 8px; }
+button { cursor:pointer; }
+button:hover { border-color:var(--accent); }
+button.primary { background:#2b3d7a; border-color:#3c55a8; }
+button.danger { background:#5c2424; }
+main { display:grid; grid-template-columns: 420px 1fr; gap:12px; padding:12px; align-items:start; }
+.panel { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px; }
+.panel h2 { font-size:13px; margin:0 0 8px; color:var(--muted); font-weight:600; letter-spacing:.4px; }
+.row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+.row > input[type=text] { flex:1; }
+textarea { width:100%; min-height:96px; resize:vertical; }
+.tabs { display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap; }
+.tabs button.active { background:#2b3d7a; border-color:#3c55a8; }
+.step { display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--border); border-radius:6px; margin-bottom:6px; background:var(--panel2); }
+.step .name { flex:1; }
+.step .note { color:var(--muted); font-size:12px; max-width:46%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.badge { font-size:11px; padding:1px 8px; border-radius:999px; border:1px solid var(--border); color:var(--muted); }
+.badge.PENDING { color:var(--muted); }
+.badge.RUNNING { color:var(--accent); border-color:#33406e; }
+.badge.SUCCEEDED, .badge.PASS { color:var(--ok); border-color:#245c41; }
+.badge.FAILED, .badge.FAIL { color:var(--bad); border-color:#5c2424; }
+.badge.BLOCKED, .badge.NEEDS_REVIEW { color:var(--warn); border-color:#5c4f24; }
+.badge.CANCELLED, .badge.NOT_APPLICABLE, .badge.STALE { color:var(--muted); }
+.badge.draft { color:var(--warn); border-color:#5c4f24; }
+.badge.formal { color:var(--ok); border-color:#245c41; }
+pre { white-space:pre-wrap; word-break:break-word; background:var(--panel2); border:1px solid var(--border); border-radius:8px; padding:10px; max-height:62vh; overflow:auto; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th, td { text-align:left; padding:5px 8px; border-bottom:1px solid var(--border); vertical-align:top; }
+th { color:var(--muted); font-weight:600; }
+.muted { color:var(--muted); }
+.small { font-size:12px; }
+.diff { background:#10131a; border:1px solid var(--border); border-radius:8px; padding:8px; max-height:40vh; overflow:auto; font-family:Consolas,monospace; font-size:12px; white-space:pre; }
+.issue { color:var(--warn); }
+.hidden { display:none; }
+.spacer { flex:1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>心理学教育 Build 工作台</h1>
+  <input type="text" id="projectId" placeholder="项目 ID" value="demo" style="width:140px">
+  <button onclick="openProject()">打开/创建项目</button>
+  <button class="danger" onclick="deleteProject()">删除项目</button>
+  <span class="spacer"></span>
+  <span class="chip" id="chipLlm">LLM: ?</span>
+  <span class="chip" id="chipResearch">研究: ?</span>
+  <span class="chip" id="chipRules">规则: ?</span>
+</header>
+<main>
+  <section class="panel">
+    <h2>BUILD</h2>
+    <textarea id="request" placeholder="描述你要做的课程任务，例如：按照我上传的模板，写《托育机构管理实务》第八章四节课程脚本，每节 1800–2100 字，每节至少 1 个案例，称谓统一使用“婴幼儿”。"></textarea>
+    <div class="row small">
+      <label>模板：<input type="file" id="templateFile" accept=".docx,.md,.txt"></label>
+    </div>
+    <div class="row small">
+      <label>材料：<input type="file" id="materialFiles" multiple accept=".docx,.md,.txt,.pdf"></label>
+    </div>
+    <div class="row">
+      <button class="primary" onclick="startBuild()">开始 Build</button>
+      <button onclick="cancelRun()">取消运行</button>
+      <span class="muted small" id="runLabel"></span>
+      <span class="muted small" id="budgetLabel"></span>
+    </div>
+    <h2 style="margin-top:14px">PLAN</h2>
+    <div id="plan"></div>
+    <h2 style="margin-top:14px">变更集（候选）</h2>
+    <div id="changesets"></div>
+  </section>
+  <section class="panel">
+    <div class="tabs">
+      <button class="active" data-tab="preview" onclick="showTab('preview')">预览</button>
+      <button data-tab="gates" onclick="showTab('gates')">门禁 G1–G8</button>
+      <button data-tab="media" onclick="showTab('media')">媒体</button>
+      <button data-tab="evidence" onclick="showTab('evidence')">证据</button>
+      <button data-tab="requirements" onclick="showTab('requirements')">要求/规则</button>
+      <button data-tab="registry" onclick="showTab('registry')">能力</button>
+      <button data-tab="diff" onclick="showTab('diff')">Diff / 接受</button>
+      <button data-tab="case" onclick="showTab('case')">案例替换</button>
+      <button data-tab="export" onclick="showTab('export')">导出</button>
+    </div>
+    <div id="tab-preview">
+      <div class="row"><button onclick="loadPreview()">刷新预览</button><span class="muted small">预览始终显示草稿与检查状态</span></div>
+      <pre id="preview"></pre>
+    </div>
+    <div id="tab-gates" class="hidden">
+      <div class="row"><button onclick="loadGates()">刷新门禁</button></div>
+      <div id="gates"></div>
+    </div>
+    <div id="tab-media" class="hidden">
+      <div class="row"><button onclick="loadMedia()">刷新媒体</button><span class="muted small">图示为 SVG；动画只到分镜与提示词，视频渲染前停止</span></div>
+      <div id="media"></div>
+    </div>
+    <div id="tab-evidence" class="hidden">
+      <div class="row"><button onclick="loadEvidence()">刷新证据</button></div>
+      <div id="evidence"></div>
+    </div>
+    <div id="tab-requirements" class="hidden">
+      <div class="row"><button onclick="loadRequirements()">刷新要求/规则</button></div>
+      <div id="requirements"></div>
+    </div>
+    <div id="tab-registry" class="hidden">
+      <div class="row">
+        <button onclick="loadRegistry()">刷新能力</button>
+        <button onclick="probeSandbox()">重新探测沙箱</button>
+        <span class="muted small" id="sandboxChip"></span>
+      </div>
+      <div class="row small">
+        <input type="text" id="skillUrl" placeholder="Skill 归档 URL（https://github.com/.../archive/xxx.tar.gz 或 file:///...）">
+        <input type="text" id="skillRef" placeholder="ref/sha（可选）" style="width:160px">
+        <button onclick="importSkill()">隔离导入</button>
+      </div>
+      <p class="muted small">导入只进入隔离区并做哈希/路径/体积检查，绝不执行任何脚本；审查通过并发布 pin 之后才能进入运行路由。</p>
+      <div id="registry"></div>
+    </div>
+    <div id="tab-diff" class="hidden">
+      <div id="diffList"></div>
+      <div class="diff" id="diffBody"></div>
+    </div>
+    <div id="tab-case" class="hidden">
+      <div class="row">
+        <select id="caseSelect"></select>
+        <input type="text" id="caseInstruction" placeholder="修改要求，例如：换成一个托育园午睡管理的案例">
+        <button class="primary" onclick="replaceCase()">替换案例</button>
+      </div>
+      <p class="muted small">替换后只重建依赖该案例的脚本段落、门禁、预览与导出；无关产物版本不变。</p>
+    </div>
+    <div id="tab-export" class="hidden">
+      <div class="row">
+        <button onclick="doExport('draft')">导出草稿</button>
+        <button class="primary" onclick="doExport('formal')">导出正式</button>
+        <button onclick="loadOutputs()">刷新</button>
+      </div>
+      <p class="muted small">正式导出会先写入暂存区并通过 G8；只有在你接受对应变更集之后，才发布到 outputs/formal（候选不会提前冒充正式交付物）。</p>
+      <div id="outputs"></div>
+    </div>
+  </section>
+</main>
+<script>
+let project = "demo";
+let currentRun = null;
+let pollTimer = null;
+
+async function api(path, options) {
+  const res = await fetch(path, options);
+  const text = await res.text();
+  let data; try { data = JSON.parse(text); } catch { data = { detail: text }; }
+  if (!res.ok) { console.warn(path, res.status, data); }
+  return data;
+}
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[c])); }
+
+async function loadStatus() {
+  const s = await api("/api/status");
+  const llm = s.providers?.llm || {};
+  const research = s.providers?.research || {};
+  const chip = (el, name, st) => {
+    el.textContent = `${name}: ${st.available ? "已配置" : "未配置"}`;
+    el.className = "chip " + (st.available ? "ok" : "bad");
+    el.title = (st.reasons || []).join("\n");
+  };
+  chip(document.getElementById("chipLlm"), "LLM", llm);
+  chip(document.getElementById("chipResearch"), "研究", research);
+  document.getElementById("chipRules").textContent = "规则: " + (s.rules_version || "");
+  const b = s.budgets || {};
+  document.getElementById("budgetLabel").textContent =
+    b.model_calls ? `预算：${b.model_calls} 次模型调用 / ${b.research_requests} 次研究请求 / ${Math.round((b.run_seconds || 0) / 60)} 分钟` : "";
+}
+
+async function openProject() {
+  project = document.getElementById("projectId").value.trim() || "demo";
+  await api("/api/projects", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ project_id: project }) });
+  refreshPlan(); loadChangesets(); loadPreview(); loadOutputs();
+}
+
+async function uploadFile(file) {
+  const fd = new FormData();
+  fd.append("file", file);
+  return api(`/api/projects/${encodeURIComponent(project)}/upload`, { method:"POST", body: fd });
+}
+
+async function deleteProject() {
+  if (!confirm(`确认删除项目 ${project} 的托管数据（输入副本、产物、日志、缓存）？上传前原文件不受影响。`)) return;
+  const res = await api(`/api/projects/${encodeURIComponent(project)}`, { method: "DELETE" });
+  alert(res.note || res.detail || "已删除");
+  refreshPlan(); loadChangesets(); loadPreview();
+}
+
+async function rerunFrom(stepId) {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/plan/rerun`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ step_id: stepId })
+  });
+  if (res.reason || res.detail) { alert(res.reason || res.detail); return; }
+  currentRun = res.run_id;
+  document.getElementById("runLabel").textContent = `run ${res.run_id}`;
+  pollRun();
+  loadChangesets();
+}
+
+async function startBuild() {
+  const request = document.getElementById("request").value.trim();
+  if (!request) { alert("请填写任务描述"); return; }
+  const templateFile = document.getElementById("templateFile").files[0];
+  const materialFiles = Array.from(document.getElementById("materialFiles").files || []);
+  const template = templateFile ? (await uploadFile(templateFile)).path : null;
+  const materials = [];
+  for (const f of materialFiles) materials.push((await uploadFile(f)).path);
+  const start = await api(`/api/projects/${encodeURIComponent(project)}/build`, {
+    method:"POST", headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ request, template_path: template, material_paths: materials })
+  });
+  if (start.detail) { alert(start.detail); return; }
+  currentRun = start.run_id;
+  document.getElementById("runLabel").textContent = `run ${start.run_id}`;
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(pollRun, 1500);
+  pollRun();
+}
+
+async function pollRun() {
+  if (!currentRun) return;
+  const status = await api(`/api/projects/${encodeURIComponent(project)}/runs/${currentRun}`);
+  if (status.detail) return;
+  renderPlan(status.steps);
+  document.getElementById("runLabel").textContent = `run ${currentRun} · ${status.run.status} · ${status.run.environment}`;
+  if (status.run.status !== "running") {
+    clearInterval(pollTimer); pollTimer = null;
+    loadChangesets(); loadPreview(); loadGates(); loadEvidence(); loadOutputs();
+  }
+}
+
+async function cancelRun() {
+  if (!currentRun) return;
+  await api(`/api/projects/${encodeURIComponent(project)}/runs/${currentRun}/cancel`, { method:"POST" });
+}
+
+async function refreshPlan() {
+  const plan = await api(`/api/projects/${encodeURIComponent(project)}/plan`);
+  renderPlan((plan.steps || []).map(s => ({ ...s, status: s.status })));
+}
+
+function renderPlan(steps) {
+  const el = document.getElementById("plan");
+  el.innerHTML = (steps || []).map(s => `
+    <div class="step">
+      <span class="badge ${esc(s.status)}">${esc(s.status)}</span>
+      <span class="name">${esc(s.title || s.step_id)}</span>
+      <span class="note muted">${esc(s.note || s.error || "")}</span>
+      ${s.kind !== "gate" && s.kind !== "export" ? `
+        <button class="small" onclick="planEdit('${esc(s.step_id)}','${s.disabled ? "enable" : "disable"}')">${s.disabled ? "启用" : "禁用"}</button>
+      ` : ""}
+      <button class="small" onclick="planEdit('${esc(s.step_id)}','${s.locked ? "unlock" : "lock"}')">${s.locked ? "解锁" : "锁定"}</button>
+      <button class="small" onclick="rerunFrom('${esc(s.step_id)}')">重跑</button>
+      <button class="small" onclick="planEdit('${esc(s.step_id)}','move',-1)">↑</button>
+    </div>`).join("");
+}
+
+async function planEdit(stepId, op, index) {
+  const plan = await api(`/api/projects/${encodeURIComponent(project)}/plan`);
+  const steps = plan.steps || [];
+  if (op === "move") {
+    const i = steps.findIndex(s => s.step_id === stepId);
+    index = Math.max(0, i + index);
+  }
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/plan/edit`, {
+    method:"POST", headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ op, step_id: stepId, index })
+  });
+  if (res.ok === false || res.reason) alert(res.reason);
+  renderPlan(res.steps ? res.steps.map(s => ({ ...s, status: s.status })) : steps);
+  refreshPlan();
+}
+
+async function loadPreview() {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/preview`);
+  document.getElementById("preview").textContent = res.content?.markdown || res.detail || "（尚未生成预览）";
+}
+
+async function loadGates() {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/gates`);
+  const readiness = res.readiness || {};
+  const rows = Object.entries(res.results || {}).map(([k, r]) => `
+    <tr><td>${esc(r.gate_id)}</td><td>${esc(r.target?.artifact_id || "")}</td>
+    <td><span class="badge ${esc(r.status)}">${esc(r.status)}</span></td>
+    <td class="small">${(r.issues || []).map(i => esc(i.reason)).join("<br>") || esc(r.not_applicable_reason || "")}</td></tr>`).join("");
+  document.getElementById("gates").innerHTML = `
+    <p>${readiness.ready ? '<span class="badge formal">可正式导出</span>' : '<span class="badge draft">不可正式导出</span>'}</p>
+    ${readiness.blocking?.length ? `<p class="issue small">${readiness.blocking.map(esc).join("<br>")}</p>` : ""}
+    <table><thead><tr><th>Gate</th><th>目标</th><th>状态</th><th>问题/原因</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function loadEvidence() {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/evidence`);
+  const claims = (res.claims || []).map(c => `
+    <tr><td>${esc(c.claim_id)}@v${esc(c.version)}</td><td>${esc(c.text)}</td><td>${esc(c.claim_type)}</td>
+    <td><span class="badge ${esc(c.status)}">${esc(c.status)}</span></td></tr>`).join("");
+  const sources = (res.sources || []).map(s => `
+    <tr><td>${esc(s.source_id)}@v${esc(s.version)}</td><td>${esc(s.title)}</td><td>${esc(s.source_type)}</td>
+    <td>${esc(s.content_level)}</td><td>${esc(s.sha256 || "")}</td></tr>`).join("");
+  const asmts = (res.assessments || []).map(a => `
+    <tr><td>${esc(a.claim_rev)}</td><td>${esc(a.source_rev)}</td><td>${esc(a.support)}</td>
+    <td><span class="badge ${esc(a.result)}">${esc(a.result)}</span></td><td class="small">${esc((a.quote || "").slice(0, 120))}</td></tr>`).join("");
+  const logs = (res.search_logs || []).map(l => `<li class="small">${esc(l.database)} · ${esc(l.query)} · ${esc(l.outcome)} · ${esc(l.results_count)} 条</li>`).join("");
+  document.getElementById("evidence").innerHTML = `
+    <h3>Claims</h3><table><thead><tr><th>ID</th><th>文本</th><th>类型</th><th>状态</th></tr></thead><tbody>${claims}</tbody></table>
+    <h3>Sources</h3><table><thead><tr><th>ID</th><th>标题</th><th>类型</th><th>层级</th><th>SHA-256</th></tr></thead><tbody>${sources}</tbody></table>
+    <h3>Assessments</h3><table><thead><tr><th>Claim</th><th>Source</th><th>支持关系</th><th>结果</th><th>原文片段</th></tr></thead><tbody>${asmts}</tbody></table>
+    <h3>检索日志</h3><ul>${logs || "<li class='muted small'>无</li>"}</ul>`;
+}
+
+async function loadChangesets() {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/changesets`);
+  const list = res.changesets || [];
+  document.getElementById("changesets").innerHTML = list.map(cs => `
+    <div class="step">
+      <span class="badge ${cs.status === "accepted" ? "PASS" : cs.status === "rejected" ? "CANCELLED" : cs.status === "conflict" ? "FAIL" : "PENDING"}">${esc(cs.status)}</span>
+      <span class="name small">${esc(cs.reason || cs.changeset_id)}</span>
+      <span class="muted small">${cs.item_count} 项</span>
+      <button class="small" onclick="loadDiff('${esc(cs.changeset_id)}')">Diff</button>
+      ${cs.status === "candidate" ? `
+        <button class="small primary" onclick="decide('${esc(cs.changeset_id)}','accept')">接受</button>
+        <button class="small danger" onclick="decide('${esc(cs.changeset_id)}','reject')">拒绝</button>` : ""}
+    </div>`).join("") || '<p class="muted small">暂无变更集</p>';
+  fillCaseSelect();
+}
+
+async function decide(changesetId, action) {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/changesets/${changesetId}/${action}`, { method:"POST" });
+  if (res.ok === false || res.reason) alert(res.reason);
+  loadChangesets(); loadPreview(); loadGates(); loadOutputs();
+}
+
+async function loadDiff(changesetId) {
+  showTab("diff");
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/changesets/${changesetId}/diff`);
+  const diffs = res.diff || [];
+  document.getElementById("diffList").innerHTML = diffs.map((d, i) => `
+    <button class="small" onclick="showDiff(${i})">${esc(d.artifact_id)} ${d.changed ? "· 变更" : "· 未变"}</button>`).join(" ");
+  window.__diffs = diffs;
+  showDiff(0);
+}
+function showDiff(i) {
+  const d = (window.__diffs || [])[i];
+  document.getElementById("diffBody").textContent = d ? (d.diff || []).join("\n") : "";
+}
+
+async function fillCaseSelect() {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/artifacts`);
+  const cases = (res.artifacts || []).filter(a => a.artifact_type === "case" && a.accepted_rev);
+  document.getElementById("caseSelect").innerHTML = cases.map(c => `<option value="${esc(c.artifact_id)}">${esc(c.artifact_id)}</option>`).join("") || '<option value="">无已接受案例</option>';
+}
+
+async function replaceCase() {
+  const caseId = document.getElementById("caseSelect").value;
+  const instruction = document.getElementById("caseInstruction").value.trim();
+  if (!caseId || !instruction) { alert("请选择案例并填写修改要求"); return; }
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/case-replace`, {
+    method:"POST", headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ case_artifact_id: caseId, instruction })
+  });
+  if (res.detail) { alert(res.detail); return; }
+  alert(`已生成候选变更集 ${res.changeset_id}（影响：${(res.affected_sections || []).join("、") || "无脚本段落"}）`);
+  loadChangesets();
+}
+
+async function doExport(mode) {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/export`, {
+    method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ mode })
+  });
+  if (res.reason || res.detail) alert(res.reason || res.detail);
+  loadOutputs(); loadGates();
+}
+
+async function loadOutputs() {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/outputs`);
+  const m = res.manifest;
+  const published = res.formal_files || [];
+  if (!m) { document.getElementById("outputs").innerHTML = '<p class="muted small">暂无导出</p>'; return; }
+  document.getElementById("outputs").innerHTML = `
+    <p><span class="badge ${m.mode === "formal" ? "formal" : "draft"}">${esc(m.label || m.mode)}</span> <span class="muted small">${esc(m.draft_label || "")}</span></p>
+    <p class="muted small">渲染器：${esc((m.renderer && (m.renderer.docx + " · " + (m.renderer.fonts || []).join("/"))) || "未记录")}</p>
+    <p class="muted small">已发布到正式目录：${published.length ? esc(published.join("、")) : "（无，接受变更集后发布）"}</p>
+    <table><thead><tr><th>候选文件</th><th>类型</th><th>标识</th></tr></thead><tbody>
+    ${(m.files || []).map(f => `<tr><td class="small">${esc(f.path)}</td><td>${esc(f.kind)}</td><td>${esc(f.label)}</td></tr>`).join("")}
+    </tbody></table>`;
+}
+
+function showTab(name) {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  ["preview","gates","media","evidence","requirements","registry","diff","case","export"].forEach(t => {
+    document.getElementById("tab-" + t).classList.toggle("hidden", t !== name);
+  });
+  if (name === "gates") loadGates();
+  if (name === "media") loadMedia();
+  if (name === "evidence") loadEvidence();
+  if (name === "requirements") loadRequirements();
+  if (name === "registry") loadRegistry();
+  if (name === "case") fillCaseSelect();
+  if (name === "export") loadOutputs();
+}
+
+async function loadMedia() {
+  const res = await api(`/api/projects/${encodeURIComponent(project)}/media`);
+  const sections = (res.sections || []).map(sec => {
+    const plan = sec.media_plan?.items || [];
+    const planRows = plan.map(i => `
+      <tr><td>${esc(i.item_id)}</td><td>${esc(i.goal_ref || "")}</td><td>${esc(i.knowledge_function)}</td>
+      <td>${esc(i.recommended_medium)}</td><td class="small">${esc(i.rationale || "")}</td></tr>`).join("");
+    const decisions = sec.animation_decisions?.decisions || [];
+    const decisionRows = decisions.map(d => `
+      <tr><td>${esc(d.item_id)}</td>
+      <td><span class="badge ${d.decision === "ANIMATION" ? "PASS" : "NOT_APPLICABLE"}">${esc(d.decision)}</span></td>
+      <td class="small">${esc(d.rationale || "")}${d.enforced ? "（系统校正：" + esc(d.enforced) + "）" : ""}</td>
+      <td class="small">${esc(d.static_alternative_desc || "")}</td></tr>`).join("");
+    const svgs = (sec.diagrams || []).map(d => `
+      <figure style="margin:8px 0">
+        <img src="/api/projects/${encodeURIComponent(project)}/file?path=${encodeURIComponent(d.svg_path || "")}"
+             alt="${esc(d.alt_text || d.title || "")}" style="max-width:100%;border:1px solid var(--border);border-radius:8px;background:#fff">
+        <figcaption class="muted small">${esc(d.title || "")}（${esc(d.diagram_type || "")}）</figcaption>
+      </figure>`).join("");
+    const sb = sec.storyboard;
+    const shotRows = (sb?.shots || []).map(s => `
+      <tr><td>${esc(s.shot_id)}</td><td class="small">${esc(s.narration)}</td>
+      <td class="small">${esc(s.visual_state_start)} → ${esc(s.visual_change)} → ${esc(s.visual_state_end)}</td>
+      <td>${esc(s.duration)}s</td><td class="small">${esc(s.knowledge_function)}</td></tr>`).join("");
+    return `
+      <h3>${esc(sec.title || sec.section_id)}</h3>
+      <table><thead><tr><th>知识点</th><th>目标</th><th>知识功能</th><th>媒体</th><th>理由</th></tr></thead><tbody>${planRows || "<tr><td colspan='5' class='muted'>（未运行）</td></tr>"}</tbody></table>
+      ${decisionRows ? `<table><thead><tr><th>候选</th><th>决策</th><th>理由</th><th>静态替代</th></tr></thead><tbody>${decisionRows}</tbody></table>` : ""}
+      ${svgs || '<p class="muted small">（无图示）</p>'}
+      ${sb?.shots?.length ? `
+        <table><thead><tr><th>镜头</th><th>讲解</th><th>画面变化</th><th>时长</th><th>知识功能</th></tr></thead><tbody>${shotRows}</tbody></table>
+        <p class="muted small">静态终态：${esc(sb.static_terminal_state || "")}</p>
+        <pre class="small">${esc(sb.video_prompt || "")}</pre>` : ""}`;
+  }).join("<hr>");
+  document.getElementById("media").innerHTML = sections || '<p class="muted small">暂无媒体产物</p>';
+}
+
+async function loadRegistry() {
+  const sandboxInfo = await api("/api/sandbox");
+  const chip = document.getElementById("sandboxChip");
+  chip.textContent = `沙箱：${sandboxInfo.available ? sandboxInfo.adapter + "（已验证）" : "不可用"}`;
+  chip.className = "muted small";
+  const res = await api("/api/registry");
+  const rows = (res.skills || []).map(s => `
+    <tr>
+      <td>${esc(s.name)}</td>
+      <td><span class="badge ${s.review_status === "APPROVED" ? "PASS" : s.review_status === "REJECTED" ? "FAIL" : "PENDING"}">${esc(s.review_status)}</span></td>
+      <td>${esc(s.execution_policy || "")}</td>
+      <td>${esc(s.enabled_by_default ? "启用" : "未启用")}</td>
+      <td>${esc(s.pinned_version || "")}${s.patches?.length ? " +" + esc(s.patches.join(",")) : ""}</td>
+      <td class="small">${s.self_implemented ? "自有实现" : esc(s.source?.repository_url || "")}</td>
+      <td>${s.self_implemented ? "" : `
+        <button class="small" onclick="reviewSkill('${esc(s.name)}','in_review')">送审</button>
+        <button class="small" onclick="reviewSkill('${esc(s.name)}','approve')">批准</button>
+        <button class="small" onclick="reviewSkill('${esc(s.name)}','reject')">驳回</button>
+        <button class="small" onclick="publishSkill('${esc(s.name)}')">发布</button>`}
+      </td>
+    </tr>`).join("");
+  const details = (sandboxInfo.details || []).map(d => `<li class="small muted">${esc(d)}</li>`).join("");
+  document.getElementById("registry").innerHTML = `
+    <ul>${details}</ul>
+    <table><thead><tr><th>名称</th><th>审查</th><th>执行策略</th><th>默认启用</th><th>版本/补丁</th><th>来源</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function probeSandbox() {
+  await api("/api/sandbox/probe", { method: "POST" });
+  loadRegistry();
+}
+
+async function importSkill() {
+  const url = document.getElementById("skillUrl").value.trim();
+  const ref = document.getElementById("skillRef").value.trim() || null;
+  if (!url) { alert("请填写归档 URL"); return; }
+  const res = await api("/api/skills/import", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url, ref })
+  });
+  if (res.detail) { alert(res.detail); return; }
+  alert(`已隔离导入：${res.name}（状态 ${res.review_status}）`);
+  loadRegistry();
+}
+
+async function reviewSkill(name, decision) {
+  let reviewer = "teacher";
+  let evidence = null;
+  if (decision === "approve") {
+    reviewer = prompt("审查人：", "teacher") || "teacher";
+    evidence = prompt("审查证据（源码哈希/审查记录位置）：", "quarantine manifest sha256 + 手工阅读") || "";
+  }
+  const res = await api("/api/skills/review", {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, decision, reviewer, evidence })
+  });
+  if (res.detail) alert(res.detail);
+  loadRegistry();
+}
+
+async function publishSkill(name) {
+  const res = await api("/api/skills/publish", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name })
+  });
+  if (res.detail) { alert(res.detail); return; }
+  alert(`已发布并 pin：${res.pinned_version}`);
+  loadRegistry();
+}
+
+async function loadRequirements() {
+  const req = await api(`/api/projects/${encodeURIComponent(project)}/artifact-json/requirements`);
+  const rules = await api(`/api/projects/${encodeURIComponent(project)}/rules`);
+  const mem = await api(`/api/projects/${encodeURIComponent(project)}/memory`);
+  if (req.detail) { document.getElementById("requirements").innerHTML = `<p class="muted small">${esc(req.detail)}</p>`; return; }
+  const items = (req.items || []).map(i => `
+    <tr><td>${esc(i.req_id)}</td><td>${esc(i.text)}</td><td>${esc(i.source)}</td>
+    <td><span class="badge ${i.status === "conflicted" ? "FAIL" : i.status === "confirmed" ? "PASS" : "PENDING"}">${esc(i.status)}</span></td>
+    <td class="small">${esc(i.conflict || "")}</td></tr>`).join("");
+  const m = mem.memory;
+  document.getElementById("requirements").innerHTML = `
+    <p>字数规则：${esc(req.word_rules?.min ?? 0)}–${esc(req.word_rules?.max ?? 0)}（${esc(req.word_rules?.counting || "")}） · 术语：${esc((req.terminology || []).join("、") || "无")}</p>
+    <table><thead><tr><th>ID</th><th>要求</th><th>来源</th><th>状态</th><th>冲突</th></tr></thead><tbody>${items}</tbody></table>
+    <h3>项目规则（PROJECT_RULES.md）</h3>
+    <pre class="small">${esc(rules.text || "（无）")}</pre>
+    <h3>Project Memory</h3>
+    <pre class="small">${esc(m ? JSON.stringify(m, null, 2) : "（尚未生成：接受变更集后写入）")}</pre>`;
+}
+
+loadStatus();
+openProject();
+</script>
+</body>
+</html>

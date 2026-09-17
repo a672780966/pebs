@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pebs/assessment",
+  "title": "Assessment",
+  "type": "object",
+  "required": ["section_id", "items"],
+  "properties": {
+    "section_id": { "type": "string" },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["assessment_id", "kind", "question", "answer", "target_goal"],
+        "properties": {
+          "assessment_id": { "type": "string" },
+          "kind": { "enum": ["hinge_question", "formative", "reflection_prompt"] },
+          "question": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "answer": { "type": "string" },
+          "distractors": { "type": "array", "items": { "type": "string" } },
+          "rationale": { "type": "string" },
+          "target_goal": { "type": "string" },
+          "claim_refs": { "type": "array", "items": { "type": "string" } },
+          "student_viewable": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
