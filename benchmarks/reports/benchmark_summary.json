@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-19T05:46:56",
+  "generated_at": "2026-09-19T07:20:53",
   "cases": [
     {
       "case_id": "A",
@@ -252,8 +252,8 @@
       "case_id": "G",
       "scenario": {
         "status": "succeeded",
-        "attempts": 8,
-        "succeeded": 5,
+        "attempts": 9,
+        "succeeded": 6,
         "evidence_policy": [
           "SUPPORTED"
         ],
@@ -264,7 +264,7 @@
         "routing_errors": null,
         "plan_errors": null,
         "model_calls": 9.0,
-        "runtime_seconds": 20.92,
+        "runtime_seconds": 2354.22,
         "automatic_issues": 0.0,
         "runs": 1
       }
@@ -596,14 +596,14 @@
       "automatic_issues": 0
     },
     {
-      "run_id": "run_7619897365aa",
+      "run_id": "run_ee22bc3e2062",
       "case_id": "G",
       "mode": "scenario",
       "variant": "scenario",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 8,
-      "succeeded": 5,
+      "attempts": 9,
+      "succeeded": 6,
       "evidence_policy": [
         "SUPPORTED"
       ],
@@ -615,7 +615,7 @@
       "plan_errors": null,
       "model_calls": 9,
       "research_calls": null,
-      "runtime_seconds": 20.92,
+      "runtime_seconds": 2354.22,
       "skill_failure_rate": null,
       "locality_preservation_rate": 1.0,
       "automatic_issues": 0
