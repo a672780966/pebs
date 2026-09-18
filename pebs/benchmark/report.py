@@ -46,21 +46,27 @@ def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
     directory = runs_dir or cases.runs_dir()
     if not directory.exists():
         return []
-    grouped: dict[tuple[str, str], list[tuple[float, dict[str, Any]]]] = {}
+    grouped: dict[tuple[str, str, str], list[tuple[float, dict[str, Any]]]] = {}
     for path in sorted(directory.glob("*/run.json")):
         try:
             record = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
-        key = (str(record.get("case_id")), str(record.get("mode")))
+        # §46：Builtin / External / Hybrid 是不同实验，必须分行对比而不是互相覆盖
+        key = (
+            str(record.get("case_id")),
+            str(record.get("mode")),
+            str(record.get("experiment") or ""),
+        )
         grouped.setdefault(key, []).append((path.stat().st_mtime, record))
     representatives: list[dict[str, Any]] = []
-    for (case_id, mode), items in sorted(grouped.items()):
+    for (case_id, mode, experiment), items in sorted(grouped.items()):
         items.sort(key=lambda pair: pair[0])
         succeeded = [pair for pair in items if pair[1].get("run_status") == "succeeded"]
         chosen = succeeded[-1][1] if succeeded else items[-1][1]
         chosen["_attempts"] = len(items)
         chosen["_succeeded"] = len(succeeded)
+        chosen["_variant"] = f"{mode} [+{experiment}]" if experiment else mode
         representatives.append(chosen)
     return representatives
 
@@ -72,6 +78,8 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
         "run_id": run.get("run_id"),
         "case_id": run.get("case_id"),
         "mode": run.get("mode"),
+        "variant": run.get("_variant") or run.get("mode"),
+        "experiment": run.get("experiment") or "",
         "status": run.get("run_status"),
         "attempts": run.get("_attempts", 1),
         "succeeded": run.get("_succeeded", 1 if run.get("run_status") == "succeeded" else 0),
@@ -101,12 +109,11 @@ def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     table: list[dict[str, Any]] = []
     for case_id in sorted(by_case):
         entry: dict[str, Any] = {"case_id": case_id}
-        for mode in COLUMNS:
-            matching = [row for row in by_case[case_id] if row["mode"] == mode]
-            if not matching:
-                entry[mode] = None
-                continue
-            entry[mode] = {
+        variants: dict[str, list[dict[str, Any]]] = {}
+        for row in by_case[case_id]:
+            variants.setdefault(str(row.get("variant") or row["mode"]), []).append(row)
+        for variant, matching in sorted(variants.items()):
+            entry[variant] = {
                 "status": matching[-1].get("status"),
                 "attempts": matching[-1].get("attempts"),
                 "succeeded": matching[-1].get("succeeded"),
@@ -148,18 +155,17 @@ def render_markdown(summary: dict[str, Any]) -> str:
         "",
         f"生成时间：{summary.get('generated_at')}；run 数（每 case×mode 取最新）：{summary.get('runs', 0)}",
         "",
-        "| Case | Mode | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |",
+        "| Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |",
         "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for case in summary.get("cases", []):
-        for mode in COLUMNS:
-            entry = case.get(mode)
-            if not entry:
+        for variant, entry in sorted(case.items()):
+            if variant == "case_id" or not isinstance(entry, dict):
                 continue
             lines.append(
                 "| {case} | {mode} | {status} | {attempts} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} |".format(
                     case=case["case_id"],
-                    mode=mode,
+                    mode=variant,
                     status=entry.get("status"),
                     attempts=f"{entry.get('succeeded', 0)}/{entry.get('attempts', 1)}",
                     human=entry.get("human_score"),

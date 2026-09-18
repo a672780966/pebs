@@ -186,6 +186,10 @@ def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[st
     )
     run_id = start["run_id"]
     status = _wait(engine, run_id)
+    if status["run"]["status"] == "running":
+        # harness 已到等待上限仍在运行：如实标记为 interrupted，避免留下悬挂的 "running"
+        engine.store.set_run_status(run_id, "interrupted")
+        status = engine.run_status(run_id)
     if accept and status["run"]["status"] == "succeeded":
         engine.accept(start["changeset_id"])
 

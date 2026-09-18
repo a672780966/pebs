@@ -1,10 +1,10 @@
 run:
   case_id: A
   mode: dynamic
-  run_id: run_8ce4ed3d4daf
+  run_id: run_5448e7ef6646
   run_status: succeeded
-  run_dir: C:\Users\admin\Documents\ChatGPT\心理学教育skills\benchmarks\runs\20260918-184245-A-dynamic
-  artifact_count: 47
+  run_dir: C:\Users\admin\Documents\ChatGPT\心理学教育skills\benchmarks\runs\20260918-215759-A-dynamic
+  artifact_count: 50
   evidence_policy:
   - SUPPORTED
 reviewer: ''
