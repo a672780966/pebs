@@ -12,7 +12,7 @@ from .evidence import EvidenceStore
 from .hooks import Hooks, HookFailure
 from .permissions import PermissionManager, PermissionDenied
 from .providers import ProviderError, ProviderUnavailable, merge_research_items as _merge_research_items
-from .store import ConflictError, Store, content_hash, file_hash, now_iso
+from .store import BudgetExceeded, ConflictError, Store, content_hash, file_hash, now_iso
 from .template_parse import ParseError, check_import_limits, extract_text, parse_template
 
 SYSTEM = (
@@ -771,13 +771,38 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
     if pending and research_status["available"] and llm_status["available"]:
         for claim in pending:
             _check_cancel(ctx)
-            per_claim_requests = len(source_names) + (2 * fetch_limit if fetch_enabled else 0)
-            ctx.store.check_budget(ctx.run_id, research=per_claim_requests)
+            # M6 §31：执行层预算感知——剩余研究预算不足时降级（少查来源/跳过全文/跳过核验），
+            # 而不是把整个运行拖到 BudgetExceeded。
+            remaining = (
+                ctx.store.budget_remaining(ctx.run_id)["research_requests"]
+                if hasattr(ctx.store, "budget_remaining")
+                else 10 ** 6
+            )
+            full_cost = len(source_names) + (2 * fetch_limit if fetch_enabled else 0)
             queries = _research_queries(ctx, claim)
+            if remaining <= 0:
+                notes.append(
+                    f"{claim['claim_id']}：研究预算已用尽，跳过文献核验；该 Claim 将保持未支持并从证据契约排除"
+                )
+                continue
+            claim_fetch_enabled = fetch_enabled
+            claim_source_limit = len(queries)
+            if remaining < full_cost:
+                claim_fetch_enabled = False
+                claim_source_limit = 1
+                notes.append(
+                    f"{claim['claim_id']}：剩余研究预算 {remaining} < 完整核验成本 {full_cost}；降级为单来源核验（跳过全文抓取）"
+                )
+            per_claim_requests = claim_source_limit * max(len(source_names), 1) + (2 * fetch_limit if claim_fetch_enabled else 0)
+            try:
+                ctx.store.check_budget(ctx.run_id, research=per_claim_requests)
+            except BudgetExceeded:
+                notes.append(f"{claim['claim_id']}：预算不足（需要 {per_claim_requests}），跳过文献核验并保持未支持")
+                continue
             merged: list[dict[str, Any]] = []
             per_source: dict[str, int] = {}
             errors: dict[str, str] = {}
-            for query in queries:
+            for query in queries[:claim_source_limit]:
                 try:
                     outcome = ctx.research.search(query, rows=5)
                 except (ProviderUnavailable, ProviderError) as exc:
@@ -802,7 +827,7 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
             for item in (usable or ranked)[:assess_limit]:
                 text = str(item.get("abstract") or "").strip() or str(item.get("title") or "")
                 level = item.get("content_level", "metadata")
-                if fetch_enabled and fetched < fetch_limit and level != "full_text":
+                if claim_fetch_enabled and fetched < fetch_limit and level != "full_text":
                     pdf_url = item.get("fulltext_url")
                     if not pdf_url and item.get("doi") and hasattr(ctx.research, "find_fulltext"):
                         pdf_url = ctx.research.find_fulltext(str(item["doi"]))

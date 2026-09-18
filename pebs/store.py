@@ -650,6 +650,16 @@ class Store:
     def bump_research(self, run_id: str, n: int = 1) -> None:
         self._exec("UPDATE runs SET research_used = research_used + ? WHERE run_id = ?", (n, run_id))
 
+    def budget_remaining(self, run_id: str) -> dict[str, int]:
+        """M6 §31：执行层也需要知道剩余预算，以便降级（不是执行到一半才 BLOCKED）。"""
+        run = self.get_run(run_id)
+        started = time.mktime(time.strptime(run["created_at"], "%Y-%m-%dT%H:%M:%S"))
+        return {
+            "model_calls": int(run["budget_model_calls"]) - int(run["calls_used"]),
+            "research_requests": int(run["budget_research"]) - int(run["research_used"]),
+            "run_seconds": int(run["budget_seconds"]) - int(time.time() - started),
+        }
+
     def check_budget(self, run_id: str, *, model_calls: int = 0, research: int = 0) -> None:
         run = self.get_run(run_id)
         if run["calls_used"] + model_calls > run["budget_model_calls"]:

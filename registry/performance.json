@@ -10,7 +10,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
+      "runs": 5,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -18,7 +18,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-18T09:39:19"
+      "last_verified": "2026-09-18T10:29:44"
     },
     "requirements-builder": {
       "skill": "requirements-builder",
@@ -28,7 +28,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
+      "runs": 5,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -36,7 +36,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-18T09:39:19"
+      "last_verified": "2026-09-18T10:29:44"
     },
     "learning-designer": {
       "skill": "learning-designer",
@@ -46,7 +46,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
+      "runs": 5,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -54,7 +54,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-18T09:39:19"
+      "last_verified": "2026-09-18T10:29:44"
     },
     "claim-extractor": {
       "skill": "claim-extractor",
@@ -64,8 +64,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
-      "success_rate": 0.75,
+      "runs": 5,
+      "success_rate": 0.8,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -74,7 +74,7 @@
       "known_failure_modes": [
         "Claim 提取结果为空：模型未返回可核验的实证性 Claim。请检查请求是否包含可核验的心理学事实，或补充材料后重试（系统不会用空证据继续生产）。"
       ],
-      "last_verified": "2026-09-18T09:39:19"
+      "last_verified": "2026-09-18T10:29:44"
     },
     "evidence-reviewer": {
       "skill": "evidence-reviewer",
@@ -84,17 +84,18 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
-      "success_rate": 0.75,
+      "runs": 5,
+      "success_rate": 0.6,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [
-        "依赖未成功：claim-extractor"
+        "依赖未成功：claim-extractor",
+        "预算耗尽：research request budget exhausted"
       ],
-      "last_verified": "2026-09-18T09:39:19"
+      "last_verified": "2026-09-18T10:29:44"
     },
     "pck-developer": {
       "skill": "pck-developer",
@@ -104,8 +105,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
-      "success_rate": 0.25,
+      "runs": 5,
+      "success_rate": 0.2,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -114,9 +115,10 @@
       "known_failure_modes": [
         "执行前置条件未满足：clm_7b12769477@v2 状态为 UNSUPPORTED；PCK 只允许消费 ['SUPPORTED'] 证据（见 rules.evidence.pck_claim_statuses）",
         "执行前置条件未满足：证据索引为空：没有可消费的 SUPPORTED Claim",
-        "依赖未成功：evidence-reviewer"
+        "依赖未成功：evidence-reviewer",
+        "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）"
       ],
-      "last_verified": "2026-09-18T09:39:19"
+      "last_verified": "2026-09-18T10:29:44"
     },
     "media-router": {
       "skill": "media-router",
@@ -265,17 +267,18 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
-      "success_rate": 0.25,
+      "runs": 5,
+      "success_rate": 0.2,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [
-        "依赖未成功：pck-developer"
+        "依赖未成功：pck-developer",
+        "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）"
       ],
-      "last_verified": "2026-09-18T09:39:19"
+      "last_verified": "2026-09-18T10:29:44"
     },
     "assessment-designer": {
       "skill": "assessment-designer",
@@ -285,15 +288,17 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 1,
-      "success_rate": 1.0,
+      "runs": 2,
+      "success_rate": 0.5,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
-      "known_failure_modes": [],
-      "last_verified": "2026-09-18T09:39:19"
+      "known_failure_modes": [
+        "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）"
+      ],
+      "last_verified": "2026-09-18T10:29:44"
     },
     "case-designer": {
       "skill": "case-designer",
@@ -303,15 +308,17 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 2,
-      "success_rate": 1.0,
+      "runs": 3,
+      "success_rate": 0.6667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
-      "known_failure_modes": [],
-      "last_verified": "2026-09-18T09:44:11"
+      "known_failure_modes": [
+        "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）"
+      ],
+      "last_verified": "2026-09-18T10:29:44"
     },
     "script-writer": {
       "skill": "script-writer",
@@ -321,15 +328,17 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 2,
-      "success_rate": 1.0,
+      "runs": 3,
+      "success_rate": 0.6667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
-      "known_failure_modes": [],
-      "last_verified": "2026-09-18T09:44:11"
+      "known_failure_modes": [
+        "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）"
+      ],
+      "last_verified": "2026-09-18T10:29:44"
     },
     "gate-runner": {
       "skill": "gate-runner",
@@ -339,15 +348,17 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 1,
-      "success_rate": 1.0,
+      "runs": 2,
+      "success_rate": 0.5,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
-      "known_failure_modes": [],
-      "last_verified": "2026-09-18T09:39:19"
+      "known_failure_modes": [
+        "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）"
+      ],
+      "last_verified": "2026-09-18T10:29:44"
     }
   }
 }
