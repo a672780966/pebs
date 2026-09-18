@@ -274,9 +274,38 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
     from .benchmark import report as report_mod
     from .benchmark import runner
 
+    if args.submit_eval:
+        from .benchmark import evaluation as evaluation_mod
+
+        if not args.project:
+            print("error: --submit-eval 需要 --project", file=sys.stderr)
+            return 1
+        engine = Engine(args.project)
+        payload = report_mod.load_worksheet(Path(args.submit_eval))
+        try:
+            content = evaluation_mod.record(engine, payload, run_id=payload.get("run_id", ""), mode=payload.get("mode", ""))
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
+        print(
+            json.dumps(
+                {
+                    "reviewer": content["reviewer"],
+                    "overall": content["overall"],
+                    "edit_ratio": content["edit_ratio"],
+                    "evidence_errors": content["evidence_errors"],
+                    "routing_errors": content["routing_errors"],
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
     if args.report:
         path = report_mod.write_report()
+        worksheets = report_mod.write_worksheets()
         print(path)
+        print(f"worksheets: {len(worksheets)} 份（benchmarks/reports/worksheets/）")
         return 0
     case_ids = [item.strip() for item in (args.cases or "A,B,C,D,E,F,G,H").split(",") if item.strip()]
     modes = [item.strip() for item in (args.modes or "dynamic").split(",") if item.strip()]
@@ -393,7 +422,9 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--cases", default="A,B,C,D,E,F,G,H")
     bench.add_argument("--modes", default="dynamic")
     bench.add_argument("--no-accept", action="store_true")
-    bench.add_argument("--report", action="store_true", help="只根据已有 runs 生成对比报告")
+    bench.add_argument("--report", action="store_true", help="只根据已有 runs 生成对比报告与教师评分工作表")
+    bench.add_argument("--submit-eval", default="", help="回收教师填写的工作表 YAML（需配合 --project）")
+    bench.add_argument("--project", default="", help="--submit-eval 的目标项目")
     bench.add_argument("--strict", action="store_true", help="存在失败/自动问题时以非零退出")
     bench.add_argument("--max-model-calls", type=int, default=0)
     bench.add_argument("--max-research", type=int, default=0)

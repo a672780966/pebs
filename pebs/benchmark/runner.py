@@ -193,6 +193,11 @@ def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[st
     automatic = checks.evaluate(engine.store, case.get("expect") or {}, plan=plan, route=route)
     from . import safety as safety_mod
 
+    # §19/§39/§40：每次 benchmark run 都记入 performance registry（只 observe/record）
+    from . import performance as performance_mod
+
+    performance_mod.record_trace(skill_trace)
+
     return {
         "run_id": run_id,
         "changeset_id": start["changeset_id"],

@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-18T06:20:31；run 数（每 case×mode 取最新）：5
+生成时间：2026-09-18T08:30:29；run 数（每 case×mode 取最新）：5
 
 | Case | Mode | Status | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |

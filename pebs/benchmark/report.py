@@ -162,6 +162,106 @@ def render_markdown(summary: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def write_worksheets(runs: list[dict[str, Any]] | None = None, *, directory: Path | None = None) -> list[Path]:
+    """§30–§32：为每次 run 生成教师评分工作表（人工填写后可用 CLI 回收）。"""
+    import yaml
+
+    runs = runs if runs is not None else load_runs()
+    target_dir = directory or (cases.reports_dir() / "worksheets")
+    target_dir.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+    for run in runs:
+        case_id = str(run.get("case_id") or "?")
+        mode = str(run.get("mode") or "?")
+        template = {
+            "run": {
+                "case_id": case_id,
+                "mode": mode,
+                "run_id": run.get("run_id"),
+                "run_status": run.get("run_status"),
+                "run_dir": run.get("run_dir"),
+                "artifact_count": len(run.get("artifact_hashes") or {}),
+                "evidence_policy": run.get("evidence_policy"),
+            },
+            "reviewer": "",
+            "role": "teacher",
+            "scores": {
+                "subject_accuracy": None,
+                "teaching_logic": None,
+                "goal_clarity": None,
+                "content_alignment": None,
+                "concept_clarity": None,
+                "case_quality": None,
+                "executability": None,
+                "student_engagement": None,
+                "cognitive_challenge": None,
+                "assessment_design": None,
+                "language_naturalness": None,
+                "visual_necessity": None,
+                "coherence": None,
+                "teacher_usability": None,
+                "spoken_naturalness": None,
+            },
+            "comment": "",
+            "must_fix": [],
+            "nice_to_have": [],
+            "evidence_errors": 0,
+            "routing_errors": 0,
+            "plan_errors": 0,
+            "edits": {
+                "generated_text": "",
+                "edited_text": "",
+                "items": [{"category": "", "severity": ""}],
+            },
+            "notes": [
+                "填写说明见 benchmarks/reports/worksheets/README.md",
+                "scores 使用 1–5；spoken_naturalness 仅脚本类任务必填",
+                "edits.items 的 category 取值：fact correction / teaching restructure / tone edit / case replacement / media correction / assessment correction / template correction",
+                "edits.items 的 severity 取值：S0 cosmetic / S1 wording / S2 local teaching improvement / S3 conceptual correction / S4 factual-evidence correction / S5 major redesign",
+            ],
+        }
+        path = target_dir / f"{case_id}-{mode}-human_eval.yaml"
+        path.write_text(yaml.safe_dump(template, allow_unicode=True, sort_keys=False), encoding="utf-8")
+        written.append(path)
+    readme = target_dir / "README.md"
+    if not readme.exists():
+        readme.write_text(
+            "# 教师评分工作表（M6 §30–§32）\n\n"
+            "1. 打开对应的 `<case>-<mode>-human_eval.yaml`，在 `scores` 中给 1–5 分（14 个维度；脚本类任务另填 `spoken_naturalness`）。\n"
+            "2. `comment` 必填（文字备注），`must_fix` / `nice_to_have` 选填。\n"
+            "3. 若做过人工修改，把修改前后的文本填入 `edits.generated_text` / `edits.edited_text`，并按类别与严重度登记 `edits.items`。\n"
+            "4. 提交：`python -m pebs.cli benchmark --submit-eval <worksheet.yaml> --project <project_id>`\n"
+            "   （等价于 POST /api/projects/<project_id>/evaluation；评分以 Artifact 形式落库并绑定 Skill 版本）\n",
+            encoding="utf-8",
+        )
+    return written
+
+
+def load_worksheet(path: Path) -> dict[str, Any]:
+    """把教师填写的工作表转换成 /evaluation 的 payload。"""
+    import yaml
+
+    data = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+    scores = {key: value for key, value in (data.get("scores") or {}).items() if value is not None}
+    edits = data.get("edits") or {}
+    edits["items"] = [item for item in (edits.get("items") or []) if item.get("category") or item.get("severity")]
+    run = data.get("run") or {}
+    return {
+        "reviewer": str(data.get("reviewer") or ""),
+        "role": str(data.get("role") or "teacher"),
+        "run_id": str(run.get("run_id") or ""),
+        "mode": str(run.get("mode") or ""),
+        "scores": scores,
+        "comment": str(data.get("comment") or ""),
+        "must_fix": list(data.get("must_fix") or []),
+        "nice_to_have": list(data.get("nice_to_have") or []),
+        "evidence_errors": int(data.get("evidence_errors") or 0),
+        "routing_errors": int(data.get("routing_errors") or 0),
+        "plan_errors": int(data.get("plan_errors") or 0),
+        "edits": edits,
+    }
+
+
 def write_report(summary: dict[str, Any] | None = None, *, path: Path | None = None) -> Path:
     summary = summary or summarize()
     target = path or (cases.reports_dir() / "benchmark_summary.md")

@@ -1,0 +1,45 @@
+run:
+  case_id: B
+  mode: direct_codex
+  run_id: ''
+  run_status: succeeded
+  run_dir: C:\Users\admin\Documents\ChatGPT\心理学教育skills\benchmarks\runs\20260918-032255-B-direct_codex
+  artifact_count: 0
+  evidence_policy: null
+reviewer: ''
+role: teacher
+scores:
+  subject_accuracy: null
+  teaching_logic: null
+  goal_clarity: null
+  content_alignment: null
+  concept_clarity: null
+  case_quality: null
+  executability: null
+  student_engagement: null
+  cognitive_challenge: null
+  assessment_design: null
+  language_naturalness: null
+  visual_necessity: null
+  coherence: null
+  teacher_usability: null
+  spoken_naturalness: null
+comment: ''
+must_fix: []
+nice_to_have: []
+evidence_errors: 0
+routing_errors: 0
+plan_errors: 0
+edits:
+  generated_text: ''
+  edited_text: ''
+  items:
+  - category: ''
+    severity: ''
+notes:
+- 填写说明见 benchmarks/reports/worksheets/README.md
+- scores 使用 1–5；spoken_naturalness 仅脚本类任务必填
+- edits.items 的 category 取值：fact correction / teaching restructure / tone edit / case
+  replacement / media correction / assessment correction / template correction
+- edits.items 的 severity 取值：S0 cosmetic / S1 wording / S2 local teaching improvement
+  / S3 conceptual correction / S4 factual-evidence correction / S5 major redesign

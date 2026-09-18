@@ -9,7 +9,8 @@ request: |
   每节 1800–2100 字，每节至少 1 个案例，动画只在必要处使用；
   称谓统一使用“婴幼儿”；四节之间减少重复。
 template_fixture: fixtures/template_childcare_management.docx
-material_fixtures: []
+material_fixtures:
+  - fixtures/materials/childcare_management_standards.md
 expect:
   routing:
     knowledge_types_any_of: [concept, procedure, case_analysis]

@@ -141,22 +141,8 @@ def update_performance(engine: Any, trace: dict[str, Any], human: dict[str, Any]
     """把人工结果绑定到 skill 版本（§40）写入 performance registry。"""
     from . import performance
 
-    score = human.get("overall")
-    ratio = human.get("edit_ratio")
-    for skill in trace.get("skills", []):
-        status = skill.get("status")
-        performance.record_run(
-            skill=str(skill.get("skill")),
-            version=str(skill.get("version") or ""),
-            provider_sha=str(skill.get("upstream_sha") or ""),
-            package_sha256=str(skill.get("package_sha256") or ""),
-            patch=str(skill.get("patch") or ""),
-            domain="",
-            success=status == "SUCCEEDED",
-            schema_failure=bool(skill.get("error") and "Schema" in str(skill.get("error"))),
-            model_calls=0,
-            latency=0.0,
-            failure_mode=str(skill.get("error") or "")[:120] if status in ("FAILED", "BLOCKED") else "",
-            human_score=score,
-            edit_ratio=ratio,
-        )
+    performance.record_trace(
+        trace,
+        human_score=human.get("overall"),
+        edit_ratio=human.get("edit_ratio"),
+    )

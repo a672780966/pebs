@@ -8,7 +8,8 @@ request: |
   包含 2–3 个深度思考环节；避免与后续情绪、自我意识、学习课的内容重复。
   最后生成教案和课堂 PPT，不需要录课脚本。
 template_fixture: ""
-material_fixtures: []
+material_fixtures:
+  - fixtures/materials/freshman_psychology_syllabus.md
 expect:
   routing:
     knowledge_types_any_of: [concept, critical_thinking, reflection, transfer]

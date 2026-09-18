@@ -123,6 +123,48 @@ def record_run(
     return record
 
 
+def record_trace(
+    trace: dict[str, Any],
+    *,
+    human_score: float | None = None,
+    edit_ratio: float | None = None,
+    latency_by_skill: dict[str, float] | None = None,
+    model_calls_by_skill: dict[str, int] | None = None,
+) -> list[dict[str, Any]]:
+    """§19/§39/§40：把一次 Build 的 Skill Trace 写入 performance registry。
+
+    记录必须绑定 skill version / provider SHA / package hash / patch；
+    只做 observe/record（§47：M6 不允许历史表现影响路由）。
+    """
+    latency_by_skill = latency_by_skill or {}
+    model_calls_by_skill = model_calls_by_skill or {}
+    recorded: list[dict[str, Any]] = []
+    for skill in trace.get("skills", []):
+        name = str(skill.get("skill") or "")
+        if not name:
+            continue
+        status = str(skill.get("status") or "")
+        error = str(skill.get("error") or "")
+        recorded.append(
+            record_run(
+                skill=name,
+                version=str(skill.get("version") or ""),
+                provider_sha=str(skill.get("upstream_sha") or ""),
+                package_sha256=str(skill.get("package_sha256") or ""),
+                patch=str(skill.get("patch") or ""),
+                domain=str(skill.get("domain") or ""),
+                success=status == "SUCCEEDED",
+                schema_failure=bool(status == "FAILED" and "Schema" in error),
+                model_calls=int(model_calls_by_skill.get(name, 0) or 0),
+                latency=float(latency_by_skill.get(name, 0.0) or 0.0),
+                failure_mode=(error[:120] if status in ("FAILED", "BLOCKED") else ""),
+                human_score=human_score,
+                edit_ratio=edit_ratio,
+            )
+        )
+    return recorded
+
+
 def promotion_decision(record: dict[str, Any], *, unresolved_safety: bool = False) -> dict[str, Any]:
     """§68：EXPERIMENTAL → STABLE 的门槛；数据不足时不让外部 Skill 默认优先。"""
     reasons: list[str] = []

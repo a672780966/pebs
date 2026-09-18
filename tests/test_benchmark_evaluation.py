@@ -98,6 +98,111 @@ def test_human_eval_is_recorded_as_artifact_and_updates_performance(engine, regi
     assert promoted["eligible"] in (True, False)
 
 
+def test_performance_records_skill_versions_from_trace(registry_env):
+    from pebs.benchmark import performance
+
+    trace = {
+        "skills": [
+            {
+                "skill": "dual-coding-designer",
+                "version": "6bbbce418f82",
+                "upstream_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+                "package_sha256": "pkg-1",
+                "patch": "dual-coding-pebs-1",
+                "domain": "media",
+                "status": "SUCCEEDED",
+            },
+            {
+                "skill": "hinge-question-designer",
+                "version": "6bbbce418f82",
+                "status": "FAILED",
+                "error": "外部 Skill 输出两次均未通过 Schema 校验",
+            },
+        ]
+    }
+    records = performance.record_trace(trace)
+    assert len(records) == 2
+    data = performance.load_performance()
+    dual = data["skills"]["dual-coding-designer"]
+    assert dual["runs"] == 1
+    assert dual["success_rate"] == 1.0
+    assert dual["provider_sha"].startswith("6bbbce41")
+    assert dual["patch"] == "dual-coding-pebs-1"
+    hinge = data["skills"]["hinge-question-designer"]
+    assert hinge["schema_failure_rate"] == 1.0
+    assert hinge["known_failure_modes"]
+
+
+def test_human_eval_worksheet_round_trip(tmp_path):
+    from pebs.benchmark import report as report_mod
+
+    run = {
+        "case_id": "A",
+        "mode": "dynamic",
+        "run_id": "run_demo",
+        "run_status": "succeeded",
+        "artifact_hashes": {"script:sec1": "abc"},
+        "evidence_policy": ["SUPPORTED"],
+    }
+    written = report_mod.write_worksheets([run], directory=tmp_path / "worksheets")
+    assert len(written) == 1
+    payload = report_mod.load_worksheet(written[0])
+    assert payload["reviewer"] == ""
+    assert payload["scores"] == {}, "未填写的维度不应进入 payload"
+    errors = evaluation.validate_eval(payload)
+    assert any("reviewer" in error for error in errors)
+    assert any("scores" in error for error in errors)
+    assert any("comment" in error for error in errors)
+
+    import yaml
+
+    data = yaml.safe_load(written[0].read_text(encoding="utf-8"))
+    data["reviewer"] = "李老师"
+    data["comment"] = "结构清楚，案例需要更贴近本校情境。"
+    data["scores"] = {key: 4 for key in data["scores"]}
+    data["edits"]["items"] = [{"category": "case replacement", "severity": "S3"}]
+    written[0].write_text(yaml.safe_dump(data, allow_unicode=True, sort_keys=False), encoding="utf-8")
+    filled = report_mod.load_worksheet(written[0])
+    assert evaluation.validate_eval(filled) == []
+    assert filled["run_id"] == "run_demo"
+
+
+def test_engine_build_trace_records_performance(engine, registry_env):
+    """真实 Trace（FakeLLM 构建）写入 performance registry：绑定版本/provider/patch。"""
+    engine.llm = FakeLLM()
+    start, status = run_dynamic_build(engine, REQUEST_1)
+    assert status["run"]["status"] == "succeeded", [
+        (step["step_id"], step["step"], step.get("error")) for step in status["steps"]
+    ]
+    from pebs.benchmark import performance, trace as trace_mod
+
+    skill_trace = trace_mod.build_trace(engine, start["run_id"])
+    recorded = performance.record_trace(skill_trace)
+    assert recorded, "Trace 中的 skill 必须全部落库"
+    data = performance.load_performance()
+    assert data["skills"]
+    assert all(item["runs"] >= 1 for item in data["skills"].values())
+    assert all(item["last_verified"] for item in data["skills"].values())
+
+
+def test_benchmark_report_renders_status_and_issues():
+    from pebs.benchmark import report as report_mod
+
+    record = {
+        "case_id": "A",
+        "mode": "dynamic",
+        "run_id": "run_x",
+        "run_status": "succeeded",
+        "metrics": {"model_calls": 22, "wall_time_seconds": 770.7},
+        "automatic_issues": {"issues": [{"kind": "SAFETY", "detail": "x"}]},
+        "evidence_policy": ["SUPPORTED"],
+    }
+    summary = report_mod.summarize([record])
+    markdown = report_mod.render_markdown(summary)
+    assert "| A | dynamic | succeeded |" in markdown
+    assert "22" in markdown and "770.7" in markdown
+
+
 def test_evaluation_endpoints_expose_trace_and_accept_scores(client):
     client.post("/api/projects", json={"project_id": "evaltest"})
     evaluation_payload = _valid_payload()
