@@ -118,7 +118,9 @@ def run_case(
     # §31：把预算交给 Planner，使其在预算不足时生成降级 Plan（而不是执行到一半 BLOCKED）
     effective_budgets = dict(config.RULES.get("budgets") or {})
     effective_budgets.update(budgets or {})
-    project = project_id or f"bench-{case_id.lower()}-{mode}"
+    # 默认给每次 benchmark run 一个独立项目：否则第二次跑同一 case 会复用上一次的
+    # 已接受产物（calls=0、Plan 全 reuse），得到不可比的"空跑"结果。
+    project = project_id or f"bench-{case_id.lower()}-{mode}-{time.strftime('%H%M%S', time.localtime())}"
     target = run_dir(case_id, mode)
     target.mkdir(parents=True, exist_ok=True)
     started = time.time()

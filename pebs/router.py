@@ -66,7 +66,20 @@ def parse_word_range(text: str) -> tuple[int | None, int | None]:
     return (None, None)
 
 
+NUMBERED_SECTION_PATTERN = re.compile(r"(?<![\d.])(\d{1,2}\.\d{1,2})\s*[、．.,，:：]?\s*([^\n，。,；;]{2,30})")
+
+
 def parse_section_titles(text: str) -> list[str]:
+    # M6 §23/§36：编号小节（"8.1 标题；8.2 标题"）是真正的章节；
+    # 存在编号小节时，容器式标题（如"第八章四节课程脚本"）不再算作一节。
+    numbered: list[str] = []
+    for match in NUMBERED_SECTION_PATTERN.finditer(text):
+        label = f"{match.group(1)} {match.group(2).strip()}"
+        if label not in numbered:
+            numbered.append(label)
+    if numbered:
+        return numbered
+
     titles: list[str] = []
     for pattern in [r"第[一二三四五六七八九十\d]+[章节节课]\s*[：:、]?\s*([^\n，。,；;]{2,30})"]:
         for match in re.finditer(pattern, text):

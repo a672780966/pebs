@@ -64,7 +64,39 @@ def test_operator_can_opt_in_qualify_required_for_practice_courses(monkeypatch):
     assert problems and "PENDING" in problems[0]
 
 
+def test_unsupported_claims_are_excluded_from_the_contract_not_hidden(engine):
+    """§13/§48：evidence_index 只登记可消费 Claim；不可消费的显式列入 excluded。"""
+    from conftest import REQUEST_1, FakeLLM, run_build
+
+    engine.llm = FakeLLM()
+    run_id, changeset_id = run_build(engine, REQUEST_1)
+    engine.accept(changeset_id)
+    index = engine.store.accepted_content("evidence_index")
+    assert "claims" in index and "excluded_claims" in index
+    allowed = set(preallowed())
+    for entry in index["claims"]:
+        assert entry["status"] in allowed, entry
+    for entry in index["excluded_claims"]:
+        assert entry["status"] not in allowed, entry
+        assert "排除" in entry["reason"]
+    # 不隐藏：所有 Claim 都仍能在 claims 产物 / 证据库中查到
+    claims_doc = engine.store.accepted_content("claims")
+    all_ids = {claim["claim_id"] for claim in claims_doc.get("claims", [])}
+    indexed_ids = {entry["claim_id"] for entry in index["claims"]} | {
+        entry["claim_id"] for entry in index["excluded_claims"]
+    }
+    assert all_ids <= indexed_ids
+
+
+def preallowed() -> list[str]:
+    from pebs import config
+
+    return list((config.RULES.get("evidence") or {}).get("pck_claim_statuses") or ["SUPPORTED"])
+
+
 def test_unknown_status_is_never_consumed(monkeypatch):
+    from pebs import config
+
     monkeypatch.setattr(config, "RULES", _rules(["SUPPORTED", "QUALIFY_REQUIRED", "DISPUTED"]))
     problems = preconditions.check_supported_claims(
         _FakeCtx("UNSUPPORTED"), inputs=["evidence_index"], usage_scope=["讲解"]

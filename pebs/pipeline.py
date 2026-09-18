@@ -582,6 +582,14 @@ claim_type 取 descriptive/correlational/predictive/causal/mechanistic/theoretic
         claims.append({**record, "text": text, "claim_type": item.get("claim_type", "descriptive")})
     content = {"claims": claims, "unavailable": []}
     deps = [r for r in [ctx.rev(f"learning_design:{s['section_id']}") for s in ctx.sections()] if r]
+    if not claims:
+        # M6 生产修正：0 条 Claim 会让证据契约为空、PCK 在下游才被阻塞，错误信息难以定位。
+        # 明确在此失败，给出可执行的诊断（模型未返回 Claim / 请求与材料需要补充）。
+        raise StepFailed(
+            "Claim 提取结果为空：模型未返回可核验的实证性 Claim。"
+            "请检查请求是否包含可核验的心理学事实，或补充材料后重试"
+            "（系统不会用空证据继续生产）。"
+        )
     ctx.emit("claims", "claims_set", content, "claim-extractor", deps=deps)
     return {"notes": [f"登记 {len(claims)} 条待核验 Claim"]}
 
@@ -923,8 +931,32 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
         }
         for claim in current_claims
     ]
+    # M6 §13/§48：evidence_index 是"PCK 可消费的证据契约"。
+    # 不可消费的 Claim（PENDING / UNSUPPORTED / DISPUTED…）不进入契约，但必须显式登记在
+    # excluded 中（不隐藏、不删除）；是否可消费由 rules.evidence.pck_claim_statuses 决定。
+    from . import preconditions as precondition_mod
+
+    allowed_statuses = set(precondition_mod.allowed_claim_statuses())
+    consumable = [item for item in statuses if item["status"] in allowed_statuses]
+    excluded = [
+        {
+            "claim_id": item["claim_id"],
+            "version": item["version"],
+            "status": item["status"],
+            "reason": f"状态 {item['status']} 不在 PCK 可消费状态 {sorted(allowed_statuses)} 内；已从证据契约排除，等待人工复核或补充材料",
+        }
+        for item in statuses
+        if item["status"] not in allowed_statuses
+    ]
+    if excluded:
+        notes.append(
+            f"证据契约排除 {len(excluded)} 条不可消费 Claim（"
+            + "、".join(sorted({item['status'] for item in excluded}))
+            + "）；Claim 与核验记录仍保留在 claims/assessments 中"
+        )
     index = {
-        "claims": statuses,
+        "claims": consumable,
+        "excluded_claims": excluded,
         "assessments": [
             {
                 "assessment_id": a["assessment_id"],
