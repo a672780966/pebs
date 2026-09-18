@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-18T10:29:44",
+  "generated_at": "2026-09-18T17:03:25",
   "cases": [
     {
       "case_id": "A",
@@ -94,7 +94,7 @@
       "direct_codex": null,
       "builtin": null,
       "dynamic": {
-        "status": "blocked",
+        "status": "running",
         "evidence_policy": [
           "SUPPORTED"
         ],
@@ -104,8 +104,8 @@
         "evidence_errors": null,
         "routing_errors": null,
         "plan_errors": null,
-        "model_calls": 88.0,
-        "runtime_seconds": 2677.4,
+        "model_calls": 102.0,
+        "runtime_seconds": 3636.03,
         "automatic_issues": 4.0,
         "runs": 1
       },
@@ -219,10 +219,10 @@
       "automatic_issues": 2
     },
     {
-      "run_id": "run_25e754fc9c58",
+      "run_id": "run_9239cb6a1434",
       "case_id": "C",
       "mode": "dynamic",
-      "status": "blocked",
+      "status": "running",
       "evidence_policy": [
         "SUPPORTED"
       ],
@@ -232,9 +232,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
-      "model_calls": 88,
-      "research_calls": 57,
-      "runtime_seconds": 2677.4,
+      "model_calls": 102,
+      "research_calls": 64,
+      "runtime_seconds": 3636.03,
       "skill_failure_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 4

@@ -250,7 +250,18 @@ def _run_direct(case: dict[str, Any], target: Path) -> dict[str, Any]:
     }
 
 
-def _wait(engine: Engine, run_id: str, timeout: float = 3600.0) -> dict[str, Any]:
+def _wait_timeout(run: dict[str, Any]) -> float:
+    """等待上限必须≥运行自身的时间预算，否则 harness 会在 run 仍运行时误报 running。"""
+    budget = int(run.get("budget_seconds") or 0)
+    return float(max(3600, budget + 600))
+
+
+def _wait(engine: Engine, run_id: str, timeout: float | None = None) -> dict[str, Any]:
+    if timeout is None:
+        try:
+            timeout = _wait_timeout(engine.store.get_run(run_id))
+        except Exception:  # noqa: BLE001 - 取不到 budget 时退回 1 小时
+            timeout = 3600.0
     deadline = time.time() + timeout
     status = engine.run_status(run_id)
     while status["run"]["status"] == "running" and time.time() < deadline:
