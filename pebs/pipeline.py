@@ -582,14 +582,23 @@ claim_type 取 descriptive/correlational/predictive/causal/mechanistic/theoretic
         claims.append({**record, "text": text, "claim_type": item.get("claim_type", "descriptive")})
     content = {"claims": claims, "unavailable": []}
     deps = [r for r in [ctx.rev(f"learning_design:{s['section_id']}") for s in ctx.sections()] if r]
+    allow_empty = bool((config.RULES.get("evidence") or {}).get("allow_empty_claims"))
     if not claims:
-        # M6 生产修正：0 条 Claim 会让证据契约为空、PCK 在下游才被阻塞，错误信息难以定位。
-        # 明确在此失败，给出可执行的诊断（模型未返回 Claim / 请求与材料需要补充）。
-        raise StepFailed(
-            "Claim 提取结果为空：模型未返回可核验的实证性 Claim。"
-            "请检查请求是否包含可核验的心理学事实，或补充材料后重试"
-            "（系统不会用空证据继续生产）。"
+        if not allow_empty:
+            # M6 生产修正：0 条 Claim 会让证据契约为空、PCK 在下游才被阻塞，错误信息难以定位。
+            # 明确在此失败，给出可执行的诊断（模型未返回 Claim / 请求与材料需要补充）。
+            raise StepFailed(
+                "Claim 提取结果为空：模型未返回可核验的实证性 Claim。"
+                "请检查请求是否包含可核验的心理学事实，或补充材料后重试"
+                "（系统不会用空证据继续生产）。"
+            )
+        content["no_empirical_claims"] = True
+        content["note"] = (
+            "本节课程未提取到实证性 Claim；按 rules.evidence.allow_empty_claims 允许继续，"
+            "PCK 只能基于教学法设计，产物必须标注“无实证证据支持”的限制。"
         )
+        ctx.emit("claims", "claims_set", content, "claim-extractor", deps=deps)
+        return {"notes": [content["note"]]}
     ctx.emit("claims", "claims_set", content, "claim-extractor", deps=deps)
     return {"notes": [f"登记 {len(claims)} 条待核验 Claim"]}
 
@@ -982,6 +991,7 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
     index = {
         "claims": consumable,
         "excluded_claims": excluded,
+        "declared_no_empirical_claims": bool(claims_doc.get("no_empirical_claims")) and not consumable,
         "assessments": [
             {
                 "assessment_id": a["assessment_id"],

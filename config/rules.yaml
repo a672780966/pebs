@@ -21,6 +21,11 @@ budgets:
 evidence:
   pck_claim_statuses:
     - SUPPORTED
+  # M6 §22/§48：概念/态度/反思型课程可能**没有**实证 Claim（例如"理解心理学有什么用"）。
+  # 默认 false：0 条 Claim 即失败，避免用空证据继续生产。
+  # 操作者显式设为 true 时，claims 步骤会产出"声明无实证 Claim"的空 claims_set，
+  # PCK 允许继续但产物必须标注限制（run/step note 与 evidence_index 均记录）。
+  allow_empty_claims: false
 timeouts:
   read_seconds: 60
   model_seconds: 180

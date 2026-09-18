@@ -108,6 +108,7 @@ def run_case(
     budgets: dict[str, int] | None = None,
     accept: bool = True,
     allow_qualified_claims: bool = False,
+    allow_empty_claims: bool = False,
     extra_skills: list[str] | None = None,
     experiment: str = "",
 ) -> dict[str, Any]:
@@ -135,13 +136,20 @@ def run_case(
 
     original_rules = config.RULES
     effective_policy = list((original_rules.get("evidence") or {}).get("pck_claim_statuses") or ["SUPPORTED"])
-    if allow_qualified_claims:
-        # M6 §13/§48：操作者显式放行 QUALIFY_REQUIRED（限定语必须保留）；
-        # 该设置会写进 run.json 的 evidence_policy，保证可复现与可审计。
+    effective_empty_policy = bool((original_rules.get("evidence") or {}).get("allow_empty_claims"))
+    if allow_qualified_claims or allow_empty_claims:
+        # M6 §13/§48：操作者显式放行（限定语必须保留 / 无实证 Claim 必须声明限制）；
+        # 该设置会写进 run.json，保证可复现与可审计。
+        evidence = dict(original_rules.get("evidence") or {})
+        if allow_qualified_claims:
+            evidence["pck_claim_statuses"] = ["SUPPORTED", "QUALIFY_REQUIRED"]
+            effective_policy = ["SUPPORTED", "QUALIFY_REQUIRED"]
+        if allow_empty_claims:
+            evidence["allow_empty_claims"] = True
+            effective_empty_policy = True
         relaxed = dict(original_rules)
-        relaxed["evidence"] = {"pck_claim_statuses": ["SUPPORTED", "QUALIFY_REQUIRED"]}
+        relaxed["evidence"] = evidence
         config.RULES = relaxed
-        effective_policy = ["SUPPORTED", "QUALIFY_REQUIRED"]
     try:
         if mode == "direct_codex":
             record = _run_direct(case, target)
@@ -160,6 +168,7 @@ def run_case(
             "fixtures": _fixture_hashes(case),
             "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
             "evidence_policy": effective_policy,
+            "empty_claims_policy": effective_empty_policy,
             "experiment": experiment or ("+".join(extra_skills) if extra_skills else ""),
             "extra_skills": extra_skills,
             "run_dir": str(target),

@@ -61,7 +61,13 @@ def check_supported_claims(
     index = ctx.content(contract["required_inputs"][0]) or {}
     entries = index.get("claims")
     if not isinstance(entries, list) or not entries:
-        return ["证据索引为空：没有可消费的 SUPPORTED Claim"]
+        # M6 §22/§48：概念/态度型课程可能没有实证 Claim。默认失败；操作者显式允许
+        # （rules.evidence.allow_empty_claims=true）且 claims 步骤已声明时，PCK 可继续，
+        # 限制必须已记录在 evidence_index 与 step note 中。
+        allow_empty = bool((config.RULES.get("evidence") or {}).get("allow_empty_claims"))
+        if allow_empty and index.get("declared_no_empirical_claims"):
+            return []
+        return ["证据索引为空，没有可用的 SUPPORTED Claim"]
 
     scope = {str(item) for item in usage_scope} if usage_scope else None
     problems: list[str] = []
