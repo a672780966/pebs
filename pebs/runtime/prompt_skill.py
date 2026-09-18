@@ -73,15 +73,62 @@ def canonical_schema_text(artifact_type: str | None) -> str:
 
 
 class PromptSkillExecutor:
-    def __init__(self, llm: Any, *, loader=skill_loader.load):
+    def __init__(self, llm: Any, *, loader=skill_loader.load, store: Any = None):
         self.llm = llm
         self.loader = loader
+        # 预算核算由受信任的 runtime 持有 store（RestrictedContext 不允许 Skill 触碰 store）
+        self.store = store
 
     def execute(self, ctx: Any, node: dict[str, Any], *, skill_record: dict[str, Any]) -> dict[str, Any]:
+        """执行外部 Prompt Skill。
+
+        M6 修正：分节产物（artifact_ids 含 {section_id}）必须**分节调用**并逐节校验；
+        此前一次性调用再把同一 payload 复制到每一节，导致各节内容完全相同（§17 A/B 发现）。
+        """
         name = skill_record.get("name")
         loaded = self.loader(name)
         instructions = skill_loader.instruction_text(loaded)
         schema_name, artifact_type = skill_loader.schema_for(skill_record)
+        template = str(((skill_record.get("handler") or {}).get("artifact_ids") or {}).get(artifact_type) or "")
+        sections = ctx.sections() if hasattr(ctx, "sections") else []
+        if artifact_type and "{section_id}" in template and len(sections) > 1:
+            payloads: dict[str, Any] = {}
+            for section in sections:
+                payloads[section["section_id"]] = self._execute_one(
+                    ctx,
+                    node,
+                    skill_record=skill_record,
+                    loaded=loaded,
+                    instructions=instructions,
+                    schema_name=schema_name,
+                    artifact_type=artifact_type,
+                    section=section,
+                )
+            return {"_sections": payloads, "_section_scoped": True}
+        return self._execute_one(
+            ctx,
+            node,
+            skill_record=skill_record,
+            loaded=loaded,
+            instructions=instructions,
+            schema_name=schema_name,
+            artifact_type=artifact_type,
+            section=sections[0] if sections else None,
+        )
+
+    def _execute_one(
+        self,
+        ctx: Any,
+        node: dict[str, Any],
+        *,
+        skill_record: dict[str, Any],
+        loaded: Any,
+        instructions: str,
+        schema_name: str | None,
+        artifact_type: str | None,
+        section: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        name = skill_record.get("name")
         artifacts: dict[str, Any] = {}
         for artifact_type_name in skill_loader.declared_artifact_types(skill_record):
             ids = ctx.artifact_ids_of_type(artifact_type_name) if hasattr(ctx, "artifact_ids_of_type") else []
@@ -90,12 +137,16 @@ class PromptSkillExecutor:
             if not contents:
                 continue
             artifacts[artifact_type_name] = contents if len(contents) > 1 else next(iter(contents.values()))
+        constraints = dict(node.get("constraints") or {})
+        if section:
+            constraints["section_id"] = section["section_id"]
+            constraints["section_title"] = section.get("title", "")
         skill_context = context_mod.build_context(
             task=node.get("reason") or f"执行外部 Skill：{name}",
             skill_record=skill_record,
             artifacts=artifacts,
             project_rules=getattr(ctx, "project_rules", "") or "",
-            constraints=node.get("constraints") or {},
+            constraints=constraints,
             output_schema=loaded.output_schema,
             extra_allowed=["materials"] if skill_record.get("filesystem") == "project_inputs_read" else [],
         )
@@ -106,10 +157,16 @@ class PromptSkillExecutor:
             if schema_text
             else ""
         )
+        section_line = (
+            f"\n本节：{section['section_id']} {section.get('title', '')}（只处理本节；不要复用其它节的内容）\n"
+            if section
+            else ""
+        )
         prompt = (
             f"Skill 指令：\n{instructions}\n\n"
             f"任务与最小上下文（只包含该 Skill 被允许消费的产物）：\n"
-            f"{json.dumps({k: v for k, v in skill_context.items() if not k.startswith('_')}, ensure_ascii=False)[:12000]}\n\n"
+            f"{json.dumps({k: v for k, v in skill_context.items() if not k.startswith('_')}, ensure_ascii=False)[:12000]}\n"
+            f"{section_line}\n"
             f"输出要求：JSON 对象；artifact 类型={artifact_type}；canonical schema={schema_name or '无'}"
             f"{schema_block}"
         )
@@ -118,8 +175,11 @@ class PromptSkillExecutor:
             from ..pipeline import StepBlocked
 
             raise StepBlocked("LLM Provider 不可用：" + "；".join(availability.get("reasons", [])))
-        data = self.llm.generate_json(task=f"external_skill:{name}", system=SYSTEM, prompt=prompt)
-        data = _with_section_defaults(ctx, node, artifact_type, data)
+        data = self._generate(ctx, task=f"external_skill:{name}", prompt=prompt)
+        scoped_node = dict(node)
+        if section:
+            scoped_node["section_id"] = section["section_id"]
+        data = _with_section_defaults(ctx, scoped_node, artifact_type, data)
         errors = _validate_with_policies(data, skill_record=skill_record, artifact_type=artifact_type, inline_schema=loaded.output_schema)
         if errors:
             repair_prompt = (
@@ -127,14 +187,30 @@ class PromptSkillExecutor:
                 + "\n\n上一次输出未通过校验，请修正后重新输出完整 JSON：\n- "
                 + "\n- ".join(errors[:6])
             )
-            data = self.llm.generate_json(task=f"external_skill_repair:{name}", system=SYSTEM, prompt=repair_prompt)
-            data = _with_section_defaults(ctx, node, artifact_type, data)
+            data = self._generate(ctx, task=f"external_skill_repair:{name}", prompt=repair_prompt)
+            data = _with_section_defaults(ctx, scoped_node, artifact_type, data)
             errors = _validate_with_policies(data, skill_record=skill_record, artifact_type=artifact_type, inline_schema=loaded.output_schema)
             if errors:
                 raise SkillExecutionFailed(
                     f"外部 Skill 输出两次均未通过 Schema 校验：{'；'.join(errors[:3])}"
                 )
         return data
+
+    def _generate(self, ctx: Any, *, task: str, prompt: str) -> dict[str, Any]:
+        """外部 Skill 的每次模型调用都必须计入预算（M6 §31/§35 成本核算）。"""
+        store = self.store
+        run_id = str(getattr(ctx, "run_id", "") or "")
+        if store is not None and run_id and hasattr(store, "check_budget"):
+            from ..store import BudgetExceeded
+
+            try:
+                store.check_budget(run_id, model_calls=1)
+            except BudgetExceeded as exc:
+                from .. import pipeline
+
+                raise pipeline.StepBlocked(f"预算耗尽：{exc}") from exc
+            store.bump_calls(run_id, 1)
+        return self.llm.generate_json(task=task, system=SYSTEM, prompt=prompt)
 
 
 def _with_section_defaults(ctx: Any, node: dict[str, Any], artifact_type: str | None, data: dict[str, Any]) -> dict[str, Any]:
@@ -163,5 +239,10 @@ def _with_section_defaults(ctx: Any, node: dict[str, Any], artifact_type: str | 
 
 
 def execute_prompt_skill(ctx: Any, node: dict[str, Any], skill_record: dict[str, Any], llm: Any) -> dict[str, Any]:
-    executor = PromptSkillExecutor(llm)
+    store = None
+    try:  # RestrictedContext 会拦截 store；只有真实 PipelineContext 才用于预算核算
+        store = getattr(ctx, "store", None)
+    except Exception:  # noqa: BLE001 - 受限上下文下不做核算，仍可执行
+        store = None
+    executor = PromptSkillExecutor(llm, store=store)
     return executor.execute(ctx, node, skill_record=skill_record)

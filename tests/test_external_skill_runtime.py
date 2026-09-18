@@ -67,6 +67,36 @@ def test_external_skill_prompt_includes_the_canonical_schema(registry_env, engin
     assert "pck_notes" in joined
 
 
+def test_section_scoped_external_skill_is_called_per_section(registry_env, engine):
+    """M6：分节产物必须分节调用，各节内容不得相同（§17 A/B 发现的问题）。"""
+    from conftest import REQUEST_2, run_dynamic_build
+
+    name = _install(registry_env, registry_env, "ext-per-section-plan")
+    engine.llm = FakeLLM(
+        external_skill_payloads=[
+            {"strategies": [{"goal_ref": "g1", "knowledge_type": "concept", "strategy": "explicit-instruction", "rationale": "sec1"}], "pck_notes": ["sec1 的教学说明"]},
+            {"strategies": [{"goal_ref": "g1", "knowledge_type": "concept", "strategy": "explicit-instruction", "rationale": "sec2"}], "pck_notes": ["sec2 的教学说明"]},
+        ]
+    )
+    start, status = run_dynamic_build(engine, REQUEST_2)
+    assert status["run"]["status"] == "succeeded", [
+        (step["step_id"], step["step_id"], step["status"], step["error"]) for step in status["steps"]
+    ]
+    requirements = engine.store.get_revision(engine.store.revisions_of("requirements")[-1])["content"]
+    section_ids = [section["section_id"] for section in requirements["sections"]]
+    assert len(section_ids) >= 2
+    notes = {}
+    for section_id in section_ids:
+        revisions = engine.store.revisions_of(f"teaching_plan:{section_id}")
+        assert revisions, f"{section_id} 应由外部 Skill 产出"
+        notes[section_id] = engine.store.get_revision(revisions[-1])["content"].get("pck_notes")
+    assert notes[section_ids[0]] != notes[section_ids[1]], notes
+    assert notes[section_ids[0]] == ["sec1 的教学说明"]
+    assert notes[section_ids[1]] == ["sec2 的教学说明"]
+    # 每次外部调用都计入预算（§31/§35）
+    assert engine.store.get_run(start["run_id"])["calls_used"] > 0
+
+
 def test_unapproved_external_skill_is_not_selectable(registry_env, engine):
     name = _install(registry_env, registry_env, "ext-unapproved-plan", approve=False)
     names = {item["name"] for item in resolver.candidates("teaching_plan")}

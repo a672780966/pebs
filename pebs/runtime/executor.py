@@ -31,20 +31,28 @@ def _emit_external_artifacts(ctx: pipeline.PipelineContext, record: dict[str, An
     mapping = (record.get("handler") or {}).get("artifact_ids") or {}
     produced: list[str] = []
     deps = [rev for rev in (ctx.rev(item) for item in record.get("requires", [])) if rev]
+    section_payloads = content.get("_sections") if isinstance(content, dict) else None
     for artifact_type in record.get("produces", []):
         template = str(mapping.get(artifact_type) or "")
         if not template:
             raise SkillRuntimeBlocked(f"{record.get('name')} 未声明 artifact_ids.{artifact_type}")
         if "{section_id}" in template:
             for section in ctx.sections():
-                payload = dict(content)
-                payload.setdefault("section_id", section["section_id"])
+                section_id = section["section_id"]
+                if isinstance(section_payloads, dict) and section_id in section_payloads:
+                    # M6：分节调用时使用该节自己的 payload（不再把同一内容复制到每一节）
+                    source = section_payloads[section_id]
+                    payload = dict(source) if isinstance(source, dict) else {"items": source}
+                else:
+                    payload = {key: value for key, value in content.items() if key != "_sections"}
+                payload.setdefault("section_id", section_id)
                 payload.setdefault("title", section.get("title", ""))
-                artifact_id = template.format(section_id=section["section_id"])
+                artifact_id = template.format(section_id=section_id)
                 info = ctx.emit(artifact_id, artifact_type, payload, str(record.get("name")), deps=deps)
                 produced.append(info["revision_id"])
         else:
-            info = ctx.emit(template, artifact_type, content, str(record.get("name")), deps=deps)
+            payload = {key: value for key, value in content.items() if key != "_sections"} if isinstance(content, dict) else content
+            info = ctx.emit(template, artifact_type, payload, str(record.get("name")), deps=deps)
             produced.append(info["revision_id"])
     return produced
 
@@ -58,7 +66,7 @@ class _Runner:
         self.engine = engine
         self.ctx = ctx
         self.builtin = BuiltinStepExecutor(pipeline.STEPS)
-        self.prompt = PromptSkillExecutor(engine.llm)
+        self.prompt = PromptSkillExecutor(engine.llm, store=engine.store)
         self.sandbox = SandboxSkillExecutor()
         self.write_lock = threading.Lock()
         self.aborted = threading.Event()
