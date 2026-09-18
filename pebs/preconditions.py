@@ -65,7 +65,10 @@ def check_supported_claims(
         # （rules.evidence.allow_empty_claims=true）且 claims 步骤已声明时，PCK 可继续，
         # 限制必须已记录在 evidence_index 与 step note 中。
         allow_empty = bool((config.RULES.get("evidence") or {}).get("allow_empty_claims"))
-        if allow_empty and index.get("declared_no_empirical_claims"):
+        allow_unverified = bool((config.RULES.get("evidence") or {}).get("allow_unverified_pck"))
+        if (allow_empty and index.get("declared_no_empirical_claims")) or (
+            allow_unverified and index.get("declared_no_consumable_claims")
+        ):
             return []
         return ["证据索引为空，没有可用的 SUPPORTED Claim"]
 
@@ -108,6 +111,9 @@ def check_supported_claims(
         if usage == PLACEHOLDER_USAGE:
             problems.append(f"{claim_id}@v{version} 的 usage 为「{usage}」，属于待核验占位")
     if not problems and consumed == 0:
+        allow_unverified = bool((config.RULES.get("evidence") or {}).get("allow_unverified_pck"))
+        if allow_unverified and index.get("declared_no_consumable_claims"):
+            return []
         problems.append("证据契约范围内没有可用于 PCK 的 Claim")
     return problems
 

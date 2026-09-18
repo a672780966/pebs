@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-19T00:04:09；run 数（每 case×mode 取最新）：10
+生成时间：2026-09-19T00:23:30；run 数（每 case×mode 取最新）：12
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -12,30 +12,32 @@
 | A | dynamic [+external-media] | succeeded | 1/1 | None | None | None | None | None | 28.0 | 1020.85 | 3.0 |
 | B | direct_codex | succeeded | 1/1 | None | None | None | None | None | 1.0 | 210.04 | 0.0 |
 | B | dynamic | failed | 0/4 | None | None | None | None | None | 2.0 | 97.14 | 2.0 |
+| B | dynamic [+empty-claims-policy] | blocked | 0/1 | None | None | None | None | None | 33.0 | 925.75 | 3.0 |
 | B | dynamic [+external-media-B] | running | 0/1 | None | None | None | None | None | 40.0 | 7826.67 | 3.0 |
 | C | dynamic | succeeded | 3/5 | None | None | None | None | None | 48.0 | 1868.79 | 0.0 |
+| D | dynamic | failed | 0/1 | None | None | None | None | None | 2.0 | 90.16 | 0.0 |
 
 ## Skill Performance Registry（§19/§40；内部 skills 全部记录）
 
 | Skill | Version | Runs | Success | Schema Fail | Human | Edit Ratio | Status |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| assessment-designer | 0.1.0 | 7 | 0.8571 | 0.0 | None | None | EXPERIMENTAL |
-| case-designer | 0.1.0 | 8 | 0.875 | 0.0 | None | None | EXPERIMENTAL |
-| claim-extractor | 0.1.0 | 11 | 0.9091 | 0.0 | None | None | EXPERIMENTAL |
-| diagram-designer | 0.1.0 | 4 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
-| docx-exporter | 0.1.0 | 4 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
+| assessment-designer | 0.1.0 | 8 | 0.75 | 0.0 | None | None | EXPERIMENTAL |
+| case-designer | 0.1.0 | 9 | 0.7778 | 0.0 | None | None | EXPERIMENTAL |
+| claim-extractor | 0.1.0 | 13 | 0.8462 | 0.0 | None | None | EXPERIMENTAL |
+| diagram-designer | 0.1.0 | 5 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
+| docx-exporter | 0.1.0 | 5 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
 | dual-coding-designer | 6bbbce418f82 | 3 | 0.6667 | 0.3333 | None | None | EXPERIMENTAL |
-| evidence-indexer | 0.1.0 | 4 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
-| evidence-reviewer | 0.1.0 | 11 | 0.8182 | 0.0 | None | None | EXPERIMENTAL |
-| gate-runner | 0.1.0 | 7 | 0.5714 | 0.0 | None | None | EXPERIMENTAL |
-| learning-designer | 0.1.0 | 11 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
-| lesson-designer | 0.1.0 | 11 | 0.6364 | 0.0 | None | None | EXPERIMENTAL |
-| media-router | 0.1.0 | 3 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
-| pck-developer | 0.1.0 | 11 | 0.6364 | 0.0 | None | None | EXPERIMENTAL |
-| presentation-composer | 0.1.0 | 4 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
-| presentation-planner | 0.1.0 | 4 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
-| preview-builder | 0.1.0 | 4 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
-| requirements-builder | 0.1.0 | 11 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
-| script-writer | 0.1.0 | 8 | 0.625 | 0.0 | None | None | EXPERIMENTAL |
-| template-parser | 0.1.0 | 11 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| evidence-indexer | 0.1.0 | 5 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
+| evidence-reviewer | 0.1.0 | 13 | 0.7692 | 0.0 | None | None | EXPERIMENTAL |
+| gate-runner | 0.1.0 | 8 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
+| learning-designer | 0.1.0 | 13 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| lesson-designer | 0.1.0 | 13 | 0.5385 | 0.0 | None | None | EXPERIMENTAL |
+| media-router | 0.1.0 | 4 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
+| pck-developer | 0.1.0 | 13 | 0.5385 | 0.0 | None | None | EXPERIMENTAL |
+| presentation-composer | 0.1.0 | 5 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
+| presentation-planner | 0.1.0 | 5 | 0.0 | 0.0 | None | None | EXPERIMENTAL |
+| preview-builder | 0.1.0 | 5 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| requirements-builder | 0.1.0 | 13 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| script-writer | 0.1.0 | 9 | 0.5556 | 0.0 | None | None | EXPERIMENTAL |
+| template-parser | 0.1.0 | 13 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
 

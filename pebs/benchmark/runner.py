@@ -82,6 +82,137 @@ def seed_case_artifacts(engine: Engine, case: dict[str, Any]) -> list[str]:
     return seeded
 
 
+def run_scenario(
+    case_id: str,
+    *,
+    budgets: dict[str, int] | None = None,
+    accept: bool = True,
+    project_id: str | None = None,
+) -> dict[str, Any]:
+    """§26/§27：先跑完并接受基线课程，再执行 scenario（局部修改 / 只出 PPT）。
+
+    - local_edit：调用 conversation_edit，并用 preserve 集合校验无关产物 hash 未变；
+    - ppt_only：复用已有 learning_design/teaching_plan/script，只跑 media → slide_plan → pptx → QA。
+    """
+    case = cases.get_case(case_id)
+    base_id = str(case.get("depends_on") or "")
+    if not base_id:
+        raise ValueError(f"{case_id} 未声明 depends_on，无法构造 scenario")
+    base = cases.get_case(base_id)
+    project = project_id or f"bench-{case_id.lower()}-{time.strftime('%H%M%S', time.localtime())}"
+    target = run_dir(case_id, "scenario")
+    target.mkdir(parents=True, exist_ok=True)
+    started = time.time()
+
+    engine = Engine(project)
+    effective_budgets = dict(config.RULES.get("budgets") or {})
+    effective_budgets.update(budgets or {})
+    seed_case_artifacts(engine, base)
+    base_start = engine.start_build(
+        base["request"],
+        template_path=cases.fixture_path(base, "template_fixture"),
+        material_paths=[cases.benchmark_dir() / name for name in base.get("material_fixtures") or []],
+        budgets=effective_budgets,
+        planner_mode="dynamic",
+    )
+    base_status = _wait(engine, base_start["run_id"])
+    if accept and base_status["run"]["status"] == "succeeded":
+        engine.accept(base_start["changeset_id"])
+    record: dict[str, Any] = {
+        "case_id": case["id"],
+        "case_title": case.get("title", ""),
+        "mode": "scenario",
+        "scenario": str(case.get("scenario")),
+        "base_case": base_id,
+        "base_run_id": base_start["run_id"],
+        "base_run_status": base_status["run"]["status"],
+        "project_id": project,
+        "evidence_policy": list((config.RULES.get("evidence") or {}).get("pck_claim_statuses") or ["SUPPORTED"]),
+    }
+    if base_status["run"]["status"] != "succeeded":
+        record.update(
+            {
+                "run_status": base_status["run"]["status"],
+                "note": "基线课程未成功，scenario 未执行",
+                "metrics": {},
+                "run_dir": str(target),
+            }
+        )
+        (target / "run.json").write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return record
+
+    before = metrics.snapshot_hashes(engine.store)
+    scenario = str(case.get("scenario"))
+    if scenario == "local_edit":
+        instruction = str(case.get("edit_instruction") or case["request"])
+        result = engine.conversation_edit(instruction)
+        if accept and result.get("run_status") == "succeeded":
+            engine.accept(result["changeset_id"])
+        after = metrics.snapshot_hashes(engine.store)
+        preserve = [str(item) for item in (case.get("preserve") or [])]
+        locality = metrics.locality_report(
+            before, after, preserve=preserve, expected=result.get("affected_artifacts") or []
+        )
+        record.update(
+            {
+                "run_id": result.get("run_id"),
+                "run_status": result.get("run_status"),
+                "edit": {
+                    "instruction": instruction,
+                    "plan_id": result.get("plan_id"),
+                    "affected_artifacts": result.get("affected_artifacts"),
+                    "locked_artifacts": result.get("locked_artifacts"),
+                    "changeset_id": result.get("changeset_id"),
+                },
+                "locality": locality,
+                "metrics": {
+                    "locality_preservation_rate": locality["locality_preservation_rate"],
+                    "unnecessary_regeneration": len(locality["unnecessary_regeneration"]),
+                    "unnecessary_regeneration_rate": locality["unnecessary_regeneration_rate"],
+                    "model_calls": int(engine.store.get_run(result["run_id"])["calls_used"]) if result.get("run_id") else 0,
+                },
+                "artifact_hashes": after,
+            }
+        )
+    elif scenario == "ppt_only":
+        start = engine.start_build(case["request"], budgets=effective_budgets, planner_mode="dynamic")
+        status = _wait(engine, start["run_id"])
+        if accept and status["run"]["status"] == "succeeded":
+            engine.accept(start["changeset_id"])
+        revisions = engine.store.revisions_of("build_plan_dynamic")
+        plan = engine.store.get_revision(revisions[-1])["content"] if revisions else {}
+        nodes = [(node.get("skill"), bool(node.get("reused"))) for node in plan.get("nodes", [])]
+        reused = [skill for skill, flag in nodes if flag]
+        record.update(
+            {
+                "run_id": start["run_id"],
+                "run_status": status["run"]["status"],
+                "plan_nodes": nodes,
+                "metrics": {
+                    "locality_preservation_rate": 1.0 if reused else 0.0,
+                    "reuse_rate": round(len(reused) / max(len(nodes), 1), 3),
+                    "model_calls": int(engine.store.get_run(start["run_id"])["calls_used"]),
+                    "reused_skills": reused,
+                },
+                "artifact_hashes": metrics.snapshot_hashes(engine.store),
+            }
+        )
+    else:
+        record.update({"run_status": "blocked", "note": f"未知 scenario：{scenario}", "metrics": {}})
+
+    record.update(
+        {
+            "wall_time_seconds": round(time.time() - started, 2),
+            "fixtures": _fixture_hashes(case),
+            "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
+            "run_dir": str(target),
+        }
+    )
+    record.setdefault("metrics", {})["wall_time_seconds"] = record["wall_time_seconds"]
+    (target / "run.json").write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return record
+
+
 def run_dir(case_id: str, mode: str) -> Path:
     stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime())
     return cases.runs_dir() / f"{stamp}-{case_id}-{mode}"
@@ -109,10 +240,14 @@ def run_case(
     accept: bool = True,
     allow_qualified_claims: bool = False,
     allow_empty_claims: bool = False,
+    allow_unverified_pck: bool = False,
     extra_skills: list[str] | None = None,
     experiment: str = "",
 ) -> dict[str, Any]:
     case = cases.get_case(case_id)
+    if case.get("scenario"):
+        # F（local edit）/ G（ppt-only）等场景必须先有"已完成课程"，由 run_scenario 处理
+        return run_scenario(case_id, budgets=budgets, accept=accept)
     extra_skills = [str(item) for item in (extra_skills or [])]
     if extra_skills:
         # §46 Skill Selection Experiment：显式 `/skill-name` 追加到请求，
@@ -137,7 +272,8 @@ def run_case(
     original_rules = config.RULES
     effective_policy = list((original_rules.get("evidence") or {}).get("pck_claim_statuses") or ["SUPPORTED"])
     effective_empty_policy = bool((original_rules.get("evidence") or {}).get("allow_empty_claims"))
-    if allow_qualified_claims or allow_empty_claims:
+    effective_unverified_policy = bool((original_rules.get("evidence") or {}).get("allow_unverified_pck"))
+    if allow_qualified_claims or allow_empty_claims or allow_unverified_pck:
         # M6 §13/§48：操作者显式放行（限定语必须保留 / 无实证 Claim 必须声明限制）；
         # 该设置会写进 run.json，保证可复现与可审计。
         evidence = dict(original_rules.get("evidence") or {})
@@ -147,6 +283,9 @@ def run_case(
         if allow_empty_claims:
             evidence["allow_empty_claims"] = True
             effective_empty_policy = True
+        if allow_unverified_pck:
+            evidence["allow_unverified_pck"] = True
+            effective_unverified_policy = True
         relaxed = dict(original_rules)
         relaxed["evidence"] = evidence
         config.RULES = relaxed
@@ -169,6 +308,7 @@ def run_case(
             "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
             "evidence_policy": effective_policy,
             "empty_claims_policy": effective_empty_policy,
+            "unverified_pck_policy": effective_unverified_policy,
             "experiment": experiment or ("+".join(extra_skills) if extra_skills else ""),
             "extra_skills": extra_skills,
             "run_dir": str(target),

@@ -51,8 +51,20 @@ def test_allow_empty_claims_lets_the_run_continue_with_a_recorded_limitation(eng
     assert preconditions.check_supported_claims(_ctx(index), inputs=["evidence_index"], usage_scope=["讲解"]) == []
 
 
-def _ctx(index: dict):
+def _ctx(index: dict, *, status: str = "UNSUPPORTED", usage: str = "讲解"):
+    class _Evidence:
+        def claim_status(self, claim_id, version):
+            return status
+
+        def latest_version(self, claim_id):
+            return 1
+
+        def get_claim(self, claim_id, version=None):
+            return {"population": "大学生", "usage": usage}
+
     class _C:
+        evidence = _Evidence()
+
         def content(self, artifact_id):
             return index if artifact_id == "evidence_index" else None
 
@@ -76,3 +88,32 @@ def test_precondition_needs_both_the_flag_and_the_declaration(monkeypatch):
         _ctx({"claims": [], "declared_no_empirical_claims": False}), inputs=["evidence_index"]
     )
     assert problems and "证据索引为空" in problems[0]
+
+
+def test_unverified_pck_policy_covers_claims_that_cannot_be_supported(monkeypatch):
+    """B 课实测：Claim 被提取但全部不可支持（实践/态度型）。
+
+    默认阻塞；allow_unverified_pck=true 且索引已声明"无可用证据"时，PCK 可继续，
+    但证据门、安全门、PII 门本身不降级。
+    """
+    rules = dict(config.RULES)
+    evidence = dict(rules.get("evidence") or {})
+    evidence["allow_unverified_pck"] = False
+    rules["evidence"] = evidence
+    monkeypatch.setattr(config, "RULES", rules)
+    index = {"claims": [], "excluded_claims": [{"claim_id": "c1", "version": 1, "status": "UNSUPPORTED"}], "declared_no_consumable_claims": True}
+    problems = preconditions.check_supported_claims(_ctx(index), inputs=["evidence_index"], usage_scope=["讲解"])
+    assert problems and "证据索引为空" in problems[0]
+
+    evidence["allow_unverified_pck"] = True
+    monkeypatch.setattr(config, "RULES", rules)
+    assert preconditions.check_supported_claims(_ctx(index), inputs=["evidence_index"], usage_scope=["讲解"]) == []
+
+    # consumed==0（Claim 存在但不在 usage_scope 内）同样受该政策覆盖
+    index2 = {
+        "claims": [{"claim_id": "c1", "version": 1}],
+        "excluded_claims": [{"claim_id": "c2", "version": 1, "status": "UNSUPPORTED"}],
+        "declared_no_consumable_claims": True,
+    }
+    ctx2 = _ctx(index2, status="SUPPORTED", usage="评价")
+    assert preconditions.check_supported_claims(ctx2, inputs=["evidence_index"], usage_scope=["讲解"]) == []

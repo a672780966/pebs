@@ -73,32 +73,59 @@ def summarize_run(trace: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# 这些产物由运行/规划层写入，不是"被重建的教学产物"，不计入 Unnecessary Regeneration
+SYSTEM_ARTIFACTS = frozenset(
+    {"patch_plan", "human_eval", "build_plan_dynamic", "router_result", "build_plan", "skill_invocations"}
+)
+
+
 def locality_report(
     before_hashes: dict[str, str],
     after_hashes: dict[str, str],
     *,
     preserve: list[str],
+    expected: list[str] | None = None,
 ) -> dict[str, Any]:
-    """§38 / Acceptance 7：preserve 集合中不应有任何 hash 变化。"""
+    """§26 / §38 / Acceptance 7。
+
+    - preserve 集合必须 hash 不变（违反即 preserve_violations）；
+    - 预期受影响集合（expected，即 Impact Analyzer 的输出）内的变化是正常的；
+    - 系统产物（patch_plan / 运行记录）不算重建；
+    - 其余变化才是 Unnecessary Regeneration。
+    """
     violated = [
         artifact_id
         for artifact_id in preserve
         if after_hashes.get(artifact_id) != before_hashes.get(artifact_id)
     ]
-    unrelated_changed = sorted(
+    expected_set = set(expected or []) | SYSTEM_ARTIFACTS
+    changed = {
         artifact_id
         for artifact_id, digest in after_hashes.items()
-        if artifact_id not in preserve and before_hashes.get(artifact_id) not in (None, digest)
+        if before_hashes.get(artifact_id) not in (None, digest)
+    }
+    new_artifacts = {
+        artifact_id for artifact_id in after_hashes if artifact_id not in before_hashes
+    }
+    unnecessary = sorted(
+        artifact_id
+        for artifact_id in changed | new_artifacts
+        if artifact_id not in expected_set and artifact_id not in set(preserve)
     )
     return {
         "preserve": sorted(preserve),
+        "expected": sorted(expected_set),
         "preserve_violations": sorted(violated),
         "locality_preservation_rate": round(
             (len(preserve) - len(violated)) / len(preserve), 4
         )
         if preserve
         else 1.0,
-        "unexpected_changes": unrelated_changed,
+        "changed_artifacts": sorted(changed | new_artifacts),
+        "unnecessary_regeneration": unnecessary,
+        "unnecessary_regeneration_rate": round(
+            len(unnecessary) / max(len(changed | new_artifacts), 1), 4
+        ),
     }
 
 

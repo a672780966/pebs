@@ -26,6 +26,10 @@ evidence:
   # 操作者显式设为 true 时，claims 步骤会产出"声明无实证 Claim"的空 claims_set，
   # PCK 允许继续但产物必须标注限制（run/step note 与 evidence_index 均记录）。
   allow_empty_claims: false
+  # M6 §22/§48：如果课程提取到的 Claim 全部无法获得证据支持（实践型/态度型课程常见），
+  # 默认仍阻塞。操作者显式设为 true 时允许 PCK 基于教学法继续，但必须在记录中标注
+  # "无可用证据支持"；Evidence/Safety/PII 各门禁本身不降级。
+  allow_unverified_pck: false
 timeouts:
   read_seconds: 60
   model_seconds: 180

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-19T00:04:09",
+  "generated_at": "2026-09-19T00:23:30",
   "cases": [
     {
       "case_id": "A",
@@ -148,6 +148,24 @@
         "automatic_issues": 2.0,
         "runs": 1
       },
+      "dynamic [+empty-claims-policy]": {
+        "status": "blocked",
+        "attempts": 1,
+        "succeeded": 0,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 33.0,
+        "runtime_seconds": 925.75,
+        "automatic_issues": 3.0,
+        "runs": 1
+      },
       "dynamic [+external-media-B]": {
         "status": "running",
         "attempts": 1,
@@ -187,9 +205,30 @@
         "automatic_issues": 0.0,
         "runs": 1
       }
+    },
+    {
+      "case_id": "D",
+      "dynamic": {
+        "status": "failed",
+        "attempts": 1,
+        "succeeded": 0,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 2.0,
+        "runtime_seconds": 90.16,
+        "automatic_issues": 0.0,
+        "runs": 1
+      }
     }
   ],
-  "runs": 10,
+  "runs": 12,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -390,6 +429,31 @@
       "automatic_issues": 2
     },
     {
+      "run_id": "run_b397e2640d44",
+      "case_id": "B",
+      "mode": "dynamic",
+      "variant": "dynamic [+empty-claims-policy]",
+      "experiment": "empty-claims-policy",
+      "status": "blocked",
+      "attempts": 1,
+      "succeeded": 0,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 33,
+      "research_calls": 24,
+      "runtime_seconds": 925.75,
+      "skill_failure_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 3
+    },
+    {
       "run_id": "run_810144e1835a",
       "case_id": "B",
       "mode": "dynamic",
@@ -436,6 +500,31 @@
       "research_calls": 12,
       "runtime_seconds": 1868.79,
       "skill_failure_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 0
+    },
+    {
+      "run_id": "run_b8d460c72786",
+      "case_id": "D",
+      "mode": "dynamic",
+      "variant": "dynamic",
+      "experiment": "",
+      "status": "failed",
+      "attempts": 1,
+      "succeeded": 0,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 2,
+      "research_calls": 0,
+      "runtime_seconds": 90.16,
+      "skill_failure_rate": 0.0909,
       "locality_preservation_rate": null,
       "automatic_issues": 0
     }

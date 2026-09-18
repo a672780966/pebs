@@ -51,6 +51,20 @@ def _rank_label(message: str, labels: list[str]) -> str | None:
     return None
 
 
+def _numbered_refs(message: str) -> list[str]:
+    """M6 §34：编号小节引用（8.1 / 8.2 …），用于四节课程的自然语言定位。"""
+    return sorted({match.group(1) for match in re.finditer(r"(?<![\d.])(\d{1,2}\.\d{1,2})(?![\d.])", message)})
+
+
+def _match_section_by_label(message: str, sections: list[dict[str, Any]]) -> str | None:
+    for label in _numbered_refs(message):
+        for section in sections:
+            title = str(section.get("title") or "")
+            if title.startswith(label):
+                return section["section_id"]
+    return None
+
+
 def _match_section_by_title(message: str, sections: list[dict[str, Any]], min_length: int = 3) -> str | None:
     best: tuple[int, str] | None = None
     for section in sections:
@@ -106,6 +120,11 @@ def resolve(
         if candidate in {section["section_id"] for section in sections}:
             section_ids.append(candidate)
 
+    if not section_ids:
+        labelled = _match_section_by_label(message, sections)
+        if labelled:
+            section_ids.append(labelled)
+            resolved["match_reasons"].append(f"编号小节匹配 → {labelled}")
     if not section_ids:
         titled = _match_section_by_title(message, sections)
         if titled:

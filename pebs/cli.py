@@ -329,6 +329,7 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
                     budgets=budgets or None,
                     allow_qualified_claims=args.allow_qualified_claims,
                     allow_empty_claims=args.allow_empty_claims,
+                    allow_unverified_pck=args.allow_unverified_pck,
                     extra_skills=[item.strip() for item in args.skills.split(",") if item.strip()],
                     experiment=args.experiment,
                 )
@@ -442,6 +443,11 @@ def main(argv: list[str] | None = None) -> int:
         "--allow-empty-claims",
         action="store_true",
         help="概念/态度型课程：允许无实证 Claim 继续（限制会记录在 claims/evidence_index 与 run.json）",
+    )
+    bench.add_argument(
+        "--allow-unverified-pck",
+        action="store_true",
+        help="实践/态度型课程：Claim 全部不可支持时允许 PCK 基于教学法继续（记录限制；门禁本身不降级）",
     )
     bench.add_argument("--experiment", default="", help="实验标签（写入 run.json）")
     bench.set_defaults(func=cmd_benchmark)

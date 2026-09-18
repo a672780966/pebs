@@ -992,6 +992,7 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
         "claims": consumable,
         "excluded_claims": excluded,
         "declared_no_empirical_claims": bool(claims_doc.get("no_empirical_claims")) and not consumable,
+        "declared_no_consumable_claims": bool(not consumable and (statuses or excluded)),
         "assessments": [
             {
                 "assessment_id": a["assessment_id"],
@@ -1069,6 +1070,13 @@ def step_teaching_plan(ctx: PipelineContext) -> dict[str, Any]:
     blocked = preconditions.block_reason(ctx, {"preconditions": declared})
     if blocked:
         raise StepBlocked(blocked)
+    # M6 §22/§48：显式放行"无可用证据"时，限制必须随产物记录，供教师复核
+    _index = ctx.content("evidence_index") or {}
+    if _index.get("declared_no_consumable_claims") or _index.get("declared_no_empirical_claims"):
+        notes.append(
+            "证据契约中没有可消费的实证 Claim（已按 rules.evidence.allow_unverified_pck / "
+            "allow_empty_claims 放行）：教学策略只能基于教学法设计，不含实证心理学机制断言，需教师复核。"
+        )
     for section in ctx.sections():
         _check_cancel(ctx)
         _skill(ctx, "pck-developer")
