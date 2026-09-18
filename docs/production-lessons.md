@@ -48,6 +48,61 @@
 - **fix**: 从二者 optional_requires 中移除 `pptx_deck`；同时 Planner 对"已存在的可选输入"直接复用为零成本节点（§27）
 - **regression_test**: `tests/test_golden_benchmark_plan.py`（A/C 的 Plan 不含 pptx；G 显式请求时才生成）
 
+## 2026-09-18 — 执行层没有预算感知，四节课在核验中途 BLOCKED（RUNTIME/COST）
+
+- **date**: 2026-09-18
+- **task**: Golden Benchmark C（托育四节课程）dynamic 真实运行
+- **symptom**: 88 次模型调用 / 57 次研究请求后 `evidence-reviewer BLOCKED: research request budget exhausted`；Planner 的降级只改 `research_need`，执行层照旧每 Claim 做 3 来源 + 全文抓取
+- **root_cause**: `step_evidence` 直接 `check_budget`，没有读取剩余预算并降级
+- **skill**: `evidence-reviewer`
+- **artifact**: `pebs/store.py`（budget_remaining）、`pebs/pipeline.py`
+- **fix**: 每个 Claim 前读 `budget_remaining`：预算耗尽→跳过文献核验（Claim 保持未支持并排除出证据契约）；预算不足以覆盖完整成本→单来源核验并关闭全文抓取；所有降级写入 step notes
+- **regression_test**: `tests/test_evidence.py`、`tests/test_research.py`、`tests/test_pipeline.py`、`tests/test_golden_benchmark_plan.py`（全绿）
+
+## 2026-09-18 — 四节课程运行超过 harness 的固定 3600s 等待上限（RUNTIME）
+
+- **date**: 2026-09-18
+- **task**: Golden Benchmark C dynamic 真实运行（第二次）
+- **symptom**: run 仍在执行时 harness 已放弃等待，把 run 记为 "running" 并退出，遗留孤立线程与缺失的 run.json
+- **root_cause**: `runner._wait` 硬编码 3600s，而四节课程（~150 次模型调用 × ~30s）需要更久
+- **skill**: n/a（benchmark harness）
+- **artifact**: `pebs/benchmark/runner.py`
+- **fix**: `_wait_timeout(run)` = max(3600, run.budget_seconds + 600)，等待上限跟随运行自身的时间预算
+- **regression_test**: `tests/test_wait_timeout.py`
+
+## 2026-09-18 — 编号小节（8.1/8.2）被并成一节（ROUTING）
+
+- **date**: 2026-09-18
+- **task**: Golden Benchmark C 真实运行（第一次）
+- **symptom**: 请求写了 8.1–8.4 四节，`requirements.sections` 只有 1 节（sec1 "四节课程脚本"），最终只产出 script:sec1
+- **root_cause**: `parse_section_titles` 只识别"第N节/章"与"任务N"
+- **skill**: `requirements-builder`（Router）
+- **artifact**: `pebs/router.py`
+- **fix**: 识别 `X.Y 标题` 编号小节；存在编号小节时忽略容器式标题（如"第八章四节课程脚本"）
+- **regression_test**: `tests/test_section_numbering.py`
+
+## 2026-09-18 — 模型返回 0 条 Claim 时在 PCK 处才失败（EVIDENCE）
+
+- **date**: 2026-09-18
+- **task**: Golden Benchmark B（大学生心理健康第一课）dynamic 真实运行
+- **symptom**: 运行继续到 PCK 才以"证据索引为空"阻塞，错误信息无法定位到上游提取环节；浪费 31 次模型调用
+- **root_cause**: `step_claims` 接受空列表并照常产出 claims_set
+- **skill**: `claim-extractor`
+- **artifact**: `pebs/pipeline.py`
+- **fix**: 0 条 Claim 立即 `StepFailed`，提示"模型未返回可核验的实证性 Claim；请检查请求或补充材料（系统不会用空证据继续生产）"
+- **regression_test**: `tests/test_claims_extraction_guard.py`
+
+## 2026-09-18 — 单条未支持 Claim 阻塞整门课程（EVIDENCE）
+
+- **date**: 2026-09-18
+- **task**: Golden Benchmark A/B dynamic 真实运行
+- **symptom**: 证据索引里有 SUPPORTED Claim，但一条 UNSUPPORTED/PENDING 就让 PCK 拒绝执行
+- **root_cause**: `evidence_index.claims` 登记了全部 Claim，而它是"PCK 可消费契约"
+- **skill**: `evidence-reviewer` / `pck-developer`
+- **artifact**: `pebs/pipeline.py`、`pebs/preconditions.py`
+- **fix**: 契约只登记可消费状态（`rules.evidence.pck_claim_statuses`，默认 SUPPORTED）；不可消费的显式写入 `excluded_claims`（含状态与原因，不隐藏）；另修正 `usage_scope` 按多值 token 交集匹配
+- **regression_test**: `tests/test_evidence_status_policy.py`、`tests/test_usage_scope_matching.py`
+
 ## 2026-09-18 — 真实 Codex 运行：PCK 前置条件因 usage 多值而永远阻塞（EVIDENCE/RUNTIME）
 
 - **date**: 2026-09-18
