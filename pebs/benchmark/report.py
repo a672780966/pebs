@@ -38,22 +38,31 @@ def quality_score(record: dict[str, Any]) -> float | None:
 
 
 def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
-    """每个 (case, mode) 只取最新一次 run（重试不累加指标），并保留状态与证据政策。"""
+    """每个 (case, mode) 取一个代表 run，并统计尝试次数与成功次数。
+
+    真实运行的证据核验存在模型波动：同一 case 可能一次 succeeded、一次 blocked。
+    只显示"最新一次"会误导；因此代表 run 优先取最近的成功记录（没有成功记录才取最新），
+    并附 attempts/succeeded 计数。"""
     directory = runs_dir or cases.runs_dir()
     if not directory.exists():
         return []
-    latest: dict[tuple[str, str], tuple[float, dict[str, Any]]] = {}
+    grouped: dict[tuple[str, str], list[tuple[float, dict[str, Any]]]] = {}
     for path in sorted(directory.glob("*/run.json")):
         try:
             record = json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             continue
         key = (str(record.get("case_id")), str(record.get("mode")))
-        mtime = path.stat().st_mtime
-        if key not in latest or mtime >= latest[key][0]:
-            record["_run_json"] = str(path)
-            latest[key] = (mtime, record)
-    return [item[1] for item in sorted(latest.values(), key=lambda pair: (pair[1].get("case_id", ""), pair[1].get("mode", "")))]
+        grouped.setdefault(key, []).append((path.stat().st_mtime, record))
+    representatives: list[dict[str, Any]] = []
+    for (case_id, mode), items in sorted(grouped.items()):
+        items.sort(key=lambda pair: pair[0])
+        succeeded = [pair for pair in items if pair[1].get("run_status") == "succeeded"]
+        chosen = succeeded[-1][1] if succeeded else items[-1][1]
+        chosen["_attempts"] = len(items)
+        chosen["_succeeded"] = len(succeeded)
+        representatives.append(chosen)
+    return representatives
 
 
 def _row_for(run: dict[str, Any]) -> dict[str, Any]:
@@ -64,6 +73,8 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
         "case_id": run.get("case_id"),
         "mode": run.get("mode"),
         "status": run.get("run_status"),
+        "attempts": run.get("_attempts", 1),
+        "succeeded": run.get("_succeeded", 1 if run.get("run_status") == "succeeded" else 0),
         "evidence_policy": run.get("evidence_policy"),
         "human_score": quality_score(human) if human else None,
         "edit_ratio": human.get("edit_ratio"),
@@ -97,6 +108,8 @@ def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
                 continue
             entry[mode] = {
                 "status": matching[-1].get("status"),
+                "attempts": matching[-1].get("attempts"),
+                "succeeded": matching[-1].get("succeeded"),
                 "evidence_policy": matching[-1].get("evidence_policy"),
                 "human_score": _mean(row["human_score"] for row in matching),
                 "edit_ratio": _mean(row["edit_ratio"] for row in matching),
@@ -135,8 +148,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
         "",
         f"生成时间：{summary.get('generated_at')}；run 数（每 case×mode 取最新）：{summary.get('runs', 0)}",
         "",
-        "| Case | Mode | Status | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |",
-        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Case | Mode | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for case in summary.get("cases", []):
         for mode in COLUMNS:
@@ -144,10 +157,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
             if not entry:
                 continue
             lines.append(
-                "| {case} | {mode} | {status} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} |".format(
+                "| {case} | {mode} | {status} | {attempts} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} |".format(
                     case=case["case_id"],
                     mode=mode,
                     status=entry.get("status"),
+                    attempts=f"{entry.get('succeeded', 0)}/{entry.get('attempts', 1)}",
                     human=entry.get("human_score"),
                     edit=entry.get("edit_ratio"),
                     evidence=entry.get("evidence_errors"),
