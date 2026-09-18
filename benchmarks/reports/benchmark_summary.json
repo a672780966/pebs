@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-19T00:23:30",
+  "generated_at": "2026-09-19T05:46:56",
   "cases": [
     {
       "case_id": "A",
@@ -226,9 +226,51 @@
         "automatic_issues": 0.0,
         "runs": 1
       }
+    },
+    {
+      "case_id": "F",
+      "scenario": {
+        "status": "succeeded",
+        "attempts": 13,
+        "succeeded": 6,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 5.0,
+        "runtime_seconds": 1964.68,
+        "automatic_issues": 0.0,
+        "runs": 1
+      }
+    },
+    {
+      "case_id": "G",
+      "scenario": {
+        "status": "succeeded",
+        "attempts": 8,
+        "succeeded": 5,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 9.0,
+        "runtime_seconds": 20.92,
+        "automatic_issues": 0.0,
+        "runs": 1
+      }
     }
   ],
-  "runs": 12,
+  "runs": 14,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -526,6 +568,56 @@
       "runtime_seconds": 90.16,
       "skill_failure_rate": 0.0909,
       "locality_preservation_rate": null,
+      "automatic_issues": 0
+    },
+    {
+      "run_id": "run_dfcecd407801",
+      "case_id": "F",
+      "mode": "scenario",
+      "variant": "scenario",
+      "experiment": "",
+      "status": "succeeded",
+      "attempts": 13,
+      "succeeded": 6,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 5,
+      "research_calls": null,
+      "runtime_seconds": 1964.68,
+      "skill_failure_rate": null,
+      "locality_preservation_rate": 1.0,
+      "automatic_issues": 0
+    },
+    {
+      "run_id": "run_7619897365aa",
+      "case_id": "G",
+      "mode": "scenario",
+      "variant": "scenario",
+      "experiment": "",
+      "status": "succeeded",
+      "attempts": 8,
+      "succeeded": 5,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 9,
+      "research_calls": null,
+      "runtime_seconds": 20.92,
+      "skill_failure_rate": null,
+      "locality_preservation_rate": 1.0,
       "automatic_issues": 0
     }
   ]

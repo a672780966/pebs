@@ -169,6 +169,17 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-19 — 长文步骤在 240s 超时（RUNTIME）
+
+- **date**: 2026-09-19
+- **task**: Golden Benchmark F（在四节托育课程上做局部修改）
+- **symptom**: 基线课程运行中 `lesson-designer FAILED: lesson_plan: codex exec 超时`、`case-designer FAILED: case: codex exec 超时`，级联阻塞脚本与门禁
+- **root_cause**: `config/providers.yaml` 的 `llm.timeout_seconds=240` 对四节课程的长文产物偏紧（单节教案/案例在低 reasoning effort 下也可能超过 4 分钟）
+- **skill**: `lesson-designer` / `case-designer`
+- **artifact**: `config/providers.yaml`
+- **fix**: 单次 `codex exec` 上限提高到 480s；超时仍记为 FAILED（不静默降级、不伪造产物）
+- **regression_test**: 既有超时/失败路径测试（`tests/test_provider_codex.py`、`tests/test_provider_fallback.py`）；四节课程运行复测
+
 ## 2026-09-18 — §17 A/B 首轮数据：外部 Skill 的分节内容不分节（SKILL/PEDAGOGY）
 
 - **date**: 2026-09-18

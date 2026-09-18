@@ -8,7 +8,9 @@ llm:
   require_api_key: false
   model: ""
   reasoning_effort: low
-  timeout_seconds: 240
+  # M6：长文产物（lesson_plan / case / script）在四节课程上曾触发 240s 超时；
+  # 单次 codex exec 上限提高到 480s（超时仍会如实报 FAILED，不会静默降级）。
+  timeout_seconds: 480
   temperature: 0.2
   send_scope:
     - 用户需求文本
