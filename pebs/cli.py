@@ -434,6 +434,11 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--max-seconds", type=int, default=0)
     bench.add_argument("--skills", default="", help="§46 实验：追加显式 /skill-name（逗号分隔），用于 External only / Hybrid 对照")
     bench.add_argument(
+        "--allow-qualified-claims",
+        action="store_true",
+        help="实践型课程：显式放行 QUALIFY_REQUIRED 证据（限定语必须保留，写入 run.json 的 evidence_policy）",
+    )
+    bench.add_argument(
         "--allow-empty-claims",
         action="store_true",
         help="概念/态度型课程：允许无实证 Claim 继续（限制会记录在 claims/evidence_index 与 run.json）",
