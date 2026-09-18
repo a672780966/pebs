@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 from . import context as context_mod
@@ -22,6 +23,53 @@ class SkillExecutionFailed(Exception):
 
 
 SYSTEM = "你是被 PEBS 调用的外部教育 Skill。严格按给定输出 Schema 只输出 JSON，不编造研究结论或引用。"
+
+
+def _condense_schema(schema: dict[str, Any], *, max_chars: int = 3500) -> str:
+    """把 canonical JSON Schema 压缩成"必须满足的字段"摘要，供外部 Skill 提示使用。
+
+    M6 生产修正：此前 prompt 只给出 schema 名称，真实模型因此产出缺少必需字段的 JSON
+    （例如 media_plan 的 knowledge_function / temporal_dependency），两次校验失败即 FAILED。
+    """
+    def describe(node: dict[str, Any]) -> Any:
+        if not isinstance(node, dict):
+            return {}
+        info: dict[str, Any] = {}
+        if "type" in node:
+            info["type"] = node["type"]
+        if "enum" in node:
+            info["enum"] = node["enum"]
+        if node.get("required"):
+            info["required"] = node["required"]
+        properties = node.get("properties")
+        if isinstance(properties, dict):
+            info["properties"] = {key: describe(value) for key, value in properties.items()}
+        items = node.get("items")
+        if isinstance(items, dict):
+            info["items"] = describe(items)
+        return info
+
+    condensed = describe(schema)
+    text = json.dumps(condensed, ensure_ascii=False)
+    return text[:max_chars]
+
+
+def canonical_schema_text(artifact_type: str | None) -> str:
+    if not artifact_type:
+        return ""
+    from .. import config, registry
+
+    schema_name = registry.ARTIFACT_SCHEMAS.get(artifact_type)
+    if not schema_name:
+        return ""
+    path = Path(config.SCHEMA_DIR) / f"{schema_name}.schema.json"
+    if not path.exists():
+        return ""
+    try:
+        schema = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return ""
+    return _condense_schema(schema)
 
 
 class PromptSkillExecutor:
@@ -52,11 +100,18 @@ class PromptSkillExecutor:
             extra_allowed=["materials"] if skill_record.get("filesystem") == "project_inputs_read" else [],
         )
         node["_context_report"] = context_mod.context_report(skill_context)
+        schema_text = canonical_schema_text(artifact_type)
+        schema_block = (
+            "\nPEBS canonical schema（必须满足的字段；缺字段会直接判定失败）：\n" + schema_text + "\n"
+            if schema_text
+            else ""
+        )
         prompt = (
             f"Skill 指令：\n{instructions}\n\n"
             f"任务与最小上下文（只包含该 Skill 被允许消费的产物）：\n"
             f"{json.dumps({k: v for k, v in skill_context.items() if not k.startswith('_')}, ensure_ascii=False)[:12000]}\n\n"
             f"输出要求：JSON 对象；artifact 类型={artifact_type}；canonical schema={schema_name or '无'}"
+            f"{schema_block}"
         )
         availability = self.llm.availability() if hasattr(self.llm, "availability") else {"available": False}
         if not availability.get("available"):

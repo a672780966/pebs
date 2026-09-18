@@ -47,6 +47,26 @@ def test_approved_pinned_external_skill_enters_resolver_without_pipeline_change(
     assert engine.store.get_run(start["run_id"])["status"] == "succeeded"
 
 
+def test_external_skill_prompt_includes_the_canonical_schema(registry_env, engine):
+    """M6 §22：prompt 必须给出 canonical schema 的必需字段。
+
+    真实运行中，模型因看不到 media_plan 的必需字段（knowledge_function /
+    temporal_dependency）而两次校验失败——这是外部 Skill 可靠性的关键修复。
+    """
+    from conftest import run_dynamic_build
+
+    name = _install(registry_env, registry_env, "ext-schema-plan")
+    engine.llm = FakeLLM()
+    start, status = run_dynamic_build(engine, REQUEST_1)
+    assert status["run"]["status"] == "succeeded", [
+        (step["step_id"], step["status"], step["error"]) for step in status["steps"]
+    ]
+    joined = "\n".join(engine.llm.prompts)
+    assert "canonical schema" in joined
+    assert "strategies" in joined, "canonical teaching_plan 字段应出现在 prompt 中"
+    assert "pck_notes" in joined
+
+
 def test_unapproved_external_skill_is_not_selectable(registry_env, engine):
     name = _install(registry_env, registry_env, "ext-unapproved-plan", approve=False)
     names = {item["name"] for item in resolver.candidates("teaching_plan")}
