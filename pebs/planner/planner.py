@@ -114,6 +114,21 @@ def plan(
     requested = route.get("requested_outputs", [])
     terminals = _terminals(route)
 
+    # §16/§43：显式 `/skill-name` 必须把该 Skill 的产出加入计划（否则 prefer 只影响
+    # "同类候选之间选谁"，而该产物类型根本不会进入 DAG，显式调用形同虚设）。
+    explicit_produces: set[str] = set()
+    explicit_notes: list[str] = []
+    for name in prefer or []:
+        canonical = registry.resolve_alias(name) or name
+        record = registry.get(canonical) or {}
+        produces = [str(item) for item in (record.get("produces") or []) + (record.get("emits") or [])]
+        if not produces:
+            continue
+        explicit_produces.update(produces)
+        explicit_notes.append(f"显式调用 /{name} → 加入 {produces}")
+    if explicit_produces:
+        terminals = sorted(set(terminals) | explicit_produces)
+
     include_optional: set[str] = set()
     if {"script", "case"} & set(requested) or "case" in constraints.get("required_components", []):
         include_optional.add("case")
@@ -151,6 +166,8 @@ def plan(
     degraded = False
     reasons: list[str] = []
     route_notes: dict[str, Any] = {"research_need": route.get("research_need")}
+    if explicit_notes:
+        route_notes["explicit_skills"] = explicit_notes
 
     budget_calls = int((budgets or {}).get("model_calls", 0) or 0)
     if budget_calls and estimated["model_calls"] > budget_calls:

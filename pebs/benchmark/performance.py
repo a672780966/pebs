@@ -165,6 +165,39 @@ def record_trace(
     return recorded
 
 
+def review_promotions(*, unresolved_safety: dict[str, bool] | None = None) -> dict[str, Any]:
+    """§68/§69：只做观察与判定，不改变路由（§47：M6 不允许历史表现影响 Resolver）。"""
+    unresolved_safety = unresolved_safety or {}
+    data = load_performance()
+    promote: list[dict[str, Any]] = []
+    stay: list[dict[str, Any]] = []
+    demote: list[dict[str, Any]] = []
+    for name, record in sorted(data.get("skills", {}).items()):
+        decision = promotion_decision(record, unresolved_safety=bool(unresolved_safety.get(name)))
+        row = {
+            "skill": name,
+            "version": record.get("version"),
+            "runs": record.get("runs", 0),
+            "success_rate": record.get("success_rate"),
+            "schema_failure_rate": record.get("schema_failure_rate"),
+            "human_score": record.get("human_score"),
+            "teacher_edit_ratio": record.get("teacher_edit_ratio"),
+            "current_status": record.get("status", "EXPERIMENTAL"),
+            "target_status": decision["target"],
+            "blocking": decision["reasons"],
+        }
+        (promote if decision["eligible"] else stay).append(row)
+        if record.get("status") == "DISABLED":
+            demote.append({**row, "reason": "已禁用（历史降级）"})
+    return {
+        "promote_candidates": promote,
+        "experimental": stay,
+        "disabled": demote,
+        "thresholds": PROMOTION_THRESHOLD,
+        "note": "§47：M6 仅记录与判定；promotion 的实际生效由 M7 的 performance-aware routing 决定",
+    }
+
+
 def promotion_decision(record: dict[str, Any], *, unresolved_safety: bool = False) -> dict[str, Any]:
     """§68：EXPERIMENTAL → STABLE 的门槛；数据不足时不让外部 Skill 默认优先。"""
     reasons: list[str] = []

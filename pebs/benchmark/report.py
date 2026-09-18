@@ -172,6 +172,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     issues=entry.get("automatic_issues"),
                 )
             )
+    lines.extend(performance_section())
     lines.append("")
     return "\n".join(lines)
 
@@ -274,6 +275,42 @@ def load_worksheet(path: Path) -> dict[str, Any]:
         "plan_errors": int(data.get("plan_errors") or 0),
         "edits": edits,
     }
+
+
+def performance_section(*, provider_skills: set[str] | None = None) -> list[str]:
+    """§19/§68：把 Skill Performance Registry 摘要写进报告（只观察，不改路由）。"""
+    from . import performance as performance_mod
+
+    data = performance_mod.load_performance().get("skills", {})
+    if not data:
+        return []
+    rows = []
+    for name, record in sorted(data.items()):
+        if provider_skills is not None and name not in provider_skills:
+            continue
+        rows.append(
+            "| {name} | {version} | {runs} | {success} | {schema} | {human} | {edit} | {status} |".format(
+                name=name,
+                version=str(record.get("version") or "")[:12],
+                runs=record.get("runs", 0),
+                success=record.get("success_rate"),
+                schema=record.get("schema_failure_rate"),
+                human=record.get("human_score"),
+                edit=record.get("teacher_edit_ratio"),
+                status=record.get("status", "EXPERIMENTAL"),
+            )
+        )
+    if not rows:
+        return []
+    return [
+        "",
+        "## Skill Performance Registry（§19/§40；内部 skills 全部记录）",
+        "",
+        "| Skill | Version | Runs | Success | Schema Fail | Human | Edit Ratio | Status |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |",
+        *rows,
+        "",
+    ]
 
 
 def write_report(summary: dict[str, Any] | None = None, *, path: Path | None = None) -> Path:

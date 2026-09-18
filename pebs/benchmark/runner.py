@@ -108,8 +108,16 @@ def run_case(
     budgets: dict[str, int] | None = None,
     accept: bool = True,
     allow_qualified_claims: bool = False,
+    extra_skills: list[str] | None = None,
+    experiment: str = "",
 ) -> dict[str, Any]:
     case = cases.get_case(case_id)
+    extra_skills = [str(item) for item in (extra_skills or [])]
+    if extra_skills:
+        # §46 Skill Selection Experiment：显式 `/skill-name` 追加到请求，
+        # 用于 Builtin only / External only / Hybrid 对照（不改 case 定义）。
+        case = dict(case)
+        case["request"] = case["request"].rstrip() + " " + " ".join(f"/{name}" for name in extra_skills)
     errors = cases.validate_case(case)
     if errors:
         raise ValueError("; ".join(errors))
@@ -152,6 +160,8 @@ def run_case(
             "fixtures": _fixture_hashes(case),
             "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
             "evidence_policy": effective_policy,
+            "experiment": experiment or ("+".join(extra_skills) if extra_skills else ""),
+            "extra_skills": extra_skills,
             "run_dir": str(target),
         }
     )

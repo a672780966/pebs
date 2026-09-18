@@ -328,6 +328,8 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
                     accept=not args.no_accept,
                     budgets=budgets or None,
                     allow_qualified_claims=args.allow_qualified_claims,
+                    extra_skills=[item.strip() for item in args.skills.split(",") if item.strip()],
+                    experiment=args.experiment,
                 )
             except Exception as exc:  # noqa: BLE001 - benchmark harness reports and continues
                 failures += 1
@@ -434,6 +436,8 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="实践型课程：显式放行 QUALIFY_REQUIRED 证据（限定语必须保留，写入 run.json 的 evidence_policy）",
     )
+    bench.add_argument("--skills", default="", help="§46 实验：追加显式 /skill-name（逗号分隔），用于 External only / Hybrid 对照")
+    bench.add_argument("--experiment", default="", help="实验标签（写入 run.json）")
     bench.set_defaults(func=cmd_benchmark)
 
     delete = sub.add_parser("delete", help="删除本机项目（托管数据）")

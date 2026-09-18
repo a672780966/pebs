@@ -85,6 +85,19 @@ def _run_inputs(run: dict[str, Any]) -> dict[str, Any]:
     return raw if isinstance(raw, dict) else {}
 
 
+def _skill_for_step(step_id: str) -> str:
+    """把 pipeline step id（静态模式的步骤名）解析回 Registry 中的 Skill 名。
+
+    §40：perf 记录必须绑定 skill 版本；用步骤标题当 skill 名会让历史数据失效。
+    """
+    if registry.get(step_id):
+        return step_id
+    for name, record in registry.load_skills().items():
+        if step_id in ((record.get("handler") or {}).get("steps") or []):
+            return name
+    return ""
+
+
 def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", reproduce: dict[str, Any] | None = None) -> dict[str, Any]:
     """从 Store 里重建一次运行的 Skill Trace（不依赖内存状态）。"""
     store = engine.store
@@ -104,8 +117,19 @@ def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", 
     for node in plan.get("nodes", []):
         node_by_skill.setdefault(str(node.get("skill")), node)
     for step in steps:
-        skill_name = str(step.get("title") or step["step_id"])
-        identity = _skill_identity(step["step_id"]) if registry.get(step["step_id"]) else _skill_identity(skill_name)
+        skill_name = _skill_for_step(step["step_id"])
+        resolved = bool(skill_name)
+        identity = _skill_identity(skill_name) if resolved else {
+            "skill": f"step:{step['step_id']}",
+            "version": "",
+            "provider": "",
+            "runtime": "",
+            "agent": "",
+            "upstream_sha": "",
+            "package_sha256": "",
+            "patch": "",
+            "pinned": False,
+        }
         inputs: list[str] = []
         node = node_by_skill.get(step["step_id"]) or {}
         outputs = [rev["artifact_id"] for rev in produced.get(step["step_id"], [])]

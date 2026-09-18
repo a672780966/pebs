@@ -5,7 +5,7 @@ from __future__ import annotations
 pytestmark = __import__('pytest').mark.benchmark_smoke
 
 import pytest
-from conftest import REQUEST_1, FakeLLM, run_dynamic_build
+from conftest import REQUEST_1, FakeLLM, run_build, run_dynamic_build
 
 from pebs.benchmark import evaluation, performance
 
@@ -165,6 +165,21 @@ def test_human_eval_worksheet_round_trip(tmp_path):
     filled = report_mod.load_worksheet(written[0])
     assert evaluation.validate_eval(filled) == []
     assert filled["run_id"] == "run_demo"
+
+
+def test_trace_resolves_pipeline_steps_to_registry_skills(engine, registry_env):
+    """§40：静态模式的 step id 必须解析回 Skill 名，不能用步骤标题当 skill。"""
+    engine.llm = FakeLLM()
+    run_id, changeset_id = run_build(engine, REQUEST_1)
+    from pebs.benchmark import trace as trace_mod
+
+    skill_trace = trace_mod.build_trace(engine, run_id)
+    names = {entry["skill"] for entry in skill_trace["skills"]}
+    assert "docx-exporter" in names, names
+    assert "preview-builder" in names, names
+    assert all(" " not in name for name in names), names
+    unresolved = [name for name in names if name.startswith("step:")]
+    assert not unresolved, unresolved
 
 
 def test_engine_build_trace_records_performance(engine, registry_env):

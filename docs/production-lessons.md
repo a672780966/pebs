@@ -147,6 +147,28 @@
 - **fix**: 匹配前看前 14 字符是否含"不要/避免/禁止/不得/拒绝/不将/不应"，是则视为教学反例
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_banned_regex_ignores_negative_examples`
 
+## 2026-09-18 — Skill Trace 用步骤标题当 skill 名，性能数据无法绑定版本（SKILL/§40）
+
+- **date**: 2026-09-18
+- **task**: M6 性能注册表（`registry/performance.json`）首次积累数据
+- **symptom**: 注册表里出现"生成可编辑 PPTX""教案设计（PCK/UDL）"这类中文步骤标题作为 skill 名；§40 要求的历史数据无法按 skill+版本 归因
+- **root_cause**: `trace.build_trace` 在静态模式下拿不到 skill 名时退化为 `step.title`（散文），而不是把 pipeline step id 反查回 Registry Skill
+- **skill**: n/a（telemetry）
+- **artifact**: `pebs/benchmark/trace.py`、`registry/performance.json`
+- **fix**: `_skill_for_step()` 先按 skill 名查 Registry，再按 `handler.steps` 反查；仍无法解析时记为 `step:<id>`（可诊断）；已作废的 22 条中文名记录清除并在文件 note 中说明
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_trace_resolves_pipeline_steps_to_registry_skills`
+
+## 2026-09-18 — 显式 `/skill-name` 不进入 DAG，外部 Skill 永远不被选中（PLANNING/§16）
+
+- **date**: 2026-09-18
+- **task**: §46 Skill Selection Experiment（case A + `/dual-coding-designer`）
+- **symptom**: 请求里显式写了外部 Skill，Plan 里仍只有 11 个节点、完全没有 media 链（media_plan 从未进入 DAG）
+- **root_cause**: Planner 的 `prefer` 只影响"同类候选之间选谁"，不会把该 Skill 的产出加入终端/可选集合；没有消费者时该产物类型根本不在 DAG 里
+- **skill**: `dual-coding-designer`（外部）
+- **artifact**: `pebs/planner/planner.py`
+- **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
+- **regression_test**: `tests/test_explicit_skill_planning.py`
+
 ## 2026-09-18 — 概念/态度型课程没有实证 Claim：证据门与课程定位的冲突（EVIDENCE/PEDAGOGY）
 
 - **date**: 2026-09-18
