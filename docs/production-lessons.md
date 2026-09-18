@@ -169,6 +169,18 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-18 — §17 A/B 首轮数据：外部 Skill 的分节内容不分节（SKILL/PEDAGOGY）
+
+- **date**: 2026-09-18
+- **task**: §46 Skill Selection Experiment：case A `dynamic`（builtin media-router）vs `dynamic [+dual-coding-designer]`（external）
+- **symptom**: 两次运行都 succeeded（同任务/同材料/同模型；22 次调用），但外部 Skill 产出的 `media_plan:sec1/sec2/sec3` **11 个 item 完全相同**（functions/mediums 一致）——外部 Skill 只被调用一次，随后 `_emit_external_artifacts` 把同一 payload 复制到每一节；builtin media-router 是分节调用的
+- **root_cause**: 外部 Prompt Skill 的执行粒度是"节点一次"，而分节产物（`{section_id}` 模板）需要分节调用与分节最小上下文（§21/§27）
+- **skill**: `dual-coding-designer`（外部，provider SHA 6bbbce41…）
+- **artifact**: `pebs/runtime/prompt_skill.py`、`pebs/runtime/executor.py`
+- **fix（待实施，M6.5 后续）**: 当产物模板包含 `{section_id}` 且项目有多节时，按节调用并逐节校验（修复后需重跑 A/B）
+- **当前决策（§18/§76）**: 在补齐分节执行与人工评分之前，外部 Skill 保持 **不默认优先**，Builtin 仍是生产默认；性能注册表记录 provider SHA 与 patch 以便 M7 决策
+- **regression_test**: `tests/test_explicit_skill_planning.py`、`tests/test_external_skill_acceptance.py`（机制层）；质量结论需重跑 A/B
+
 ## 2026-09-18 — 概念/态度型课程没有实证 Claim：证据门与课程定位的冲突（EVIDENCE/PEDAGOGY）
 
 - **date**: 2026-09-18
