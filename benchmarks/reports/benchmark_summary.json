@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-18T17:38:50",
+  "generated_at": "2026-09-18T17:46:50",
   "cases": [
     {
       "case_id": "A",
@@ -22,8 +22,7 @@
       "builtin": {
         "status": "blocked",
         "evidence_policy": [
-          "SUPPORTED",
-          "QUALIFY_REQUIRED"
+          "SUPPORTED"
         ],
         "human_score": null,
         "edit_ratio": null,
@@ -31,8 +30,8 @@
         "evidence_errors": null,
         "routing_errors": null,
         "plan_errors": null,
-        "model_calls": 13.0,
-        "runtime_seconds": 456.39,
+        "model_calls": 12.0,
+        "runtime_seconds": 348.53,
         "automatic_issues": 11.0,
         "runs": 1
       },
@@ -115,13 +114,12 @@
   "runs": 6,
   "rows": [
     {
-      "run_id": "run_1cdf4189aff2",
+      "run_id": "run_41f857a82fe8",
       "case_id": "A",
       "mode": "builtin",
       "status": "blocked",
       "evidence_policy": [
-        "SUPPORTED",
-        "QUALIFY_REQUIRED"
+        "SUPPORTED"
       ],
       "human_score": null,
       "edit_ratio": null,
@@ -129,9 +127,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
-      "model_calls": 13,
-      "research_calls": 7,
-      "runtime_seconds": 456.39,
+      "model_calls": 12,
+      "research_calls": 5,
+      "runtime_seconds": 348.53,
       "skill_failure_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 11

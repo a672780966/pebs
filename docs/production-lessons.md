@@ -147,7 +147,19 @@
 - **fix**: 匹配前看前 14 字符是否含"不要/避免/禁止/不得/拒绝/不将/不应"，是则视为教学反例
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_banned_regex_ignores_negative_examples`
 
-## 2026-09-17 — CI 曾长期为红（M5.1–M5.3）
+## 2026-09-18 — 概念/态度型课程没有实证 Claim：证据门与课程定位的冲突（EVIDENCE/PEDAGOGY）
+
+- **date**: 2026-09-18
+- **task**: Golden Benchmark B（大学生心理健康第一课：理解心理学有什么用、愿意继续学）
+- **symptom**: Router 正确识别为 concept/reflection/attitude/critical_thinking/transfer，但 claim-extractor 返回 0 条实证 Claim（该课的目标是概念与态度，不是实证结论）→ 证据契约为空 → PCK 阻塞
+- **root_cause**: 系统把"有 PCK"与"有实证 Claim"绑定；对概念/态度型课程缺少"基于教学法（无实证断言）"的显式路径
+- **skill**: `claim-extractor` / `pck-developer`
+- **artifact**: `pebs/pipeline.py`（fail-fast）、`pebs/preconditions.py`
+- **fix（已完成部分）**: 0 条 Claim 立即明确失败并提示补充材料/改请求；错误信息不再误导到下游
+- **待决策（需要教学判断，不在 M6 自动化范围）**: 是否允许"无实证 Claim"的课程走标注了限制的 PCK 路径（`declared_no_empirical_claims`），或要求教师提供可核验材料。当前默认：阻塞（保守）
+- **regression_test**: `tests/test_claims_extraction_guard.py`
+
+## 2026-09-18 — CI 曾长期为红（M5.1–M5.3）
 
 
 - **date**: 2026-09-17
