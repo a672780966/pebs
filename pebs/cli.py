@@ -280,11 +280,26 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
         return 0
     case_ids = [item.strip() for item in (args.cases or "A,B,C,D,E,F,G,H").split(",") if item.strip()]
     modes = [item.strip() for item in (args.modes or "dynamic").split(",") if item.strip()]
+    budgets = {
+        key: value
+        for key, value in {
+            "model_calls": args.max_model_calls,
+            "research_requests": args.max_research,
+            "run_seconds": args.max_seconds,
+        }.items()
+        if value
+    }
     failures = 0
     for case_id in case_ids:
         for mode in modes:
             try:
-                record = runner.run_case(case_id, mode=mode, accept=not args.no_accept)
+                record = runner.run_case(
+                    case_id,
+                    mode=mode,
+                    accept=not args.no_accept,
+                    budgets=budgets or None,
+                    allow_qualified_claims=args.allow_qualified_claims,
+                )
             except Exception as exc:  # noqa: BLE001 - benchmark harness reports and continues
                 failures += 1
                 print(f"{case_id}/{mode}: ERROR {exc}", file=sys.stderr)
@@ -380,6 +395,14 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--no-accept", action="store_true")
     bench.add_argument("--report", action="store_true", help="只根据已有 runs 生成对比报告")
     bench.add_argument("--strict", action="store_true", help="存在失败/自动问题时以非零退出")
+    bench.add_argument("--max-model-calls", type=int, default=0)
+    bench.add_argument("--max-research", type=int, default=0)
+    bench.add_argument("--max-seconds", type=int, default=0)
+    bench.add_argument(
+        "--allow-qualified-claims",
+        action="store_true",
+        help="实践型课程：显式放行 QUALIFY_REQUIRED 证据（限定语必须保留，写入 run.json 的 evidence_policy）",
+    )
     bench.set_defaults(func=cmd_benchmark)
 
     delete = sub.add_parser("delete", help="删除本机项目（托管数据）")

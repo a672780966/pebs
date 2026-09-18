@@ -8,7 +8,10 @@ check, and it lets a precondition fail closed without inventing a gate result.
 
 from __future__ import annotations
 
+import re
 from typing import Any, Callable
+
+from . import config
 
 # The pipeline marks a claim that is only a pending placeholder in the script with
 # this usage value; such a claim must never be consumed by PCK authoring.
@@ -21,6 +24,26 @@ PRECONDITION_CONTRACTS: dict[str, dict[str, Any]] = {
     "supported_claims": {"required_inputs": ["evidence_index"]},
 }
 PRECONDITION_KINDS = list(PRECONDITION_CONTRACTS)
+
+
+def usage_tokens(usage: str) -> set[str]:
+    """Claim.usage 是多值字段（例如"讲解/案例/评价"）；范围匹配按 token 交集。
+
+    M6 生产修正：此前用整串与 usage_scope 精确比较，真实 Claim 永远不在范围里，
+    导致 PCK 永远被阻塞（证据其实是 SUPPORTED）。
+    """
+    return {token.strip() for token in re.split(r"[/、,，;；|]", str(usage or "")) if token.strip()}
+
+
+def allowed_claim_statuses() -> list[str]:
+    """M6 §13/§48：默认只允许 SUPPORTED；操作者可在 rules.yaml 显式放行 QUALIFY_REQUIRED。
+
+    放行的是"带限定语的文本"，不是"确定结论"；因此不降低 Evidence Gate，
+    但允许实践型课程在文献只支持到 qualify 时继续生产（限定语必须保留）。
+    """
+    configured = (config.RULES.get("evidence") or {}).get("pck_claim_statuses")
+    statuses = [str(item) for item in (configured or ["SUPPORTED"])]
+    return statuses or ["SUPPORTED"]
 
 
 def check_supported_claims(
@@ -61,12 +84,15 @@ def check_supported_claims(
         if not usage:
             problems.append(f"{claim_id}@v{version} 未声明 usage，无法确认是否属于 PCK 证据契约")
             continue
-        if scope is not None and usage not in scope:
+        if scope is not None and not (usage_tokens(usage) & scope):
             continue
         consumed += 1
         status = ctx.evidence.claim_status(claim_id, version)
-        if status != "SUPPORTED":
-            problems.append(f"{claim_id}@v{version} 状态为 {status}，PCK 只能消费 SUPPORTED 证据")
+        allowed = allowed_claim_statuses()
+        if status not in allowed:
+            problems.append(
+                f"{claim_id}@v{version} 状态为 {status}；PCK 只允许消费 {allowed} 证据（见 rules.evidence.pck_claim_statuses）"
+            )
             continue
         if int(ctx.evidence.latest_version(claim_id)) != int(version):
             problems.append(f"{claim_id}@v{version} 已被新版本取代，需重新核验后才可消费")

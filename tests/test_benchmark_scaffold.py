@@ -60,6 +60,51 @@ def test_human_rubric_has_fourteen_dimensions():
     assert {"score", "comment", "must_fix", "nice_to_have"} <= set(data["notes_required"])
 
 
+def test_banned_regex_ignores_negative_examples():
+    """教学反例（"不要写'这个孩子就是…'"）不应被判为标签化违规。"""
+    store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "讲解时提醒教师：不要使用“这个孩子就是调皮”这类标签化表达；可以换写“14:05 他把积木推到地上”。",
+            }
+        }
+    )
+    expect = {"content": {"artifact_types": ["script"], "banned_regex": ["这个孩子就是"]}}
+    result = checks.evaluate(store, expect)
+    assert result["ok"] is True
+
+    bad_store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "这个孩子就是不爱说话，所以我们要重点关注他。",
+            }
+        }
+    )
+    bad = checks.evaluate(bad_store, expect)
+    assert bad["ok"] is False
+    assert bad["issues"][0]["kind"] == "SAFETY"
+
+
+class _StubStore:
+    def __init__(self, artifacts: dict[str, dict] | None = None):
+        self._artifacts = artifacts or {}
+
+    def list_artifacts(self):
+        return [
+            {
+                "artifact_id": artifact_id,
+                "artifact_type": artifact_id.split(":", 1)[0],
+                "accepted_rev": f"{artifact_id}@r1",
+            }
+            for artifact_id in self._artifacts
+        ]
+
+    def accepted_content(self, artifact_id):
+        return (self._artifacts.get(artifact_id) or {}).get("content")
+
+
 def test_plan_and_routing_checks_detect_errors():
     expect = {
         "plan": {

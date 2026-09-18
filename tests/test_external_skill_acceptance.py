@@ -211,6 +211,26 @@ def test_restricted_context_enforces_declared_only_access():
         ctx.emit("script:sec1", "script", {}, "qa-agent")
 
 
+def test_verify_reports_missing_runtime_files(registry_env, tmp_path):
+    """CI 上没有 skills/ 目录（gitignored）：verify 必须报告缺失，让 external 测试跳过。"""
+    import shutil
+
+    manifest, root = _synthetic_provider(tmp_path)
+    provider_edu.install(provider=manifest, root=root)
+    assert provider_edu.verify(provider=manifest)["ok"] is True
+
+    record = registry.get("synthetic-rubric-designer")
+    resolved = skills_mgr.resolve_runtime("synthetic-rubric-designer")
+    runtime_path = Path(resolved["path"])
+    assert runtime_path.exists()
+    shutil.rmtree(runtime_path, ignore_errors=True)
+
+    report = provider_edu.verify(provider=manifest)
+    assert report["ok"] is False
+    problems = report["skills"][0]["problems"]
+    assert any("运行时文件缺失" in problem for problem in problems), problems
+
+
 @pytest.mark.external
 def test_real_provider_skills_are_installed_and_pinnned():
     manifest = provider_edu.load_manifest()

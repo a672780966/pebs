@@ -100,22 +100,45 @@ def _fixture_hashes(case: dict[str, Any]) -> dict[str, str]:
     return hashes
 
 
-def run_case(case_id: str, *, mode: str = "dynamic", project_id: str | None = None, budgets: dict[str, int] | None = None, accept: bool = True) -> dict[str, Any]:
+def run_case(
+    case_id: str,
+    *,
+    mode: str = "dynamic",
+    project_id: str | None = None,
+    budgets: dict[str, int] | None = None,
+    accept: bool = True,
+    allow_qualified_claims: bool = False,
+) -> dict[str, Any]:
     case = cases.get_case(case_id)
     errors = cases.validate_case(case)
     if errors:
         raise ValueError("; ".join(errors))
     if mode not in cases.VALID_MODES:
         raise ValueError(f"unknown mode: {mode}")
+    # §31：把预算交给 Planner，使其在预算不足时生成降级 Plan（而不是执行到一半 BLOCKED）
+    effective_budgets = dict(config.RULES.get("budgets") or {})
+    effective_budgets.update(budgets or {})
     project = project_id or f"bench-{case_id.lower()}-{mode}"
     target = run_dir(case_id, mode)
     target.mkdir(parents=True, exist_ok=True)
     started = time.time()
 
-    if mode == "direct_codex":
-        record = _run_direct(case, target)
-    else:
-        record = _run_pebs(case, mode=mode, project=project, budgets=budgets, accept=accept)
+    original_rules = config.RULES
+    effective_policy = list((original_rules.get("evidence") or {}).get("pck_claim_statuses") or ["SUPPORTED"])
+    if allow_qualified_claims:
+        # M6 §13/§48：操作者显式放行 QUALIFY_REQUIRED（限定语必须保留）；
+        # 该设置会写进 run.json 的 evidence_policy，保证可复现与可审计。
+        relaxed = dict(original_rules)
+        relaxed["evidence"] = {"pck_claim_statuses": ["SUPPORTED", "QUALIFY_REQUIRED"]}
+        config.RULES = relaxed
+        effective_policy = ["SUPPORTED", "QUALIFY_REQUIRED"]
+    try:
+        if mode == "direct_codex":
+            record = _run_direct(case, target)
+        else:
+            record = _run_pebs(case, mode=mode, project=project, budgets=effective_budgets, accept=accept)
+    finally:
+        config.RULES = original_rules
 
     record.update(
         {
@@ -126,9 +149,11 @@ def run_case(case_id: str, *, mode: str = "dynamic", project_id: str | None = No
             "wall_time_seconds": round(time.time() - started, 2),
             "fixtures": _fixture_hashes(case),
             "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
+            "evidence_policy": effective_policy,
             "run_dir": str(target),
         }
     )
+    record.setdefault("metrics", {})["wall_time_seconds"] = record["wall_time_seconds"]
     (target / "run.json").write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return record
 

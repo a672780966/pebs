@@ -8,7 +8,8 @@ request: |
   每节 1500–1800 字，每节至少 1 个案例；动画只在确有必要时使用；
   不能把行为直接人格化（不要“这个孩子就是……”式标签化表达）。
 template_fixture: fixtures/template_merge_education.docx
-material_fixtures: []
+material_fixtures:
+  - fixtures/materials/observation_recording_handbook.md
 expect:
   routing:
     knowledge_types_any_of: [observation, distinction, attitude, transfer, critical_thinking]

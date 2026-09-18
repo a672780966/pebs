@@ -705,6 +705,19 @@ def _qualify_claim(ctx: PipelineContext, claim: dict[str, Any], limitations: str
     return record
 
 
+def _evidence_rank(item: dict[str, Any]) -> int:
+    """M6 生产修正：content_level 由 Provider 声明，但摘要可能为空。
+
+    空摘要的"abstract"级来源无法支撑引文定位，排序时按 metadata 处理，
+    避免把 3 个核验名额浪费在无法引用来源上（不降低门禁，只提升检索质量）。
+    """
+    level = str(item.get("content_level") or "metadata")
+    has_text = bool(str(item.get("abstract") or "").strip()) or level in ("full_text", "user_excerpt")
+    if not has_text:
+        return 0
+    return {"full_text": 2, "user_excerpt": 2, "abstract": 1}.get(level, 0)
+
+
 def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
     _check_cancel(ctx)
     notes: list[str] = []
@@ -769,16 +782,16 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
                 merged = _merge_research_items(merged, outcome.items)
                 if any(item.get("content_level") in ("abstract", "full_text") for item in outcome.items):
                     break
-            ranked = sorted(
-                merged,
-                key=lambda i: {"full_text": 2, "user_excerpt": 2, "abstract": 1}.get(
-                    i.get("content_level", "metadata"), 0
-                ),
-                reverse=True,
-            )
+            ranked = sorted(merged, key=_evidence_rank, reverse=True)
+            usable = [item for item in ranked if _evidence_rank(item) > 0]
+            if not usable and ranked:
+                notes.append(
+                    f"{claim['claim_id']}：{len(ranked)} 个来源都没有可引用摘要/全文；"
+                    "标题级来源不能支撑引文定位，该 Claim 将保持未支持（等待人工或补充材料）"
+                )
             included: list[str] = []
             fetched = 0
-            for item in ranked[:assess_limit]:
+            for item in (usable or ranked)[:assess_limit]:
                 text = str(item.get("abstract") or "").strip() or str(item.get("title") or "")
                 level = item.get("content_level", "metadata")
                 if fetch_enabled and fetched < fetch_limit and level != "full_text":

@@ -81,6 +81,15 @@ def routing_checks(route: dict[str, Any], expect: dict[str, Any]) -> list[dict[s
     return issues
 
 
+NEGATION_WINDOW = ("不要", "不能", "避免", "禁止", "别", "不得", "拒绝", "不将", "不应")
+
+
+def _in_negative_context(text: str, start: int, *, window: int = 14) -> bool:
+    """禁用表达若出现在"不要/避免……"等否定语境中，属于教学反例而非违规。"""
+    prefix = text[max(0, start - window) : start]
+    return any(token in prefix for token in NEGATION_WINDOW)
+
+
 def content_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
     content = expect.get("content") or {}
     issues: list[dict[str, Any]] = []
@@ -93,8 +102,11 @@ def content_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
                 issues.append({"kind": "CONTENT", "detail": f"缺少产物：{artifact_id}"})
     for artifact_id, text in texts.items():
         for pattern in content.get("banned_regex", []):
-            if re.search(pattern, text):
+            for match in re.finditer(pattern, text):
+                if _in_negative_context(text, match.start()):
+                    continue
                 issues.append({"kind": "SAFETY", "detail": f"{artifact_id} 命中禁用表达：{pattern}"})
+                break
         for pattern in content.get("required_regex", []):
             if not re.search(pattern, text):
                 issues.append({"kind": "CONTENT", "detail": f"{artifact_id} 缺少必需表达：{pattern}"})
