@@ -27,6 +27,12 @@ limits:
   max_files_per_import: 20
   max_file_mib: 25
   max_total_mib: 100
+  # M6 §59 Security Track：文档级与解压级限制（只读取归档声明的大小，不做完整解压）
+  max_docx_chars: 400000
+  max_pdf_pages: 200
+  max_template_tables: 10
+  max_decompression_ratio: 200
+  max_decompressed_mib: 200
 # M6 §60：进入 LLM 的输入预算。超过时必须在产物里显式记账并 summarize/chunk/reject，
 # 禁止静默截断（模板截断会破坏格式约束，材料截断会丢失证据）。
 input_budget:

@@ -170,6 +170,20 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-19 — 导入限制只覆盖文件数与体积，缺文档级/解压级防护（SECURITY §59）
+
+- **date**: 2026-09-19
+- **task**: M6 Security Track（§59：Stage C 的导入限制合并后必须独立成项）
+- **symptom**: Stage C 只检查文件数/单文件体积/总量；DOCX 正文字数、PDF 页数、模板表格数、解压炸弹（zip 压缩比/解压总量）均无上限；损坏文档抛原始异常
+- **root_cause**: 限制只做在"字节入口"，没有做在"解析入口"
+- **skill**: `template-parser`
+- **artifact**: `pebs/template_parse.py`、`config/rules.yaml`
+- **fix**: 新增 `max_docx_chars` / `max_pdf_pages` / `max_template_tables` / `max_decompression_ratio` /
+  `max_decompressed_mib`；`check_archive_safety()` 只读 zip 中央目录声明的大小即可拒绝炸弹；
+  损坏 zip → 明确的 ParseError；上传文件名只取 basename（路径穿越）；全部**显式拒绝，不静默截断**
+- **regression_test**: `tests/test_document_security_limits.py`（8 项：炸弹、损坏文档、DOCX 字数、
+  模板表格、PDF 页数、上传文件名穿越、正常文件通过与既有 Stage C 限制）
+
 ## 2026-09-19 — Codex 配额耗尽：真实运行暂时不可用（RUNTIME/COST）
 
 - **date**: 2026-09-19

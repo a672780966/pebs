@@ -30,6 +30,47 @@ MAX_FILE_BYTES = int(config.RULES.get("limits", {}).get("max_file_mib", 25)) * 1
 MAX_FILES = int(config.RULES.get("limits", {}).get("max_files_per_import", 20))
 MAX_TOTAL_BYTES = int(config.RULES.get("limits", {}).get("max_total_mib", 100)) * 1024 * 1024
 
+# M6 §59 Security Track：文档级与解压级限制（Stage C 的导入限制之外）
+MAX_DOCX_CHARS = int(config.RULES.get("limits", {}).get("max_docx_chars", 400000))
+MAX_PDF_PAGES = int(config.RULES.get("limits", {}).get("max_pdf_pages", 200))
+MAX_TEMPLATE_TABLES = int(config.RULES.get("limits", {}).get("max_template_tables", 10))
+MAX_DECOMPRESSION_RATIO = int(config.RULES.get("limits", {}).get("max_decompression_ratio", 200))
+MAX_DECOMPRESSED_MIB = int(config.RULES.get("limits", {}).get("max_decompressed_mib", 200))
+
+
+def check_archive_safety(path: Path) -> None:
+    """§59：拒绝解压炸弹（DOCX/XLSX 等 zip 容器）与损坏的归档。
+
+    只读取 zip 中央目录声明的解压后大小，不做完整解压；比率或总量越界直接拒绝。
+    """
+    import zipfile
+
+    if path.suffix.lower() not in (".docx", ".xlsx", ".pptx", ".zip"):
+        return
+    try:
+        with zipfile.ZipFile(path) as archive:
+            total_uncompressed = sum(info.file_size for info in archive.infolist())
+            total_compressed = max(sum(info.compress_size for info in archive.infolist()), 1)
+    except zipfile.BadZipFile as exc:
+        raise ParseError(f"文档已损坏或不是有效的 Office 文件：{path.name}（{exc}）") from exc
+    ratio = total_uncompressed / total_compressed
+    if ratio > MAX_DECOMPRESSION_RATIO or total_uncompressed > MAX_DECOMPRESSED_MIB * 1024 * 1024:
+        raise ImportLimitExceeded(
+            f"文档解压体积异常（压缩比 {ratio:.0f}，解压后 {total_uncompressed // (1024 * 1024)} MiB），已拒绝：{path.name}",
+            http_status=413,
+        )
+
+
+def enforce_text_limit(text: str, *, kind: str, path: Path) -> None:
+    """§59：DOCX/PDF 提取出的正文超过上限时拒绝，而不是静默截断。"""
+    if kind != "docx":
+        return
+    if len(text) > MAX_DOCX_CHARS:
+        raise ImportLimitExceeded(
+            f"DOCX 正文超过 {MAX_DOCX_CHARS} 字（实际 {len(text)} 字），请拆分后重试：{path.name}",
+            http_status=413,
+        )
+
 
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
@@ -63,8 +104,14 @@ def check_import_limits(paths: list[Path]) -> list[str]:
 def _docx_text(path: Path) -> tuple[str, list[str]]:
     import docx
 
+    check_archive_safety(path)
     warnings: list[str] = []
     document = docx.Document(str(path))
+    if len(document.tables) > MAX_TEMPLATE_TABLES:
+        raise ImportLimitExceeded(
+            f"文档表格数量超过 {MAX_TEMPLATE_TABLES}（实际 {len(document.tables)}）：{path.name}",
+            http_status=413,
+        )
     parts = [p.text for p in document.paragraphs if p.text and p.text.strip()]
     for table in document.tables:
         for row in table.rows:
@@ -73,7 +120,9 @@ def _docx_text(path: Path) -> tuple[str, list[str]]:
                 parts.append(" | ".join(cells))
     if not parts:
         warnings.append("DOCX 中未提取到文本，可能是扫描件或空文档")
-    return "\n".join(parts), warnings
+    text = "\n".join(parts)
+    enforce_text_limit(text, kind="docx", path=path)
+    return text, warnings
 
 
 def _pdf_text(path: Path) -> tuple[str, list[str]]:
@@ -83,6 +132,11 @@ def _pdf_text(path: Path) -> tuple[str, list[str]]:
         return "", ["PDF 解析库未安装（pypdf），该文件未解析，不计为已读取"]
     warnings: list[str] = []
     reader = PdfReader(str(path))
+    if len(reader.pages) > MAX_PDF_PAGES:
+        raise ImportLimitExceeded(
+            f"PDF 页数超过 {MAX_PDF_PAGES}（实际 {len(reader.pages)}），请拆分后重试：{path.name}",
+            http_status=413,
+        )
     parts: list[str] = []
     empty_pages = 0
     for page in reader.pages:
@@ -133,6 +187,11 @@ def _parse_docx_template(path: Path) -> dict[str, Any]:
     import docx
 
     document = docx.Document(str(path))
+    if len(document.tables) > MAX_TEMPLATE_TABLES:
+        raise ImportLimitExceeded(
+            f"模板表格数量超过 {MAX_TEMPLATE_TABLES}（实际 {len(document.tables)}）：{path.name}",
+            http_status=413,
+        )
     columns: list[dict[str, Any]] = []
     warnings: list[str] = []
     headings: list[str] = []
@@ -215,6 +274,7 @@ def _word_range_from_text(text: str) -> tuple[int | None, int | None]:
 def parse_template(path: Path) -> dict[str, Any]:
     suffix = path.suffix.lower()
     if suffix == ".docx":
+        check_archive_safety(path)
         return _parse_docx_template(path)
     if suffix in (".md", ".markdown", ".txt"):
         return _parse_md_template(path)
