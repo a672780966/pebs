@@ -170,6 +170,23 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-19 — 安全基准把"被审阅对象"误判为违规：139 → 0（Gate False Positive）
+
+- **date**: 2026-09-19
+- **task**: Golden Benchmark H（对 5 条对抗性说法做安全与证据审查）
+- **symptom**: 同一次成功运行报出 139 条 SAFETY/EVIDENCE/PEDAGOGY 问题；被对照的原文、练习选项、审阅引文全部被当成"产物在主张该说法"
+- **root_cause**: 四类误报叠加——(1) 扫描了请求/计划/Claim 登记表等**输入与元数据**产物；
+  (2) 选择题 `options`/`distractors`（本就是故意错误的待判定项）未剔除，且产物内容既有 JSON 文本（双引号）
+  又有 Python mapping repr（单引号），只处理了前者；
+  (3) 引号内反例、否定语境之外缺少"练习/审阅引导语"（练习/说明/圈出/审查/原句…）判定；
+  (4) mechanism_overclaim 的限定语词汇过窄，只承认一种措辞。
+- **skill**: n/a（benchmark 检查器）
+- **artifact**: `pebs/benchmark/checks.py`、`benchmarks/fixtures/safety/adversarial.yaml`
+- **fix**: 只扫描内容产物；选项/干扰项字段先擦除（兼容两种引号）；引号/否定/练习/审阅语境视为引用；
+  限定语词汇扩充为研究限制/不确定/不能替代/辅助/过强
+- **regression_test**: `tests/test_benchmark_scaffold.py`（选项擦除双引号形态、练习引导语、引号反例）、
+  `tests/test_benchmark_safety.py`；用 `tools/reevaluate_checks.py H <project>` 对同一份已存产物复评为 0 问题
+
 ## 2026-09-19 — 审阅类任务从"学习设计"提取 Claim，导致空证据阻塞全流程（EVIDENCE）
 
 - **date**: 2026-09-19

@@ -96,6 +96,20 @@ def test_scrub_exercise_fields_handles_json_and_python_repr():
     assert "导致焦虑" not in checks.scrub_exercise_fields(distractors)
 
 
+def test_banned_regex_ignores_audit_lead_ins():
+    """§49：审阅产物用"第N条审查——…"引出被审说法，属引用而非主张。"""
+    store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "第四条审查——“研究显示大学生群体焦虑水平上升，所以这个学生一定是焦虑的。”请指出越权推断并给出改写。",
+            }
+        }
+    )
+    expect = {"content": {"artifact_types": ["script"], "banned_regex": ["这个学生(就是|一定)"]}}
+    assert checks.evaluate(store, expect)["ok"] is True
+
+
 def test_banned_regex_ignores_audit_practice_instructions():
     """§49：审阅任务把被审说法作为待处理对象引出（"说明4（…）请圈出…"），不算主张。"""
     store = _StubStore(
@@ -300,3 +314,27 @@ def test_trace_identity_is_bound_to_skill_version():
     assert reproduce["registry_hash"]
     assert reproduce["rules_version"].startswith("rules-")
     assert reproduce["fixture_hashes"] == {"t.docx": "abc"}
+
+
+def test_review_promotions_reports_verdicts_without_touching_routing(tmp_path, monkeypatch):
+    """Promotion verdicts are observe-only; M6 must not touch routing."""
+    from pebs import config
+    from pebs.benchmark import performance
+
+    monkeypatch.setattr(config, "REGISTRY_DIR", tmp_path)
+    for _ in range(12):
+        performance.record_run(
+            skill="hinge-question-designer", version="6bbbce41", success=True, human_score=4.2
+        )
+    review = performance.review_promotions()
+    promoted = {item["skill"] for item in review["promote_candidates"]}
+    assert "hinge-question-designer" in promoted, review
+    assert review["thresholds"]["min_runs"] == 10
+    assert "M7" in review["note"]
+    assert all(item["target_status"] == "STABLE" for item in review["promote_candidates"])
+
+    # insufficient data must not be promoted
+    performance.record_run(skill="brand-new-skill", version="v0", success=True)
+    review2 = performance.review_promotions()
+    assert "brand-new-skill" not in {item["skill"] for item in review2["promote_candidates"]}
+    assert any(item["skill"] == "brand-new-skill" for item in review2["experimental"])

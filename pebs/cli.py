@@ -301,6 +301,12 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
             )
         )
         return 0
+    if args.promotions:
+        from .benchmark import performance as performance_mod
+
+        review = performance_mod.review_promotions()
+        print(json.dumps(review, ensure_ascii=False, indent=2))
+        return 0
     if args.export_eval_kit:
         from .benchmark import evaluation as evaluation_mod
 
@@ -434,6 +440,7 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--report", action="store_true", help="只根据已有 runs 生成对比报告与教师评分工作表")
     bench.add_argument("--submit-eval", default="", help="回收教师填写的工作表 YAML（需配合 --project）")
     bench.add_argument("--export-eval-kit", action="store_true", help="导出待评课程材料包 + 评分表到 benchmarks/reports/evaluation_kit/")
+    bench.add_argument("--promotions", action="store_true", help="§68/§69：查看 skill 升降级判定（只观察，不影响路由）")
     bench.add_argument("--project", default="", help="--submit-eval 的目标项目")
     bench.add_argument("--strict", action="store_true", help="存在失败/自动问题时以非零退出")
     bench.add_argument("--max-model-calls", type=int, default=0)
