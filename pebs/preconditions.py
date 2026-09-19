@@ -11,11 +11,15 @@ from __future__ import annotations
 import re
 from typing import Any, Callable
 
-from . import config
-
 # The pipeline marks a claim that is only a pending placeholder in the script with
 # this usage value; such a claim must never be consumed by PCK authoring.
 PLACEHOLDER_USAGE = "脚本待核验"
+
+# Frozen E/1 contract: the single, non-configurable authority for the status PCK
+# may consume. No rules key, CLI flag, benchmark argument, environment variable or
+# project setting may widen it. Both check_supported_claims() and
+# pipeline.step_evidence() read this one constant.
+PCK_REQUIRED_STATUS = "SUPPORTED"
 
 # Single owner of the precondition-kind contract: which inputs a checker kind
 # actually consumes. Static validation reads this map, so a declaration can
@@ -35,17 +39,6 @@ def usage_tokens(usage: str) -> set[str]:
     return {token.strip() for token in re.split(r"[/、,，;；|]", str(usage or "")) if token.strip()}
 
 
-def allowed_claim_statuses() -> list[str]:
-    """M6 §13/§48：默认只允许 SUPPORTED；操作者可在 rules.yaml 显式放行 QUALIFY_REQUIRED。
-
-    放行的是"带限定语的文本"，不是"确定结论"；因此不降低 Evidence Gate，
-    但允许实践型课程在文献只支持到 qualify 时继续生产（限定语必须保留）。
-    """
-    configured = (config.RULES.get("evidence") or {}).get("pck_claim_statuses")
-    statuses = [str(item) for item in (configured or ["SUPPORTED"])]
-    return statuses or ["SUPPORTED"]
-
-
 def check_supported_claims(
     ctx: Any, *, inputs: list[str], usage_scope: list[str] | None = None
 ) -> list[str]:
@@ -61,16 +54,9 @@ def check_supported_claims(
     index = ctx.content(contract["required_inputs"][0]) or {}
     entries = index.get("claims")
     if not isinstance(entries, list) or not entries:
-        # M6 §22/§48：概念/态度型课程可能没有实证 Claim。默认失败；操作者显式允许
-        # （rules.evidence.allow_empty_claims=true）且 claims 步骤已声明时，PCK 可继续，
-        # 限制必须已记录在 evidence_index 与 step note 中。
-        allow_empty = bool((config.RULES.get("evidence") or {}).get("allow_empty_claims"))
-        allow_unverified = bool((config.RULES.get("evidence") or {}).get("allow_unverified_pck"))
-        if (allow_empty and index.get("declared_no_empirical_claims")) or (
-            allow_unverified and index.get("declared_no_consumable_claims")
-        ):
-            return []
-        return ["证据索引为空，没有可用的 SUPPORTED Claim"]
+        # Fail closed: an empty evidence contract is never a licence to author, and no
+        # setting may turn it into one.
+        return ["证据索引为空：没有可消费的 SUPPORTED Claim"]
 
     scope = {str(item) for item in usage_scope} if usage_scope else None
     problems: list[str] = []
@@ -97,10 +83,9 @@ def check_supported_claims(
             continue
         consumed += 1
         status = ctx.evidence.claim_status(claim_id, version)
-        allowed = allowed_claim_statuses()
-        if status not in allowed:
+        if status != PCK_REQUIRED_STATUS:
             problems.append(
-                f"{claim_id}@v{version} 状态为 {status}；PCK 只允许消费 {allowed} 证据（见 rules.evidence.pck_claim_statuses）"
+                f"{claim_id}@v{version} 状态为 {status}；PCK 只允许消费 {PCK_REQUIRED_STATUS} 证据（冻结契约，不可配置）"
             )
             continue
         if int(ctx.evidence.latest_version(claim_id)) != int(version):
@@ -111,10 +96,7 @@ def check_supported_claims(
         if usage == PLACEHOLDER_USAGE:
             problems.append(f"{claim_id}@v{version} 的 usage 为「{usage}」，属于待核验占位")
     if not problems and consumed == 0:
-        allow_unverified = bool((config.RULES.get("evidence") or {}).get("allow_unverified_pck"))
-        if allow_unverified and index.get("declared_no_consumable_claims"):
-            return []
-        problems.append("证据契约范围内没有可用于 PCK 的 Claim")
+        problems.append("证据契约范围内没有可用于 PCK 的 SUPPORTED Claim")
     return problems
 
 

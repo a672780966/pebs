@@ -598,23 +598,14 @@ claim_type 取 descriptive/correlational/predictive/causal/mechanistic/theoretic
         claims.append({**record, "text": text, "claim_type": item.get("claim_type", "descriptive")})
     content = {"claims": claims, "unavailable": []}
     deps = [r for r in [ctx.rev(f"learning_design:{s['section_id']}") for s in ctx.sections()] if r]
-    allow_empty = bool((config.RULES.get("evidence") or {}).get("allow_empty_claims"))
     if not claims:
-        if not allow_empty:
-            # M6 生产修正：0 条 Claim 会让证据契约为空、PCK 在下游才被阻塞，错误信息难以定位。
-            # 明确在此失败，给出可执行的诊断（模型未返回 Claim / 请求与材料需要补充）。
-            raise StepFailed(
-                "Claim 提取结果为空：模型未返回可核验的实证性 Claim。"
-                "请检查请求是否包含可核验的心理学事实，或补充材料后重试"
-                "（系统不会用空证据继续生产）。"
-            )
-        content["no_empirical_claims"] = True
-        content["note"] = (
-            "本节课程未提取到实证性 Claim；按 rules.evidence.allow_empty_claims 允许继续，"
-            "PCK 只能基于教学法设计，产物必须标注“无实证证据支持”的限制。"
+        # Frozen contract: 0 factual Claims fails here, at extraction, with an actionable
+        # diagnostic - never downstream at PCK, and never as an empty evidence contract.
+        raise StepFailed(
+            "Claim 提取结果为空：模型未返回可核验的实证性 Claim。"
+            "请检查请求是否包含可核验的心理学事实，或补充材料后重试"
+            "（系统不会用空证据继续生产）。"
         )
-        ctx.emit("claims", "claims_set", content, "claim-extractor", deps=deps)
-        return {"notes": [content["note"]]}
     ctx.emit("claims", "claims_set", content, "claim-extractor", deps=deps)
     return {"notes": [f"登记 {len(claims)} 条待核验 Claim"]}
 
@@ -981,22 +972,26 @@ def step_evidence(ctx: PipelineContext) -> dict[str, Any]:
         }
         for claim in current_claims
     ]
-    # M6 §13/§48：evidence_index 是"PCK 可消费的证据契约"。
-    # 不可消费的 Claim（PENDING / UNSUPPORTED / DISPUTED…）不进入契约，但必须显式登记在
-    # excluded 中（不隐藏、不删除）；是否可消费由 rules.evidence.pck_claim_statuses 决定。
+    # evidence_index is the evidence contract PCK may consume. Consumability is the
+    # frozen E/1 contract read from its single owner: only PCK_REQUIRED_STATUS enters
+    # `claims`; every other status is registered in `excluded_claims` - never hidden,
+    # never deleted, never disguised as supported - and stays auditable.
     from . import preconditions as precondition_mod
 
-    allowed_statuses = set(precondition_mod.allowed_claim_statuses())
-    consumable = [item for item in statuses if item["status"] in allowed_statuses]
+    required_status = precondition_mod.PCK_REQUIRED_STATUS
+    consumable = [item for item in statuses if item["status"] == required_status]
     excluded = [
         {
             "claim_id": item["claim_id"],
             "version": item["version"],
             "status": item["status"],
-            "reason": f"状态 {item['status']} 不在 PCK 可消费状态 {sorted(allowed_statuses)} 内；已从证据契约排除，等待人工复核或补充材料",
+            "reason": (
+                f"状态 {item['status']} 不满足冻结的 PCK 证据契约（只允许 {required_status}）；"
+                "已从证据契约排除，等待人工复核或补充材料"
+            ),
         }
         for item in statuses
-        if item["status"] not in allowed_statuses
+        if item["status"] != required_status
     ]
     if excluded:
         notes.append(
@@ -1086,13 +1081,6 @@ def step_teaching_plan(ctx: PipelineContext) -> dict[str, Any]:
     blocked = preconditions.block_reason(ctx, {"preconditions": declared})
     if blocked:
         raise StepBlocked(blocked)
-    # M6 §22/§48：显式放行"无可用证据"时，限制必须随产物记录，供教师复核
-    _index = ctx.content("evidence_index") or {}
-    if _index.get("declared_no_consumable_claims") or _index.get("declared_no_empirical_claims"):
-        notes.append(
-            "证据契约中没有可消费的实证 Claim（已按 rules.evidence.allow_unverified_pck / "
-            "allow_empty_claims 放行）：教学策略只能基于教学法设计，不含实证心理学机制断言，需教师复核。"
-        )
     for section in ctx.sections():
         _check_cancel(ctx)
         _skill(ctx, "pck-developer")

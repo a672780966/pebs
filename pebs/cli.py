@@ -327,9 +327,6 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
                     mode=mode,
                     accept=not args.no_accept,
                     budgets=budgets or None,
-                    allow_qualified_claims=args.allow_qualified_claims,
-                    allow_empty_claims=args.allow_empty_claims,
-                    allow_unverified_pck=args.allow_unverified_pck,
                     extra_skills=[item.strip() for item in args.skills.split(",") if item.strip()],
                     experiment=args.experiment,
                 )
@@ -434,21 +431,6 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--max-research", type=int, default=0)
     bench.add_argument("--max-seconds", type=int, default=0)
     bench.add_argument("--skills", default="", help="§46 实验：追加显式 /skill-name（逗号分隔），用于 External only / Hybrid 对照")
-    bench.add_argument(
-        "--allow-qualified-claims",
-        action="store_true",
-        help="实践型课程：显式放行 QUALIFY_REQUIRED 证据（限定语必须保留，写入 run.json 的 evidence_policy）",
-    )
-    bench.add_argument(
-        "--allow-empty-claims",
-        action="store_true",
-        help="概念/态度型课程：允许无实证 Claim 继续（限制会记录在 claims/evidence_index 与 run.json）",
-    )
-    bench.add_argument(
-        "--allow-unverified-pck",
-        action="store_true",
-        help="实践/态度型课程：Claim 全部不可支持时允许 PCK 基于教学法继续（记录限制；门禁本身不降级）",
-    )
     bench.add_argument("--experiment", default="", help="实验标签（写入 run.json）")
     bench.set_defaults(func=cmd_benchmark)
 

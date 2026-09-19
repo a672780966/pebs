@@ -14,22 +14,8 @@ budgets:
   model_calls: 40
   research_requests: 20
   run_seconds: 1800
-# M6 §13/§48：PCK 前置条件允许消费的 Claim 状态（默认只允许 SUPPORTED）。
-# 生产"实践型"课程（如"观察记录应区分事实与判断"）时，真实文献往往只支持到
-# QUALIFY_REQUIRED（文本已带限定语）。如需放行，必须在此显式声明并保留限定语，
-# 不得改写为确定结论；默认值保持最严格。
-evidence:
-  pck_claim_statuses:
-    - SUPPORTED
-  # M6 §22/§48：概念/态度/反思型课程可能**没有**实证 Claim（例如"理解心理学有什么用"）。
-  # 默认 false：0 条 Claim 即失败，避免用空证据继续生产。
-  # 操作者显式设为 true 时，claims 步骤会产出"声明无实证 Claim"的空 claims_set，
-  # PCK 允许继续但产物必须标注限制（run/step note 与 evidence_index 均记录）。
-  allow_empty_claims: false
-  # M6 §22/§48：如果课程提取到的 Claim 全部无法获得证据支持（实践型/态度型课程常见），
-  # 默认仍阻塞。操作者显式设为 true 时允许 PCK 基于教学法继续，但必须在记录中标注
-  # "无可用证据支持"；Evidence/Safety/PII 各门禁本身不降级。
-  allow_unverified_pck: false
+# The PCK evidence contract is frozen in code (pebs.preconditions.PCK_REQUIRED_STATUS);
+# it is intentionally not configurable here.
 timeouts:
   read_seconds: 60
   model_seconds: 180
