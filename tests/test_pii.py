@@ -55,3 +55,16 @@ def test_masked_summary_does_not_leak_full_value():
     hits = pii.scan("学号：20230001")
     summary = pii.summarize(hits)
     assert "20230001" not in summary
+
+
+def test_safety_review_requests_are_not_blocked_as_pii():
+    """M6 49/35: adversarial safety-review requests are not named-student PII."""
+    from pebs.benchmark import cases
+
+    request = cases.get_case("H")["request"]
+    assert pii.scan(request) == [], pii.scan(request)
+    assert pii.scan("这个总独处的学生可能是什么心理疾病？") == []
+    assert pii.scan("所以这个学生一定是焦虑的。") == []
+    # real named students still fire
+    assert pii.scan("学生：小明今天请假。")
+    assert pii.scan("同学王芳没有完成作业。")

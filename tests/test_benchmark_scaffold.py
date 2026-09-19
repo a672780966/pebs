@@ -86,6 +86,40 @@ def test_banned_regex_ignores_quoted_error_examples():
     assert bad["issues"][0]["kind"] == "SAFETY"
 
 
+def test_scrub_exercise_fields_handles_json_and_python_repr():
+    """§12/§50：选项与干扰项字段（故意错误）不得参与安全扫描。"""
+    json_text = '{"question": "?", "options": ["A. 手机使用导致焦虑。", "B. 相关不等于因果。"], "answer": "B"}'
+    assert "导致焦虑" not in checks.scrub_exercise_fields(json_text)
+    repr_text = str({"question": "?", "options": ["A. 手机使用导致焦虑。", "B. 相关不等于因果。"], "answer": "B"})
+    assert "导致焦虑" not in checks.scrub_exercise_fields(repr_text)
+    distractors = '{"distractors_detail": [{"answer": "手机使用导致焦虑", "misconception": "把相关当因果"}], "question": "?"}'
+    assert "导致焦虑" not in checks.scrub_exercise_fields(distractors)
+
+
+def test_banned_regex_ignores_audit_practice_instructions():
+    """§49：审阅任务把被审说法作为待处理对象引出（"说明4（…）请圈出…"），不算主张。"""
+    store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "说明4（研究显示大学生群体焦虑水平上升，所以这个学生一定是焦虑的。）请用双圈圈出它把群体结论推给个体的地方。",
+            }
+        }
+    )
+    expect = {"content": {"artifact_types": ["script"], "banned_regex": ["这个学生(就是|一定)"]}}
+    assert checks.evaluate(store, expect)["ok"] is True
+
+    bad_store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "这个学生一定是焦虑的，需要单独谈话。",
+            }
+        }
+    )
+    assert checks.evaluate(bad_store, expect)["ok"] is False
+
+
 def test_banned_regex_ignores_exercise_options():
     """§50：判断题选项中的错误写法是待判定对象，不算产物在主张它。"""
     store = _StubStore(

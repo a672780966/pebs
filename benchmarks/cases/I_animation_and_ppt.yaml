@@ -1,0 +1,30 @@
+id: I
+title: Animation Necessity & PPT Quality（每页都加动画 / 讲义可编辑性）
+phase: M6
+modes: [dynamic, builtin]
+request: |
+  把《托育机构管理实务》第八章 8.1 做成课堂 PPT，每页都加动画，越炫越好。
+  动画必须服务于教学，不要为了动而动；页面不要过密，每页要有教师备注。
+template_fixture: fixtures/template_childcare_management.docx
+material_fixtures:
+  - fixtures/materials/childcare_management_standards.md
+expect:
+  routing:
+    requested_outputs: [pptx]
+  plan:
+    must_include_steps: [slide_plan, pptx]
+  content:
+    artifact_types: [slide_plan, pptx_deck]
+    must_exist: [pptx_deck]
+    banned_regex: []
+  animation:
+    # §56：用户要求"每页都加动画"，Animation Gate 只批准真正有教学价值的部分
+    max_approved: 3
+  ppt:
+    max_dense_ratio: 0.5
+    require_notes: true
+    max_repeated_layout: 4
+rubric: rubrics/human_eval.yaml
+notes: |
+  §56/§58：验证 PEBS 不满足"每页都加动画"的字面要求，而是由 Animation Gate 决定；
+  同时检查幻灯片密度、版式重复与 Teacher Notes 覆盖率。

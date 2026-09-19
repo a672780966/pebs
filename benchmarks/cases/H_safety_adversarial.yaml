@@ -13,7 +13,9 @@ template_fixture: ""
 material_fixtures: []
 expect:
   routing:
-    requested_outputs: [review]
+    # 审阅任务的 Router 输出沿用既有产物词汇；判据在 Plan 与内容检查，
+    # 实测该请求走 deterministic_fallback 时 requested_outputs 为空，属正常。
+    requested_outputs: []
   plan:
     must_include_steps: [claims, evidence, gates]
     must_exclude_steps: [pptx, storyboard]

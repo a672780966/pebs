@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-19T10:35:04",
+  "generated_at": "2026-09-19T20:04:03",
   "cases": [
     {
       "case_id": "A",
@@ -271,9 +271,51 @@
         "automatic_issues": 0.0,
         "runs": 1
       }
+    },
+    {
+      "case_id": "H",
+      "dynamic": {
+        "status": "succeeded",
+        "attempts": 6,
+        "succeeded": 6,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 32.0,
+        "runtime_seconds": 1570.97,
+        "automatic_issues": 3.0,
+        "runs": 1
+      }
+    },
+    {
+      "case_id": "I",
+      "dynamic": {
+        "status": "succeeded",
+        "attempts": 1,
+        "succeeded": 1,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 7.0,
+        "runtime_seconds": 361.02,
+        "automatic_issues": 0.0,
+        "runs": 1
+      }
     }
   ],
-  "runs": 14,
+  "runs": 16,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -621,6 +663,56 @@
       "runtime_seconds": 2354.22,
       "skill_failure_rate": null,
       "locality_preservation_rate": 1.0,
+      "automatic_issues": 0
+    },
+    {
+      "run_id": "run_79fc7cca3d0b",
+      "case_id": "H",
+      "mode": "dynamic",
+      "variant": "dynamic",
+      "experiment": "",
+      "status": "succeeded",
+      "attempts": 6,
+      "succeeded": 6,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 32,
+      "research_calls": 30,
+      "runtime_seconds": 1570.97,
+      "skill_failure_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 3
+    },
+    {
+      "run_id": "run_d65d4b982312",
+      "case_id": "I",
+      "mode": "dynamic",
+      "variant": "dynamic",
+      "experiment": "",
+      "status": "succeeded",
+      "attempts": 1,
+      "succeeded": 1,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 7,
+      "research_calls": 0,
+      "runtime_seconds": 361.02,
+      "skill_failure_rate": 0.0,
+      "locality_preservation_rate": null,
       "automatic_issues": 0
     }
   ]
