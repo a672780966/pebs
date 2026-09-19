@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T01:48:43",
+  "generated_at": "2026-09-20T01:52:46",
   "cases": [
     {
       "case_id": "A",
@@ -887,5 +887,55 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0
     }
-  ]
+  ],
+  "mode_comparison": {
+    "direct_codex": {
+      "variants": 2,
+      "human_score": null,
+      "edit_ratio": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 2.0,
+      "runtime_seconds": 377.46,
+      "succeeded": 2.0,
+      "attempts": 2.0
+    },
+    "builtin": {
+      "variants": 1,
+      "human_score": null,
+      "edit_ratio": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 12.0,
+      "runtime_seconds": 348.53,
+      "succeeded": 0.0,
+      "attempts": 5.0
+    },
+    "dynamic": {
+      "variants": 13,
+      "human_score": null,
+      "edit_ratio": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 354.0,
+      "runtime_seconds": 20060.42,
+      "succeeded": 18.0,
+      "attempts": 37.0
+    },
+    "scenario": {
+      "variants": 2,
+      "human_score": null,
+      "edit_ratio": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 14.0,
+      "runtime_seconds": 4318.9,
+      "succeeded": 3.0,
+      "attempts": 3.0
+    }
+  }
 }

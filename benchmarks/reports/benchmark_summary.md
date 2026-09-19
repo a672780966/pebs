@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-20T01:48:43；run 数（每 case×mode 取最新）：18
+生成时间：2026-09-20T01:52:46；run 数（每 case×mode 取最新）：18
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -22,6 +22,20 @@
 | G | scenario | succeeded | 1/1 | None | None | None | None | None | 9.0 | 2354.22 | 0.0 |
 | H | dynamic | succeeded | 6/6 | None | None | None | None | None | 32.0 | 1570.97 | 3.0 |
 | I | dynamic | succeeded | 1/1 | None | None | None | None | None | 7.0 | 361.02 | 0.0 |
+
+## 模式对比（§42：Metric × Direct Codex / Builtin / Dynamic）
+
+| Metric | direct_codex | builtin | dynamic | scenario |
+| --- | ---: | ---: | ---: | ---: |
+| Human Score（1–5 均值） | — | — | — | — |
+| Teacher Edit Ratio（均值） | — | — | — | — |
+| Evidence Errors（合计） | — | — | — | — |
+| Routing Errors（合计） | — | — | — | — |
+| Plan Errors（合计） | — | — | — | — |
+| Model Calls（合计） | 2.0 | 12.0 | 354.0 | 14.0 |
+| Runtime(s)（合计） | 377.46 | 348.53 | 20060.42 | 4318.9 |
+| Succeeded / Attempts | 2.0 / 2.0 | 0 / 5.0 | 18.0 / 37.0 | 3.0 / 3.0 |
+
 
 ## 质量指标（§53/§54/§58；频度与分布，人工评分参考，不设自动阈值）
 

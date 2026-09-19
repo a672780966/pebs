@@ -170,6 +170,21 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 报告只有 per-case 明细，缺 §42 要求的 Metric × 模式对比表（BENCHMARK §42）
+
+- **date**: 2026-09-20
+- **task**: M6.4 benchmark 报告
+- **symptom**: §42 要求报告至少给出 `Metric × Direct Codex / Builtin / Dynamic` 的对比表，
+  实际只有 per-case 明细行；"Dynamic 是否优于 Builtin/Direct" 需要人工跨行累加才能回答
+- **root_cause**: `render_markdown()` 只渲染 case×variant 明细，没有把 §46 的实验变体
+  （`dynamic [+external-media]`）归回基础模式做汇总
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/report.py`
+- **fix**: 新增 `mode_comparison()` / `render_mode_comparison()`：按基础模式汇总，
+  Human Score 与 Edit Ratio 取 case 均值（避免调用量大的 case 压过其他 case），
+  计数类指标求和；结果同时写入 `benchmark_summary.json` 的 `mode_comparison` 字段
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_report_builds_metric_by_mode_comparison_table`
+
 ## 2026-09-20 — 教师评分写进了 Store，却从未回到报告 / 也从未绑定 Skill 版本（EVALUATION §33/§40/§42）
 
 - **date**: 2026-09-20

@@ -201,7 +201,9 @@ def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
                 "runs": len(matching),
             }
         table.append(entry)
-    return {"generated_at": _now(), "cases": table, "runs": len(rows), "rows": rows}
+    summary = {"generated_at": _now(), "cases": table, "runs": len(rows), "rows": rows}
+    summary["mode_comparison"] = mode_comparison(summary)
+    return summary
 
 
 def _mean(values) -> float | None:
@@ -220,6 +222,85 @@ def _now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
 
+def _base_mode(variant: str) -> str:
+    """把 `dynamic [+external-media]` 这类实验变体归回它的基础模式（§28/§46）。"""
+    return variant.split(" ", 1)[0].strip() or variant
+
+
+def mode_comparison(summary: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """§42：Metric × Direct Codex / Builtin / Dynamic 汇总（每个基础模式一行）。
+
+    Human Score 按 case 取均值（避免调用量大的 case 压过其他 case），
+    计数类指标求和。混合模式（mixed）单独一行。
+    """
+    buckets: dict[str, list[dict[str, Any]]] = {}
+    for case in summary.get("cases", []):
+        for variant, entry in case.items():
+            if variant == "case_id" or not isinstance(entry, dict):
+                continue
+            buckets.setdefault(_base_mode(str(variant)), []).append(entry)
+
+    def mean(key: str, entries: list[dict[str, Any]]) -> float | None:
+        values = [float(entry[key]) for entry in entries if entry.get(key) is not None]
+        return round(sum(values) / len(values), 3) if values else None
+
+    def total(key: str, entries: list[dict[str, Any]]) -> float | None:
+        values = [float(entry[key]) for entry in entries if entry.get(key) is not None]
+        return round(sum(values), 3) if values else None
+
+    order = [mode for mode in COLUMNS if mode in buckets]
+    order += sorted(mode for mode in buckets if mode not in COLUMNS)
+    return {
+        mode: {
+            "variants": len(buckets[mode]),
+            "human_score": mean("human_score", buckets[mode]),
+            "edit_ratio": mean("edit_ratio", buckets[mode]),
+            "evidence_errors": total("evidence_errors", buckets[mode]),
+            "routing_errors": total("routing_errors", buckets[mode]),
+            "plan_errors": total("plan_errors", buckets[mode]),
+            "model_calls": total("model_calls", buckets[mode]),
+            "runtime_seconds": total("runtime_seconds", buckets[mode]),
+            "succeeded": total("succeeded", buckets[mode]),
+            "attempts": total("attempts", buckets[mode]),
+        }
+        for mode in order
+    }
+
+
+def render_mode_comparison(summary: dict[str, Any]) -> list[str]:
+    comparison = mode_comparison(summary)
+    if not comparison:
+        return []
+    lines = [
+        "",
+        "## 模式对比（§42：Metric × Direct Codex / Builtin / Dynamic）",
+        "",
+        "| Metric | " + " | ".join(comparison) + " |",
+        "| --- | " + " | ".join("---:" for _ in comparison) + " |",
+    ]
+    metrics = (
+        ("Human Score（1–5 均值）", "human_score"),
+        ("Teacher Edit Ratio（均值）", "edit_ratio"),
+        ("Evidence Errors（合计）", "evidence_errors"),
+        ("Routing Errors（合计）", "routing_errors"),
+        ("Plan Errors（合计）", "plan_errors"),
+        ("Model Calls（合计）", "model_calls"),
+        ("Runtime(s)（合计）", "runtime_seconds"),
+        ("Succeeded / Attempts", None),
+    )
+    for label, key in metrics:
+        cells = []
+        for mode in comparison:
+            entry = comparison[mode]
+            if key is None:
+                cells.append(f"{entry.get('succeeded') or 0} / {entry.get('attempts') or 0}")
+            else:
+                cells.append("—" if entry.get(key) is None else str(entry.get(key)))
+        lines.append("| " + label + " | " + " | ".join(cells) + " |")
+    lines.append("")
+    return lines
+
+
 def render_markdown(summary: dict[str, Any]) -> str:
     lines = [
         "# M6 Benchmark Summary",
@@ -233,6 +314,10 @@ def render_markdown(summary: dict[str, Any]) -> str:
         for variant, entry in sorted(case.items()):
             if variant == "case_id" or not isinstance(entry, dict):
                 continue
+            note = ""
+            if entry.get("human_eval_stale"):
+                note = " ⚠评分针对另一版产物"
+            reviewers = entry.get("reviewers") or []
             lines.append(
                 "| {case} | {mode} | {status} | {attempts} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} |".format(
                     case=case["case_id"],
@@ -249,6 +334,9 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     issues=entry.get("automatic_issues"),
                 )
             )
+            if reviewers or note:
+                lines.append(f"| | 教师：{('、'.join(reviewers)) or '—'}{note} | | | | | | | | | | |")
+    lines.extend(render_mode_comparison(summary))
     lines.extend(quality_section())
     lines.extend(performance_section())
     lines.append("")

@@ -254,6 +254,50 @@ def test_report_builds_mode_comparison_table():
     assert "Evidence Errors" in markdown
 
 
+def test_report_builds_metric_by_mode_comparison_table():
+    """§42：报告必须有 Metric × Direct/Builtin/Dynamic 的汇总表。"""
+    runs = [
+        {
+            "case_id": "A",
+            "mode": "direct_codex",
+            "run_id": "r1",
+            "metrics": {"model_calls": 1, "wall_time_seconds": 100},
+        },
+        {
+            "case_id": "A",
+            "mode": "dynamic",
+            "run_id": "r2",
+            "metrics": {"model_calls": 8, "wall_time_seconds": 140},
+            "human_eval": {"scores": {"subject_accuracy": 4}, "edit_ratio": 0.2, "evidence_errors": 1},
+        },
+        {
+            "case_id": "B",
+            "mode": "dynamic",
+            "run_id": "r3",
+            "metrics": {"model_calls": 10, "wall_time_seconds": 160},
+            "human_eval": {"scores": {"subject_accuracy": 5}, "edit_ratio": 0.1, "evidence_errors": 0},
+        },
+        {
+            "case_id": "B",
+            "mode": "dynamic",
+            "experiment": "external-media",
+            "run_id": "r4",
+            "metrics": {"model_calls": 12, "wall_time_seconds": 200},
+        },
+    ]
+    summary = report.summarize(runs)
+    comparison = report.mode_comparison(summary)
+    assert set(comparison) == {"direct_codex", "dynamic"}
+    assert comparison["direct_codex"]["model_calls"] == 1.0
+    assert comparison["dynamic"]["model_calls"] == 30.0
+    assert comparison["dynamic"]["evidence_errors"] == 1.0
+    assert comparison["dynamic"]["human_score"] == 4.5
+    markdown = report.render_markdown(summary)
+    assert "模式对比" in markdown
+    assert "| Metric | direct_codex | dynamic |" in markdown
+    assert "Teacher Edit Ratio" in markdown
+
+
 def test_metrics_edit_ratio_and_locality():
     ratio = metrics.teacher_edit_ratio("一二三四五六七八九十", "一二三四五六七八九十一二")
     assert ratio["generated_chars"] == 10
