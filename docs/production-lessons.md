@@ -170,6 +170,26 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — `benchmark --report` 会覆盖教师已填写的工作表 / 代表 run 漂移 / 实验变体撞名（EVALUATION §30/§32/§41/§46）
+
+- **date**: 2026-09-20
+- **task**: M6.3/M6.4 教师评分工作表（Acceptance 5 的外部输入）
+- **symptom**: 跑一次 `python -m pebs.cli benchmark --report` 之后，`benchmarks/reports/worksheets/D-dynamic-human_eval.yaml`
+  的 `run` 绑定被改写（succeeded → failed，21 个产物 → 2 个）；任何已填的 14 维评分会被静默清空
+- **root_cause**: 三个叠加缺陷。(1) `write_worksheets()` 无条件重写每个 `(case, mode)` 的工作表，
+  教师填写内容是**不可再生的外部输入**，却被当成可重生成的派生物；
+  (2) `load_runs()` 用 run.json 的 **文件 mtime** 判断"最新成功 run"，而复评工具
+  （`tools/reevaluate_checks.py`）会重写旧 run.json，mtime 一变代表 run 就漂移；
+  (3) 工作表文件名不含 `experiment`，§46 的实验变体（`D-dynamic-external-assessment`）
+  直接覆盖该 case 的主工作表
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/report.py`、`benchmarks/reports/worksheets/`
+- **fix**: `write_worksheets(preserve_filled=True)` 遇到已填写（reviewer/comment/scores/edits 任一非空）
+  的工作表直接跳过；文件名带上 experiment（`<case>-<mode>-<experiment>-human_eval.yaml`）；
+  `load_runs()` 改用 run 目录名里的时间戳排序，mtime 只作兜底
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_worksheet_regeneration_never_overwrites_teacher_scores`、
+  `::test_representative_run_uses_run_timestamp_not_file_mtime`
+
 ## 2026-09-19 — 导入限制只覆盖文件数与体积，缺文档级/解压级防护（SECURITY §59）
 
 - **date**: 2026-09-19

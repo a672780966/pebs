@@ -37,8 +37,19 @@ def quality_score(record: dict[str, Any]) -> float | None:
     return round(sum(values) / len(values), 3)
 
 
+def _run_order_key(path: Path) -> tuple[str, float]:
+    """§41：run 的先后顺序取自 run 目录名里的时间戳，而不是文件 mtime。
+
+    复评工具（tools/reevaluate_checks.py）会重写 run.json，mtime 一变，
+    "最新一次成功 run"就会漂移，报告与教师工作表会指向另一个产物。"""
+    stamp = path.parent.name.split("-", 2)[:2]
+    if len(stamp) == 2 and stamp[0].isdigit() and stamp[1].isdigit():
+        return ("-".join(stamp), path.stat().st_mtime)
+    return ("", path.stat().st_mtime)
+
+
 def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
-    """每个 (case, mode) 取一个代表 run，并统计尝试次数与成功次数。
+    """每个 (case, mode, experiment) 取一个代表 run，并统计尝试次数与成功次数。
 
     真实运行的证据核验存在模型波动：同一 case 可能一次 succeeded、一次 blocked。
     只显示"最新一次"会误导；因此代表 run 优先取最近的成功记录（没有成功记录才取最新），
@@ -46,7 +57,7 @@ def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
     directory = runs_dir or cases.runs_dir()
     if not directory.exists():
         return []
-    grouped: dict[tuple[str, str, str], list[tuple[float, dict[str, Any]]]] = {}
+    grouped: dict[tuple[str, str, str], list[tuple[tuple[str, float], dict[str, Any]]]] = {}
     for path in sorted(directory.glob("*/run.json")):
         try:
             record = json.loads(path.read_text(encoding="utf-8"))
@@ -58,7 +69,7 @@ def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
             str(record.get("mode")),
             str(record.get("experiment") or ""),
         )
-        grouped.setdefault(key, []).append((path.stat().st_mtime, record))
+        grouped.setdefault(key, []).append((_run_order_key(path), record))
     representatives: list[dict[str, Any]] = []
     for (case_id, mode, experiment), items in sorted(grouped.items()):
         items.sort(key=lambda pair: pair[0])
@@ -178,13 +189,37 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     issues=entry.get("automatic_issues"),
                 )
             )
+    lines.extend(quality_section())
     lines.extend(performance_section())
     lines.append("")
     return "\n".join(lines)
 
 
-def write_worksheets(runs: list[dict[str, Any]] | None = None, *, directory: Path | None = None) -> list[Path]:
-    """§30–§32：为每次 run 生成教师评分工作表（人工填写后可用 CLI 回收）。"""
+def _worksheet_is_filled(data: dict[str, Any]) -> bool:
+    """教师是否已经在这份工作表里填过东西（§30–§32）。"""
+    if str(data.get("reviewer") or "").strip():
+        return True
+    if str(data.get("comment") or "").strip():
+        return True
+    if any(value is not None for value in (data.get("scores") or {}).values()):
+        return True
+    edits = data.get("edits") or {}
+    if str(edits.get("generated_text") or "").strip() or str(edits.get("edited_text") or "").strip():
+        return True
+    return any(item.get("category") or item.get("severity") for item in (edits.get("items") or []))
+
+
+def write_worksheets(
+    runs: list[dict[str, Any]] | None = None,
+    *,
+    directory: Path | None = None,
+    preserve_filled: bool = True,
+) -> list[Path]:
+    """§30–§32：为每次 run 生成教师评分工作表（人工填写后可用 CLI 回收）。
+
+    教师填写的评分是不可再生的外部输入：重新生成报告时绝不能覆盖已填写的工作表，
+    否则一位老师刚写好的 14 个维度评分会被 `--report` 静默清空。
+    `preserve_filled=True`（默认）下只刷新空白工作表里的 run 绑定信息。"""
     import yaml
 
     runs = runs if runs is not None else load_runs()
@@ -194,6 +229,18 @@ def write_worksheets(runs: list[dict[str, Any]] | None = None, *, directory: Pat
     for run in runs:
         case_id = str(run.get("case_id") or "?")
         mode = str(run.get("mode") or "?")
+        # §46：实验变体（external-assessment 等）是不同产物，工作表必须分开命名，
+        # 否则「只生成 PPT」这类变体会覆盖该 case 的主工作表。
+        experiment = str(run.get("experiment") or "")
+        stem = f"{case_id}-{mode}-{experiment}" if experiment else f"{case_id}-{mode}"
+        path = target_dir / f"{stem}-human_eval.yaml"
+        if preserve_filled and path.exists():
+            try:
+                existing = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+            except yaml.YAMLError:
+                existing = {}
+            if _worksheet_is_filled(existing):
+                continue
         template = {
             "run": {
                 "case_id": case_id,
@@ -241,7 +288,6 @@ def write_worksheets(runs: list[dict[str, Any]] | None = None, *, directory: Pat
                 "edits.items 的 severity 取值：S0 cosmetic / S1 wording / S2 local teaching improvement / S3 conceptual correction / S4 factual-evidence correction / S5 major redesign",
             ],
         }
-        path = target_dir / f"{case_id}-{mode}-human_eval.yaml"
         path.write_text(yaml.safe_dump(template, allow_unicode=True, sort_keys=False), encoding="utf-8")
         written.append(path)
     readme = target_dir / "README.md"
@@ -355,6 +401,51 @@ def render_selection_report(records: list[dict[str, Any]]) -> str:
             )
         lines.append("")
     return "\n".join(lines)
+
+
+def find_run_for_project(project_id: str) -> dict[str, Any] | None:
+    """§62：Evaluation Tab 需要把项目映射回它的 benchmark run（含自动问题清单）。"""
+    if not project_id:
+        return None
+    for run in load_runs():
+        if str(run.get("project_id") or "") == project_id:
+            return run
+    return None
+
+
+def quality_section(runs: list[dict[str, Any]] | None = None) -> list[str]:
+    """§53/§54/§58：把语言、口语、PPT 的频度/分布写进报告（供人工评分参考，不做硬门）。"""
+    runs = runs if runs is not None else load_runs()
+    rows: list[str] = []
+    for run in runs:
+        quality = run.get("quality_metrics") or {}
+        language = quality.get("language") or {}
+        oral = quality.get("oral") or {}
+        ppt = quality.get("ppt") or {}
+        if not (language or oral or ppt):
+            continue
+        rows.append(
+            "| {case} | {variant} | {per1000} | {long} | {spoken} | {dense} | {notes} |".format(
+                case=run.get("case_id"),
+                variant=run.get("_variant") or run.get("mode"),
+                per1000=language.get("per_1000_chars", "—"),
+                long=oral.get("long_sentence_ratio", "—"),
+                spoken=oral.get("spoken_marker_ratio", "—"),
+                dense=ppt.get("dense_ratio", "—"),
+                notes=len(ppt.get("missing_notes") or []) if ppt else "—",
+            )
+        )
+    if not rows:
+        return []
+    return [
+        "",
+        "## 质量指标（§53/§54/§58；频度与分布，人工评分参考，不设自动阈值）",
+        "",
+        "| Case | Variant | 机械连接词/千字 | 长句比例 | 口语标记比例 | 密集页比例 | 缺 Teacher Notes |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
+        *rows,
+        "",
+    ]
 
 
 def write_selection_report(records: list[dict[str, Any]], *, path: Path | None = None) -> Path:

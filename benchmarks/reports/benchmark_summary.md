@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-19T22:43:26；run 数（每 case×mode 取最新）：17
+生成时间：2026-09-20T00:40:38；run 数（每 case×mode 取最新）：17
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -21,6 +21,21 @@
 | G | scenario | succeeded | 1/1 | None | None | None | None | None | 9.0 | 2354.22 | 0.0 |
 | H | dynamic | succeeded | 6/6 | None | None | None | None | None | 32.0 | 1570.97 | 3.0 |
 | I | dynamic | succeeded | 1/1 | None | None | None | None | None | 7.0 | 361.02 | 0.0 |
+
+## 质量指标（§53/§54/§58；频度与分布，人工评分参考，不设自动阈值）
+
+| Case | Variant | 机械连接词/千字 | 长句比例 | 口语标记比例 | 密集页比例 | 缺 Teacher Notes |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| A | dynamic | 0.99 | — | — | — | — |
+| A | dynamic [+external-media] | 0.49 | — | — | — | — |
+| A | dynamic [+external-media-A2] | 0.81 | — | — | — | — |
+| B | dynamic | — | — | — | 0.0 | 0 |
+| C | dynamic | 1.13 | — | — | — | — |
+| D | dynamic | 0.0 | — | — | — | — |
+| E | dynamic | 17.62 | — | — | — | — |
+| H | dynamic | 0.0 | — | — | — | — |
+| I | dynamic | — | — | — | 0.0 | 0 |
+
 
 ## Skill Performance Registry（§19/§40；内部 skills 全部记录）
 

@@ -487,6 +487,11 @@ async function loadEvaluation() {
   const trace = data.trace || {};
   const human = data.human_eval;
   const advanced = document.getElementById("advancedMode")?.checked;
+  const br = data.benchmark_run;
+  const issueRows = (br?.issues || []).map(i => `
+    <tr><td>${esc(i.category || i.kind || "")}</td><td>${esc(i.severity || "")}</td>
+    <td class="small">${esc(i.location || i.artifact || "")}</td>
+    <td class="small">${esc(i.message || i.detail || "")}</td></tr>`).join("");
   const skills = (trace.skills || []).map(s => `
     <tr><td>${esc(s.skill)}</td><td>${esc(s.version || "")}</td><td>${esc(s.provider || "builtin")}</td>
     <td>${esc(s.patch || "")}</td><td>${esc(s.agent || "")}</td>
@@ -498,8 +503,7 @@ async function loadEvaluation() {
     <td class="small">${esc(item.reason)}</td>
     <td class="small">${esc((item.rejected_candidates || []).map(c => `${c.candidate}(${c.score})`).join("、"))}</td></tr>`).join("");
   const perf = Object.entries(data.performance || {}).filter(([name]) => (trace.skills || []).some(s => s.skill === name));
-  const perfRows = perf.map(([name, rec]) => `
-    <tr><td>${esc(name)}</td><td>${rec.runs}</td><td>${rec.success_rate}</td>
+  const perfRows = perf.map(([name, rec]) => `    <tr><td>${esc(name)}</td><td>${rec.runs}</td><td>${rec.success_rate}</td>
     <td>${rec.human_score ?? ""}</td><td>${rec.teacher_edit_ratio ?? ""}</td>
     <td>${esc((rec.known_failure_modes || []).join("；"))}</td></tr>`).join("");
   el.innerHTML = `
@@ -518,7 +522,14 @@ async function loadEvaluation() {
     ${perfRows ? `<h3>Skill Performance（绑定版本）</h3>
     <table><thead><tr><th>Skill</th><th>Runs</th><th>Success</th><th>Human</th><th>Edit Ratio</th><th>Known Failures</th></tr></thead>
     <tbody>${perfRows}</tbody></table>` : ""}
-    ${data.comparison ? `<h3>Benchmark 对比</h3><pre class="small">${esc(JSON.stringify(data.comparison.cases || [], null, 1))}</pre>` : ""}`;
+    ${data.comparison ? `<h3>Benchmark 对比</h3><pre class="small">${esc(JSON.stringify(data.comparison.cases || [], null, 1))}</pre>` : ""}
+    ${br ? `<h3>Benchmark Run（自动检查）</h3>
+    <p class="small">Case <b>${esc(br.case_id || "—")}</b> · 变体 ${esc(br.variant || "—")} ·
+      状态 ${esc(br.status || "—")} · Evidence Policy ${esc(br.evidence_policy || "—")} ·
+      机械连接词 ${esc(br.quality_metrics?.language?.per_1000_chars ?? "—")}/千字 ·
+      密集页 ${esc(br.quality_metrics?.ppt?.dense_ratio ?? "—")}</p>
+    <table><thead><tr><th>类别</th><th>严重度</th><th>位置</th><th>说明</th></tr></thead>
+    <tbody>${issueRows || '<tr><td colspan="4" class="muted small">无自动问题</td></tr>'}</tbody></table>` : ""}`;
 }
 
 async function loadMedia() {

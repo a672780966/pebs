@@ -416,12 +416,26 @@ def get_evaluation(project_id: str) -> dict[str, Any]:
             comparison = json.loads(summary_path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             comparison = None
+    # §62：把该项目对应的 benchmark run 的自动问题清单也展示出来（Issues）
+    from .benchmark import report as report_mod
+
+    benchmark_run = report_mod.find_run_for_project(project_id)
     return {
         "run": {"run_id": run["run_id"], "status": run["status"]} if run else None,
         "trace": trace,
         "human_eval": evaluation_mod.latest(engine),
         "performance": benchmark_performance(),
         "comparison": comparison,
+        "benchmark_run": {
+            "case_id": benchmark_run.get("case_id"),
+            "variant": benchmark_run.get("_variant") or benchmark_run.get("mode"),
+            "status": benchmark_run.get("run_status"),
+            "evidence_policy": benchmark_run.get("evidence_policy"),
+            "quality_metrics": benchmark_run.get("quality_metrics"),
+            "issues": (benchmark_run.get("automatic_issues") or {}).get("issues", []),
+        }
+        if benchmark_run
+        else None,
     }
 
 

@@ -224,16 +224,113 @@ def test_benchmark_report_renders_status_and_issues():
     assert "22" in markdown and "770.7" in markdown
 
 
+def test_worksheet_regeneration_never_overwrites_teacher_scores(tmp_path):
+    """§30–§32：教师评分是不可再生的外部输入，重新生成报告不得清空已填工作表。"""
+    import yaml
+
+    from pebs.benchmark import report as report_mod
+
+    run = {"case_id": "C", "mode": "dynamic", "run_id": "run_1", "run_status": "succeeded"}
+    report_mod.write_worksheets([run], directory=tmp_path)
+    path = tmp_path / "C-dynamic-human_eval.yaml"
+    filled = yaml.safe_load(path.read_text(encoding="utf-8"))
+    filled["reviewer"] = "张老师"
+    filled["scores"]["subject_accuracy"] = 5
+    filled["comment"] = "案例贴合托育场景"
+    path.write_text(yaml.safe_dump(filled, allow_unicode=True, sort_keys=False), encoding="utf-8")
+
+    report_mod.write_worksheets(
+        [{**run, "run_id": "run_2", "run_status": "failed", "artifact_hashes": {"a": "h"}}],
+        directory=tmp_path,
+    )
+    kept = yaml.safe_load(path.read_text(encoding="utf-8"))
+    assert kept["reviewer"] == "张老师"
+    assert kept["scores"]["subject_accuracy"] == 5
+    assert kept["run"]["run_id"] == "run_1"
+
+    # 空白工作表仍然要刷新到最新 run（否则教师会评错产物）
+    report_mod.write_worksheets([{**run, "run_id": "run_2", "run_status": "failed"}], directory=tmp_path)
+    assert yaml.safe_load(path.read_text(encoding="utf-8"))["run"]["run_id"] == "run_1"
+    blank = tmp_path / "D-dynamic-human_eval.yaml"
+    assert not blank.exists()
+    report_mod.write_worksheets([{"case_id": "D", "mode": "dynamic", "run_id": "run_9"}], directory=tmp_path)
+    assert yaml.safe_load(blank.read_text(encoding="utf-8"))["run"]["run_id"] == "run_9"
+
+
+def test_representative_run_uses_run_timestamp_not_file_mtime(tmp_path, monkeypatch):
+    """§41：复评工具会重写旧 run.json，代表 run 不能因此漂移。"""
+    import json
+    import os
+    import time
+
+    from pebs.benchmark import cases
+    from pebs.benchmark import report as report_mod
+
+    runs = tmp_path / "runs"
+    for stamp, run_id in (("20260101-000000", "run_old"), ("20260102-000000", "run_new")):
+        target = runs / f"{stamp}-A-dynamic"
+        target.mkdir(parents=True)
+        (target / "run.json").write_text(
+            json.dumps({"case_id": "A", "mode": "dynamic", "run_id": run_id, "run_status": "succeeded"}),
+            encoding="utf-8",
+        )
+    os.utime(runs / "20260101-000000-A-dynamic" / "run.json", (time.time() + 60, time.time() + 60))
+    monkeypatch.setattr(cases, "runs_dir", lambda: runs)
+
+    reps = report_mod.load_runs()
+    assert len(reps) == 1
+    assert reps[0]["run_id"] == "run_new"
+    assert reps[0]["_attempts"] == 2 and reps[0]["_succeeded"] == 2
+
+
 def test_evaluation_endpoints_expose_trace_and_accept_scores(client):
     client.post("/api/projects", json={"project_id": "evaltest"})
     evaluation_payload = _valid_payload()
     res = client.post("/api/projects/evaltest/evaluation", json=evaluation_payload)
     assert res.status_code == 200, res.text
-    assert res.json()["reviewer"] == "张老师"
+    assert res.json()["reviewer"] == evaluation_payload["reviewer"]
 
     invalid = client.post("/api/projects/evaltest/evaluation", json={"reviewer": "", "scores": {}, "comment": ""})
     assert invalid.status_code == 409
 
     data = client.get("/api/projects/evaltest/evaluation").json()
-    assert data["human_eval"]["reviewer"] == "张老师"
+    assert data["human_eval"]["reviewer"] == evaluation_payload["reviewer"]
     assert "trace" in data and "performance" in data and "comparison" in data
+
+
+def test_evaluation_payload_exposes_benchmark_run_issues(client, tmp_path, monkeypatch):
+    """§62/§63：Evaluation Tab 必须能看到该项目的 benchmark run 与自动问题清单。"""
+    import json
+
+    from pebs.benchmark import cases
+
+    runs = tmp_path / "runs"
+    (runs / "20260101-A-dynamic").mkdir(parents=True)
+    (runs / "20260101-A-dynamic" / "run.json").write_text(
+        json.dumps(
+            {
+                "case_id": "A",
+                "mode": "dynamic",
+                "_variant": "dynamic",
+                "project_id": "evalbench",
+                "run_status": "succeeded",
+                "evidence_policy": ["SUPPORTED"],
+                "quality_metrics": {"language": {"per_1000_chars": 0.99}, "ppt": {"dense_ratio": 0.0}},
+                "automatic_issues": {
+                    "issues": [{"kind": "SAFETY", "severity": "S2", "detail": "不应贴标签", "artifact": "script_1"}]
+                },
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(cases, "runs_dir", lambda: runs)
+
+    client.post("/api/projects", json={"project_id": "evalbench"})
+    data = client.get("/api/projects/evalbench/evaluation").json()
+    assert data["benchmark_run"]["case_id"] == "A"
+    assert data["benchmark_run"]["issues"][0]["kind"] == "SAFETY"
+    assert data["benchmark_run"]["quality_metrics"]["language"]["per_1000_chars"] == 0.99
+
+    other = client.get("/api/projects/evaltest/evaluation").json()
+    assert other["benchmark_run"] is None
