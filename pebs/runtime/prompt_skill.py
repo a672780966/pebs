@@ -213,7 +213,12 @@ class PromptSkillExecutor:
 
                 raise pipeline.StepBlocked(f"预算耗尽：{exc}") from exc
             store.bump_calls(run_id, 1)
-        return self.llm.generate_json(task=task, system=SYSTEM, prompt=prompt)
+        data = self.llm.generate_json(task=task, system=SYSTEM, prompt=prompt)
+        # provider 会把用量元数据塞进返回体；内置路径在 pipeline 里已剔除，
+        # 外部 Skill 路径若不剔除，`_usage` 就会被 emit 成教学产物的一部分。
+        if isinstance(data, dict):
+            data.pop("_usage", None)
+        return data
 
 
 def _with_section_defaults(ctx: Any, node: dict[str, Any], artifact_type: str | None, data: dict[str, Any]) -> dict[str, Any]:

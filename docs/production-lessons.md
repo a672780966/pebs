@@ -170,6 +170,24 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — provider 的 `_usage` 元数据被 emit 进外部 Skill 产物（RUNTIME §11/§39）
+
+- **date**: 2026-09-20
+- **task**: M6.4 真实外部 Skill 运行（D + `/cognitive-load-analyser`）
+- **symptom**: 真实运行的 `load_review:sec1` 产物里带着 `"_usage": {}`；
+  这是 provider 的用量元数据，却成了教学内容的一部分，会一路进入教师评分材料包
+  （`course.md`）与 run.json
+- **root_cause**: 内置路径在 `pipeline._llm()` 里已经 `data.pop("_usage", None)`，
+  但**外部 Skill 路径没有**（`prompt_skill._generate` 原样返回 provider 结果）；
+  同类问题还存在于语义路由（→ `router_result`）、对话意图（→ `patch_plan`）
+  与隐私语义复核（→ 隐私判定记录）
+- **skill**: `external-skill-runtime` / `semantic-router`
+- **artifact**: `pebs/runtime/prompt_skill.py`、`pebs/routing/semantic.py`、
+  `pebs/conversation/interpreter.py`、`pebs/pii.py`
+- **fix**: 四条会产生产物的 LLM 路径统一剔除 `_usage`（不在 provider 层剔除，
+  以免将来做成本核算时无处可取）
+- **regression_test**: `tests/test_external_skill_acceptance.py::test_provider_usage_metadata_never_reaches_the_artifact`
+
 ## 2026-09-20 — 失败的 run 也会生成教师评分表（EVALUATION §30/§32）
 
 - **date**: 2026-09-20

@@ -10,7 +10,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 28,
+      "runs": 29,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -18,7 +18,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "requirements-builder": {
@@ -29,7 +29,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 28,
+      "runs": 29,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -37,7 +37,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "learning-designer": {
@@ -48,7 +48,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 28,
+      "runs": 29,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -56,7 +56,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "claim-extractor": {
@@ -67,8 +67,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 28,
-      "success_rate": 0.8571,
+      "runs": 29,
+      "success_rate": 0.8621,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -77,7 +77,7 @@
       "known_failure_modes": [
         "Claim 提取结果为空：模型未返回可核验的实证性 Claim。请检查请求是否包含可核验的心理学事实，或补充材料后重试（系统不会用空证据继续生产）。"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "evidence-reviewer": {
@@ -88,8 +88,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 29,
-      "success_rate": 0.7931,
+      "runs": 30,
+      "success_rate": 0.8,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -101,7 +101,7 @@
         "依赖步骤未成功：claims",
         "依赖步骤未成功：worksheets"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "pck-developer": {
@@ -112,8 +112,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 25,
-      "success_rate": 0.72,
+      "runs": 26,
+      "success_rate": 0.7308,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -127,7 +127,7 @@
         "执行前置条件未满足：证据契约范围内没有可用于 PCK 的 Claim",
         "依赖步骤未成功：evidence"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "media-router": {
@@ -294,8 +294,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 24,
-      "success_rate": 0.6667,
+      "runs": 25,
+      "success_rate": 0.68,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -307,7 +307,7 @@
         "lesson_plan: codex exec 失败（lesson_plan）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com",
         "依赖步骤未成功：teaching_plan"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "assessment-designer": {
@@ -318,8 +318,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 17,
-      "success_rate": 0.8235,
+      "runs": 18,
+      "success_rate": 0.8333,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -330,7 +330,7 @@
         "依赖未成功：lesson-designer",
         "依赖步骤未成功：cases"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "case-designer": {
@@ -341,8 +341,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 13,
-      "success_rate": 0.6923,
+      "runs": 14,
+      "success_rate": 0.7143,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -354,7 +354,7 @@
         "case: codex exec 失败（case）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro),",
         "依赖步骤未成功：lesson_plans"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:26",
       "schema_repair_rate": 0.0
     },
     "script-writer": {
@@ -365,8 +365,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 22,
-      "success_rate": 0.7273,
+      "runs": 23,
+      "success_rate": 0.7391,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -379,7 +379,7 @@
         "依赖未成功：case-designer、hinge-question-designer、lesson-designer",
         "依赖步骤未成功：evidence_topup"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:27",
       "schema_repair_rate": 0.0
     },
     "gate-runner": {
@@ -390,8 +390,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 21,
-      "success_rate": 0.6667,
+      "runs": 22,
+      "success_rate": 0.6818,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -405,7 +405,7 @@
         "依赖未成功：case-designer、hinge-question-designer、lesson-designer、script-writer",
         "依赖步骤未成功：storyboard"
       ],
-      "last_verified": "2026-09-20T04:15:14",
+      "last_verified": "2026-09-20T04:56:27",
       "schema_repair_rate": 0.0
     },
     "dual-coding-designer": {
@@ -510,6 +510,25 @@
         "依赖步骤未成功：load_review"
       ],
       "last_verified": "2026-09-20T04:15:14"
+    },
+    "cognitive-load-analyser": {
+      "skill": "cognitive-load-analyser",
+      "version": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "provider_sha": "6bbbce418f82e11044009c9f3b7373a354de5bd0",
+      "package_sha256": "c86c2353ae639d70b755e0b5a9d97d2353fb7fb84a51b3207e0527d6f22e99c9",
+      "patch": "cognitive-load-analyser-pebs-1",
+      "domain": "",
+      "status": "EXPERIMENTAL",
+      "runs": 1,
+      "success_rate": 1.0,
+      "schema_failure_rate": 0.0,
+      "schema_repair_rate": 0.0,
+      "human_score": null,
+      "teacher_edit_ratio": null,
+      "average_model_calls": 0.0,
+      "average_latency": 0.0,
+      "known_failure_modes": [],
+      "last_verified": "2026-09-20T04:56:26"
     }
   }
 }

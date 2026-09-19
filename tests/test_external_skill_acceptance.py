@@ -264,6 +264,37 @@ def test_acceptance_1_and_2_external_skill_needs_no_pipeline_change(
     ]
 
 
+def test_provider_usage_metadata_never_reaches_the_artifact(synthetic_provider, provider_engine):
+    """`_usage` 是 provider 的用量元数据（内置路径已剔除），不得被 emit 成教学产物。"""
+    engine = provider_engine
+    engine.llm = FakeLLM(
+        external_skill_payloads=[
+            {
+                "section_id": "sec1",
+                "items": [
+                    {
+                        "assessment_id": "q1",
+                        "kind": "hinge_question",
+                        "question": "?",
+                        "options": ["a", "b"],
+                        "answer": "a",
+                        "target_goal": "g1",
+                    }
+                ],
+                "_usage": {"total_tokens": 123},
+            }
+        ]
+    )
+    start, status = run_dynamic_build(engine, REQUEST_1 + " /synthetic-rubric-designer")
+    assert status["run"]["status"] == "succeeded", [
+        (step["step_id"], step["status"], step["error"]) for step in status["steps"]
+    ]
+    revisions = engine.store.revisions_of("assessment:sec1")
+    assert revisions, "外部 Skill 必须产出声明的 artifact"
+    content = engine.store.get_revision(revisions[-1])["content"]
+    assert "_usage" not in json.dumps(content, ensure_ascii=False)
+
+
 def test_schema_repair_is_visible_in_trace_and_performance(synthetic_provider, provider_engine, registry_env):
     """§35：外部 Skill 第一次输出不合法、重生成后通过——必须留痕，否则 Repair Rate 无从计算。"""
     from pebs.benchmark import performance, trace as trace_mod

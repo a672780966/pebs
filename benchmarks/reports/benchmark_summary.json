@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T04:22:59",
+  "generated_at": "2026-09-20T05:18:22",
   "cases": [
     {
       "case_id": "A",
@@ -327,6 +327,27 @@
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
+      },
+      "dynamic [+external-load]": {
+        "status": "succeeded",
+        "attempts": 1,
+        "succeeded": 1,
+        "evidence_policy": null,
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 17.0,
+        "runtime_seconds": 720.33,
+        "skill_failure_rate": 0.0,
+        "schema_repair_rate": 0.0,
+        "locality_preservation_rate": null,
+        "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
       }
     },
     {
@@ -460,7 +481,7 @@
       }
     }
   ],
-  "runs": 19,
+  "runs": 20,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -863,6 +884,33 @@
       "automatic_issues": 0
     },
     {
+      "run_id": "run_4fa43397a016",
+      "case_id": "D",
+      "mode": "dynamic",
+      "variant": "dynamic [+external-load]",
+      "experiment": "external-load",
+      "status": "succeeded",
+      "attempts": 1,
+      "succeeded": 1,
+      "evidence_policy": null,
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 17,
+      "research_calls": 6,
+      "runtime_seconds": 720.33,
+      "skill_failure_rate": 0.0,
+      "schema_repair_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 0
+    },
+    {
       "run_id": "run_48670d5de26c",
       "case_id": "E",
       "mode": "dynamic",
@@ -1038,18 +1086,18 @@
       "attempts": 6.0
     },
     "dynamic": {
-      "variants": 13,
+      "variants": 14,
       "human_score": null,
       "edit_ratio": null,
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
-      "schema_repair_rate": null,
-      "skill_failure_rate": 0.034,
-      "model_calls": 354.0,
-      "runtime_seconds": 20060.42,
-      "succeeded": 18.0,
-      "attempts": 37.0
+      "schema_repair_rate": 0.0,
+      "skill_failure_rate": 0.031,
+      "model_calls": 371.0,
+      "runtime_seconds": 20780.75,
+      "succeeded": 19.0,
+      "attempts": 38.0
     },
     "scenario": {
       "variants": 2,

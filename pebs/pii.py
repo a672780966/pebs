@@ -146,6 +146,7 @@ def semantic_review(llm: Any, text: str, *, context: str = "") -> dict[str, Any]
         return None
     if not isinstance(data, dict):
         return None
+    data.pop("_usage", None)  # 用量元数据不属于隐私判定结果
     risk = str(data.get("risk", "")).upper()
     if risk not in ("LOW", "MEDIUM", "HIGH"):
         return None

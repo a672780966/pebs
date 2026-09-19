@@ -54,4 +54,6 @@ def classify(llm: Any, request: str, deterministic: dict[str, Any], context: dic
     for key in ("confidence", "knowledge_types", "requested_outputs"):
         if key not in data:
             return None
+    # provider 的用量元数据不是路由结果的一部分（会随 router_result 落成产物）
+    data.pop("_usage", None)
     return data

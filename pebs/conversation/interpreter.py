@@ -98,6 +98,7 @@ def interpret(message: str, *, llm: Any = None, sections: list[dict[str, Any]] |
         return result
     if not isinstance(data, dict):
         return result
+    data.pop("_usage", None)  # 用量元数据会随 patch_plan 落成产物，不属于编辑意图
     llm_intent = str(data.get("intent") or "").strip()
     if intent is None and llm_intent in {name for name, _ in INTENT_PRIORITY}:
         result["intent"] = llm_intent
