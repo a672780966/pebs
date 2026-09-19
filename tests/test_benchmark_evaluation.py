@@ -383,6 +383,22 @@ def test_report_reads_teacher_scores_back_from_the_project(engine, registry_env,
     assert stale_summary["cases"][0]["dynamic"]["human_score"] is None
 
 
+def test_trace_carries_selection_trace_for_the_ui(engine, registry_env):
+    """§63：Evaluation Tab 的高级模式要显示"为什么选它/为什么拒绝别的"，trace 必须带上。"""
+    from pebs.benchmark import trace as trace_mod
+
+    engine.llm = FakeLLM()
+    start, status = run_dynamic_build(engine, REQUEST_1)
+    assert status["run"]["status"] == "succeeded"
+    skill_trace = trace_mod.build_trace(engine, start["run_id"])
+    selection = skill_trace["plan"]["selection_trace"]
+    assert selection, "trace.plan.selection_trace 不能为空"
+    assert all(entry["selected"] and entry["reason"] for entry in selection)
+    contested = [entry for entry in selection if entry["rejected_candidates"]]
+    assert contested, "至少有一个产物类型存在多个候选 Skill，才谈得上选择理由"
+    assert contested[0]["rejected_candidates"][0]["rejected_because"]
+
+
 def test_evaluation_endpoints_expose_trace_and_accept_scores(client):
     client.post("/api/projects", json={"project_id": "evaltest"})
     evaluation_payload = _valid_payload()

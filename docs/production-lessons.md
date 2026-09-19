@@ -170,6 +170,21 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — Skill Trace 不带 selection_trace，§63 高级模式永远空白（UI §63/§64）
+
+- **date**: 2026-09-20
+- **task**: M6 §63 Skill Trace UI
+- **symptom**: Evaluation Tab 高级模式的"Skill 选择理由"表永远为空
+- **root_cause**: `trace.build_trace()` 只把 plan 精简成
+  `{plan_id, node_count, terminal_outputs, reused_artifacts, degraded}`，
+  **没有带上 `selection_trace`**；而 UI 读的是 `data.trace.selection_trace`。
+  Planner 里那套"选中理由 + 被拒候选 + 拒选理由"的数据从未进入 trace
+- **skill**: `benchmark-trace`
+- **artifact**: `pebs/benchmark/trace.py`、`pebs/static/index.html`
+- **fix**: trace 的 `plan` 增加 `selection_trace`；UI 兼容读取
+  `trace.plan.selection_trace`（旧位置仍可用），并在被拒候选旁显示拒选理由
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_trace_carries_selection_trace_for_the_ui`
+
 ## 2026-09-20 — 动态链路下门禁读不到产物并静默 PASS（Gate False Negative）（GATES §71-8）
 
 - **date**: 2026-09-20

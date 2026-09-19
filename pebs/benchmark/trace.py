@@ -270,6 +270,9 @@ def build_trace(
             "terminal_outputs": plan.get("terminal_outputs", []),
             "reused_artifacts": plan.get("reused_artifacts", []),
             "degraded": plan.get("degraded", False),
+            # §63/§64：Trace 必须带上"为什么选它 / 为什么拒绝其他候选"，
+            # 否则 Evaluation Tab 的高级模式永远没有可展示的解释。
+            "selection_trace": plan.get("selection_trace", []),
         },
         "skills": skills,
         "gates": gate_results,

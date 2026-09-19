@@ -497,11 +497,11 @@ async function loadEvaluation() {
     <td>${esc(s.patch || "")}</td><td>${esc(s.agent || "")}</td>
     <td><span class="badge ${esc(s.status)}">${esc(s.status)}</span></td>
     <td class="small">${esc(s.reason || s.error || "")}</td></tr>`).join("");
-  const selection = (data.trace?.selection_trace || []);
+  const selection = (data.trace?.plan?.selection_trace || data.trace?.selection_trace || []);
   const selectionRows = selection.map(item => `
     <tr><td>${esc(item.artifact)}</td><td><b>${esc(item.selected)}</b>（${esc(item.selected_score ?? "")}）</td>
     <td class="small">${esc(item.reason)}</td>
-    <td class="small">${esc((item.rejected_candidates || []).map(c => `${c.candidate}(${c.score})`).join("、"))}</td></tr>`).join("");
+    <td class="small">${esc((item.rejected_candidates || []).slice(0, 3).map(c => `${c.candidate}（${c.score}）— ${c.rejected_because || ""}`).join("；"))}</td></tr>`).join("");
   const perf = Object.entries(data.performance || {}).filter(([name]) => (trace.skills || []).some(s => s.skill === name));
   const perfRows = perf.map(([name, rec]) => `    <tr><td>${esc(name)}</td><td>${rec.runs}</td><td>${rec.success_rate}</td>
     <td>${rec.human_score ?? ""}</td><td>${rec.teacher_edit_ratio ?? ""}</td>
