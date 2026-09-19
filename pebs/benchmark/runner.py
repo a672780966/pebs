@@ -142,6 +142,7 @@ def run_scenario(
 
     before = metrics.snapshot_hashes(engine.store)
     scenario = str(case.get("scenario"))
+    scenario_skills: list[dict[str, Any]] = []
     if scenario == "local_edit":
         instruction = str(case.get("edit_instruction") or case["request"])
         result = engine.conversation_edit(instruction)
@@ -182,6 +183,11 @@ def run_scenario(
         plan = engine.store.get_revision(revisions[-1])["content"] if revisions else {}
         nodes = [(node.get("skill"), bool(node.get("reused"))) for node in plan.get("nodes", [])]
         reused = [skill for skill, flag in nodes if flag]
+        try:
+            scenario_trace = trace.build_trace(engine, start["run_id"], case_id=case["id"], mode="scenario")
+            scenario_skills = scenario_trace.get("skills", [])
+        except Exception:  # noqa: BLE001 - 场景 run 的 provenance 尽力而为
+            scenario_skills = []
         record.update(
             {
                 "run_id": start["run_id"],
@@ -203,7 +209,9 @@ def run_scenario(
         {
             "wall_time_seconds": round(time.time() - started, 2),
             "fixtures": _fixture_hashes(case),
-            "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
+            "reproducibility": trace.reproducibility(
+                fixture_hashes=_fixture_hashes(case), skills=scenario_skills
+            ),
             "run_dir": str(target),
         }
     )
@@ -347,7 +355,8 @@ def run_case(
             "project_id": project,
             "wall_time_seconds": round(time.time() - started, 2),
             "fixtures": _fixture_hashes(case),
-            "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
+            "reproducibility": (record.get("trace") or {}).get("reproducibility")
+            or trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
             "experiment": experiment or ("+".join(extra_skills) if extra_skills else ""),
             "extra_skills": extra_skills,
             "run_dir": str(target),
@@ -388,7 +397,7 @@ def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[st
         run_id,
         case_id=case["id"],
         mode=mode,
-        reproduce=trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
+        fixture_hashes=_fixture_hashes(case),
     )
     summary = metrics.summarize_run(skill_trace)
     hashes = metrics.snapshot_hashes(engine.store)

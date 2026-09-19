@@ -316,6 +316,21 @@ def test_metrics_edit_ratio_and_locality():
     assert broken["preserve_violations"] == ["script:sec1"]
 
 
+def test_reproducibility_records_commit_and_skill_provenance():
+    """§41：run 记录必须含 PEBS commit、provider SHA、skill patch —— 版本号不足以复现。"""
+    reproducible = trace.reproducibility(
+        fixture_hashes={"m.md": "abc"},
+        skills=[
+            {"skill": "dual-coding-designer", "upstream_sha": "6bbbce41", "patch": "dual-coding-pebs-1"},
+            {"skill": "script-writer"},
+        ],
+    )
+    for field in ("pebs_commit", "registry_hash", "rules_version", "timestamp", "fixture_hashes"):
+        assert field in reproducible, f"§41 要求记录 {field}"
+    assert reproducible["skill_provider_shas"] == ["6bbbce41"]
+    assert reproducible["skill_patches"] == ["dual-coding-designer@dual-coding-pebs-1"]
+
+
 def test_performance_registry_records_versions_and_promotion(tmp_path, monkeypatch):
     from pebs import config
 

@@ -170,6 +170,22 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — run 记录里没有 PEBS commit / provider SHA / patch，§41 复现信息不完整（BENCHMARK §41）
+
+- **date**: 2026-09-20
+- **task**: M6.4 benchmark 可复现性
+- **symptom**: `run.json` 的 `reproducibility` 只有 pebs_version（`0.6.0-dev`）、registry hash、
+  rules version、fixture hash；缺少 §41 明确要求的 **PEBS commit** 与 **Skill provider SHA / Skill patches**
+- **root_cause**: `pebs_version()` 返回的是包版本号（开发期恒为 `0.6.0-dev`），不能定位代码版本；
+  provider SHA / patch 只存在于 trace 的 per-skill 条目里，run 级 `reproducibility` 没带
+- **skill**: `benchmark-trace`
+- **artifact**: `pebs/benchmark/trace.py`、`pebs/benchmark/runner.py`
+- **fix**: 新增 `pebs_commit()`（`PEBS_COMMIT` 环境变量优先，否则 `git rev-parse HEAD`，失败返回空）；
+  `reproducibility()` 接受 skill 列表并输出 `skill_provider_shas` / `skill_patches` / `skill_package_sha256`；
+  `build_trace()` 增加 `fixture_hashes` 参数，默认 provenance 由 trace 自身计算，
+  `run_case()` 直接采用 trace 的（含 skill 版本）而不是另算一份不含 skill 的
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_reproducibility_records_commit_and_skill_provenance`
+
 ## 2026-09-20 — Acceptance 1/2 只有"隐含"证据：没有断言新增外部 Skill 未改 pipeline.py（INTEGRATION §16/§71-1）
 
 - **date**: 2026-09-20

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import subprocess
 import time
 from importlib import metadata
 from pathlib import Path
@@ -30,15 +32,50 @@ def pebs_version() -> str:
         return "0.6.0-dev"
 
 
-def reproducibility(*, fixture_hashes: dict[str, str] | None = None) -> dict[str, Any]:
-    """§41：每次 benchmark run 必须能回答"用什么跑出来的"。"""
+def pebs_commit() -> str:
+    """§41：run 记录必须能回答"哪个 commit 跑出来的"（版本号不足以复现）。"""
+    env = os.environ.get("PEBS_COMMIT")
+    if env and env.strip():
+        return env.strip()
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(Path(__file__).resolve().parents[2]),
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def reproducibility(
+    *, fixture_hashes: dict[str, str] | None = None, skills: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
+    """§41：每次 benchmark run 必须能回答"用什么跑出来的"。
+
+    `skills` 来自 Skill Trace：补上 provider SHA 与 patch —— 只记 "dual-coding
+    performed well" 在升级后没有意义（§40）。
+    """
+    provider_shas = sorted({str(item.get("upstream_sha") or "") for item in (skills or []) if item.get("upstream_sha")})
+    patches = sorted(
+        {f"{item.get('skill')}@{item.get('patch')}" for item in (skills or []) if item.get("patch")}
+    )
+    package_hashes = sorted(
+        {str(item.get("package_sha256") or "") for item in (skills or []) if item.get("package_sha256")}
+    )
     return {
+        "pebs_commit": pebs_commit(),
         "pebs_version": pebs_version(),
         "registry_hash": registry_hash(),
         "rules_version": config.RULES_VERSION,
         "model": str((config.PROVIDERS.get("llm") or {}).get("model") or ""),
         "provider_kind": str((config.PROVIDERS.get("llm") or {}).get("kind") or ""),
         "reasoning_effort": str((config.PROVIDERS.get("llm") or {}).get("reasoning_effort") or ""),
+        "skill_provider_shas": provider_shas,
+        "skill_patches": patches,
+        "skill_package_sha256": package_hashes,
         "fixture_hashes": fixture_hashes or {},
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
     }
@@ -112,7 +149,15 @@ def _step_duration(step: dict[str, Any]) -> float | None:
     return max(round(end_ts - start_ts, 1), 0.0)
 
 
-def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", reproduce: dict[str, Any] | None = None) -> dict[str, Any]:
+def build_trace(
+    engine: Any,
+    run_id: str,
+    *,
+    case_id: str = "",
+    mode: str = "",
+    reproduce: dict[str, Any] | None = None,
+    fixture_hashes: dict[str, str] | None = None,
+) -> dict[str, Any]:
     """从 Store 里重建一次运行的 Skill Trace（不依赖内存状态）。"""
     store = engine.store
     run = store.get_run(run_id)
@@ -220,5 +265,6 @@ def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", 
         "skills": skills,
         "gates": gate_results,
         "human_review": human_review,
-        "reproducibility": reproduce or reproducibility(),
+        # §41：不传 reproduce 时也要带上 provider SHA / patch，否则历史数据升级后失效
+        "reproducibility": reproduce or reproducibility(fixture_hashes=fixture_hashes, skills=skills),
     }
