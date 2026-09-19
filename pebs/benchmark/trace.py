@@ -98,6 +98,20 @@ def _skill_for_step(step_id: str) -> str:
     return ""
 
 
+def _step_duration(step: dict[str, Any]) -> float | None:
+    """§39：Skill Trace 需要 per-skill duration；steps 表有 started_at/ended_at（秒精度）。"""
+    started = str(step.get("started_at") or "")
+    ended = str(step.get("ended_at") or "")
+    if not started or not ended:
+        return None
+    try:
+        start_ts = time.mktime(time.strptime(started, "%Y-%m-%dT%H:%M:%S"))
+        end_ts = time.mktime(time.strptime(ended, "%Y-%m-%dT%H:%M:%S"))
+    except ValueError:
+        return None
+    return max(round(end_ts - start_ts, 1), 0.0)
+
+
 def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", reproduce: dict[str, Any] | None = None) -> dict[str, Any]:
     """从 Store 里重建一次运行的 Skill Trace（不依赖内存状态）。"""
     store = engine.store
@@ -139,6 +153,9 @@ def build_trace(engine: Any, run_id: str, *, case_id: str = "", mode: str = "", 
                 "step_id": step["step_id"],
                 "status": step["status"],
                 "attempts": step.get("attempts", 0),
+                "duration": _step_duration(step),
+                "started_at": step.get("started_at"),
+                "ended_at": step.get("ended_at"),
                 "note": step.get("note") or "",
                 "error": step.get("error") or "",
                 "input_artifacts": inputs,

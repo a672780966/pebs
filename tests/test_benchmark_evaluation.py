@@ -180,6 +180,12 @@ def test_trace_resolves_pipeline_steps_to_registry_skills(engine, registry_env):
     assert all(" " not in name for name in names), names
     unresolved = [name for name in names if name.startswith("step:")]
     assert not unresolved, unresolved
+    # §39：Trace 需要 per-skill 时长与调用结果，便于定位慢步骤与失败模式
+    for entry in skill_trace["skills"]:
+        assert "duration" in entry
+        assert entry["status"] in ("SUCCEEDED", "FAILED", "BLOCKED", "CANCELLED", "PENDING", "RUNNING")
+    succeeded = [entry for entry in skill_trace["skills"] if entry["status"] == "SUCCEEDED"]
+    assert any(entry["duration"] is not None for entry in succeeded), "已完成的步骤应记录时长"
 
 
 def test_engine_build_trace_records_performance(engine, registry_env):
