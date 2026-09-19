@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-19T08:11:00",
+  "generated_at": "2026-09-19T08:41:34",
   "cases": [
     {
       "case_id": "A",
@@ -231,8 +231,8 @@
       "case_id": "F",
       "scenario": {
         "status": "succeeded",
-        "attempts": 13,
-        "succeeded": 6,
+        "attempts": 2,
+        "succeeded": 2,
         "evidence_policy": [
           "SUPPORTED"
         ],
@@ -252,8 +252,8 @@
       "case_id": "G",
       "scenario": {
         "status": "succeeded",
-        "attempts": 9,
-        "succeeded": 6,
+        "attempts": 1,
+        "succeeded": 1,
         "evidence_policy": [
           "SUPPORTED"
         ],
@@ -577,8 +577,8 @@
       "variant": "scenario",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 13,
-      "succeeded": 6,
+      "attempts": 2,
+      "succeeded": 2,
       "evidence_policy": [
         "SUPPORTED"
       ],
@@ -602,8 +602,8 @@
       "variant": "scenario",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 9,
-      "succeeded": 6,
+      "attempts": 1,
+      "succeeded": 1,
       "evidence_policy": [
         "SUPPORTED"
       ],

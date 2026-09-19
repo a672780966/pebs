@@ -35,9 +35,17 @@ def _patch_providers(monkeypatch):
     monkeypatch.setattr(engine_mod, "get_research", lambda: FakeResearch())
 
 
-def test_local_edit_scenario_reports_locality(tmp_path, monkeypatch):
+def _isolate(tmp_path, monkeypatch):
+    """hermetic 测试不得把 run.json 写进仓库的 benchmarks/runs（会污染真实报告）。"""
+    runs = tmp_path / "runs"
+    runs.mkdir(parents=True, exist_ok=True)
     monkeypatch.setattr(config, "PROJECTS_DIR", tmp_path / "projects")
+    monkeypatch.setattr(runner.cases, "runs_dir", lambda: runs)
     _patch_providers(monkeypatch)
+
+
+def test_local_edit_scenario_reports_locality(tmp_path, monkeypatch):
+    _isolate(tmp_path, monkeypatch)
 
     record = runner.run_scenario("F", project_id="bench-f-scenario")
     assert record["base_run_status"] == "succeeded", record
@@ -51,8 +59,7 @@ def test_local_edit_scenario_reports_locality(tmp_path, monkeypatch):
 
 
 def test_ppt_only_scenario_reuses_the_existing_course(tmp_path, monkeypatch):
-    monkeypatch.setattr(config, "PROJECTS_DIR", tmp_path / "projects")
-    _patch_providers(monkeypatch)
+    _isolate(tmp_path, monkeypatch)
 
     record = runner.run_scenario("G", project_id="bench-g-scenario")
     assert record["base_run_status"] == "succeeded", record

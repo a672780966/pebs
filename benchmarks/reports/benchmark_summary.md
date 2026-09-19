@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-19T08:11:00；run 数（每 case×mode 取最新）：14
+生成时间：2026-09-19T08:41:34；run 数（每 case×mode 取最新）：14
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -16,8 +16,8 @@
 | B | dynamic [+external-media-B] | running | 0/1 | None | None | None | None | None | 40.0 | 7826.67 | 3.0 |
 | C | dynamic | succeeded | 3/5 | None | None | None | None | None | 48.0 | 1868.79 | 0.0 |
 | D | dynamic | succeeded | 2/3 | None | None | None | None | None | 10.0 | 371.08 | 1.0 |
-| F | scenario | succeeded | 6/13 | None | None | None | None | None | 5.0 | 1964.68 | 0.0 |
-| G | scenario | succeeded | 6/9 | None | None | None | None | None | 9.0 | 2354.22 | 0.0 |
+| F | scenario | succeeded | 2/2 | None | None | None | None | None | 5.0 | 1964.68 | 0.0 |
+| G | scenario | succeeded | 1/1 | None | None | None | None | None | 9.0 | 2354.22 | 0.0 |
 
 ## Skill Performance Registry（§19/§40；内部 skills 全部记录）
 
