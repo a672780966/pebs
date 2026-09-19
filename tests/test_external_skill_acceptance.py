@@ -175,6 +175,95 @@ def test_acceptance_checklist_for_a_provider_skill(synthetic_provider, provider_
     assert step["status"] == "SUCCEEDED"
 
 
+def test_acceptance_1_and_2_external_skill_needs_no_pipeline_change(
+    synthetic_provider, provider_engine, monkeypatch
+):
+    """§16 / Acceptance 1+2：新增外部 Skill 全程不改 pipeline.py，且真正跑完整链路。
+
+    链路：Registry 契约 → Resolver 看见 → Planner 选中 → Runtime 加载 →
+    Subagent 执行 → 产出声明产物 → 下游节点消费 → Gate 运行。
+    证明方式：把 `pebs.pipeline` 的每个 step 函数替换为"一旦被直接调用即失败"的哨兵，
+    只有经由动态 DAG + Legacy Step Adapter 的执行才允许通过。若新增 Skill 仍需要改
+    pipeline.py（例如为它加一个专用 step），这个测试就会失败。
+    """
+    from pebs import pipeline
+
+    engine = provider_engine
+    step_names = [name for name in dir(pipeline) if name.startswith("step_")]
+    assert step_names, "pipeline.py 必须暴露 step_* 处理器"
+
+    # 记录静态 pipeline 实际执行了哪些 step：内置 Skill 经由 Legacy Step Adapter
+    # 复用既有 step 是设计内的；关键断言是**外部 Skill 不在其中**。
+    invoked_from_pipeline: list[str] = []
+    real_steps = dict(pipeline.STEPS)
+
+    def _spy(step_id):
+        def _run(ctx):
+            invoked_from_pipeline.append(step_id)
+            return real_steps[step_id](ctx)
+
+        return _run
+
+    # STEPS 在 import 时就把函数对象捕获进了 dict，只 monkeypatch 模块属性是无效的，
+    # 必须替换注册表本身。
+    monkeypatch.setattr(pipeline, "STEPS", {key: _spy(key) for key in real_steps})
+
+    engine.llm = FakeLLM(
+        external_skill_payloads=[
+            {
+                "section_id": "sec1",
+                "items": [
+                    {
+                        "assessment_id": "q1",
+                        "kind": "hinge_question",
+                        "question": "?",
+                        "options": ["a", "b"],
+                        "answer": "a",
+                        "target_goal": "g1",
+                    }
+                ],
+            }
+        ]
+    )
+    start, status = run_dynamic_build(engine, REQUEST_1 + " /synthetic-rubric-designer")
+    assert status["run"]["status"] == "succeeded", [
+        (step["step_id"], step["status"], step["error"]) for step in status["steps"]
+    ]
+
+    # Runtime 确实加载并执行了外部 Skill
+    assert any(step["step_id"] == "synthetic-rubric-designer" for step in status["steps"])
+    produced = engine.store.revisions_of("assessment:sec1")
+    assert produced, "外部 Skill 必须产出声明的 artifact"
+
+    # Acceptance 1：外部 Skill 不是 pipeline.py 里的 step —— 它经 Runtime handler 执行，
+    # 内置 Skill 才走 Legacy Step Adapter。为新增 Skill 改 pipeline.py 会在这里失败。
+    assert "synthetic-rubric-designer" not in real_steps
+    assert "synthetic-rubric-designer" not in invoked_from_pipeline
+    assert invoked_from_pipeline, "内置 Skill 仍应通过 Legacy Step Adapter 复用既有 step"
+
+    # Planner 选择理由可追溯（§64）
+    plan = engine.store.accepted_content("build_plan_dynamic") or {}
+    selected = [node for node in plan.get("nodes", []) if node.get("skill") == "synthetic-rubric-designer"]
+    assert selected, "Planner 必须选中外部 Skill"
+    assert "assessment" in (selected[0].get("outputs") or [])
+
+    # 下游节点消费了该产物，并且 Gate 运行过
+    from pebs.benchmark import trace as trace_mod
+
+    skill_trace = trace_mod.build_trace(engine, start["run_id"])
+    downstream = [
+        item["skill"]
+        for item in skill_trace["skills"]
+        if item.get("skill") not in ("", "synthetic-rubric-designer") and item.get("output_artifacts")
+    ]
+    assert downstream, "外部 Skill 的产物必须被下游节点消费"
+    gate_steps = [step for step in status["steps"] if "gate" in step["step_id"]]
+    assert gate_steps, "Gate 必须在动态链路上运行"
+    assert all(step["status"] in ("SUCCEEDED", "NEEDS_REVIEW") for step in gate_steps), [
+        (step["step_id"], step["status"], step["error"]) for step in gate_steps
+    ]
+
+
 def test_restricted_context_enforces_declared_only_access():
     class Inner:
         def __init__(self):

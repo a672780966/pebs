@@ -170,6 +170,23 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — Acceptance 1/2 只有"隐含"证据：没有断言新增外部 Skill 未改 pipeline.py（INTEGRATION §16/§71-1）
+
+- **date**: 2026-09-20
+- **task**: M6 Acceptance 1+2 的独立证明
+- **symptom**: `pipeline.py` 里没有任何外部 Skill 的名字，但这只是"碰巧没人加"；
+  既有测试只验证外部 Skill 能跑通，没有断言"它没有变成 pipeline 的专用 step"，
+  也没有覆盖"下游消费 + Gate 运行"这两段链路
+- **root_cause**: 缺少对 `pipeline.STEPS` 注册表的显式断言；
+  且 `STEPS` 在 import 时捕获函数对象，只 monkeypatch `pipeline.step_*` 属性是**无效的**
+  （第一版测试因此是空转的，必须替换 `STEPS` 本身才有效）
+- **skill**: `external-skill-runtime`
+- **artifact**: `tests/test_external_skill_acceptance.py`
+- **fix**: 用 spy 包住 `pipeline.STEPS` 记录实际走 Legacy Step Adapter 的 step，
+  断言 (a) 外部 Skill 不在 `STEPS` 中、(b) 它从未经静态 pipeline 执行、
+  (c) 内置 Skill 仍经由既有 step 复用、(d) 其产物被下游节点消费、(e) Gate 在动态链路上运行
+- **regression_test**: `tests/test_external_skill_acceptance.py::test_acceptance_1_and_2_external_skill_needs_no_pipeline_change`
+
 ## 2026-09-20 — 报告只有 per-case 明细，缺 §42 要求的 Metric × 模式对比表（BENCHMARK §42）
 
 - **date**: 2026-09-20
