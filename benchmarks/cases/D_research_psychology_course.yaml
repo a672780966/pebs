@@ -7,7 +7,8 @@ request: |
   先查研究，区分相关与因果，标出研究限制，再形成课程设计。
   不得把相关性写成因果结论，不得把群体统计写成对具体学生的判断。
 template_fixture: ""
-material_fixtures: []
+material_fixtures:
+  - fixtures/materials/phone_anxiety_abstracts.md
 expect:
   routing:
     knowledge_types_any_of: [concept, research_literacy, critical_thinking]

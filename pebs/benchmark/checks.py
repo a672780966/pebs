@@ -82,6 +82,28 @@ def routing_checks(route: dict[str, Any], expect: dict[str, Any]) -> list[dict[s
 
 
 NEGATION_WINDOW = ("不要", "不能", "避免", "禁止", "别", "不得", "拒绝", "不将", "不应")
+# §50/§53：作为"错误写法示例"被引号或"写成/误写为/不能说成"标记的片段，不算违规
+QUOTED_EXAMPLE_PATTERNS = (
+    r"[「“\"][^」”\"]{0,40}%s[^」”\"]{0,40}[」”\"]",
+    r"(?:写成|误写为|不能写成|不应写成|不可写成|不能说成|不要说成|别写成)[^。；\n]{0,30}%s",
+    r"(?:错误写法|反例|常见误区|易错)[^。；\n]{0,40}%s",
+)
+
+
+def _in_example_context(text: str, start: int, pattern: str, *, window: int = 16) -> bool:
+    import re as _re
+
+    prefix = text[max(0, start - window) : start]
+    if any(token in prefix for token in NEGATION_WINDOW):
+        return True
+    for template in QUOTED_EXAMPLE_PATTERNS:
+        try:
+            regex = _re.compile(template % _re.escape(pattern))
+        except _re.error:
+            continue
+        if regex.search(text):
+            return True
+    return False
 
 
 def _in_negative_context(text: str, start: int, *, window: int = 14) -> bool:
@@ -103,7 +125,7 @@ def content_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
     for artifact_id, text in texts.items():
         for pattern in content.get("banned_regex", []):
             for match in re.finditer(pattern, text):
-                if _in_negative_context(text, match.start()):
+                if _in_example_context(text, match.start(), pattern):
                     continue
                 issues.append({"kind": "SAFETY", "detail": f"{artifact_id} 命中禁用表达：{pattern}"})
                 break

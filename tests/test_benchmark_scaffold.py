@@ -60,6 +60,32 @@ def test_human_rubric_has_fourteen_dimensions():
     assert {"score", "comment", "must_fix", "nice_to_have"} <= set(data["notes_required"])
 
 
+def test_banned_regex_ignores_quoted_error_examples():
+    """§50：被引号或"写成/误写为"标记的错误写法示例，不算违规。"""
+    store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "常见误区：把相关写成“手机使用导致焦虑”；正确表述是“手机使用与焦虑相关，但不能确定因果方向”。",
+            }
+        }
+    )
+    expect = {"content": {"artifact_types": ["script"], "banned_regex": ["导致焦虑"]}}
+    assert checks.evaluate(store, expect)["ok"] is True
+
+    bad_store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "研究证明手机使用导致焦虑，所以我们要减少使用。",
+            }
+        }
+    )
+    bad = checks.evaluate(bad_store, expect)
+    assert bad["ok"] is False
+    assert bad["issues"][0]["kind"] == "SAFETY"
+
+
 def test_banned_regex_ignores_negative_examples():
     """教学反例（"不要写'这个孩子就是…'"）不应被判为标签化违规。"""
     store = _StubStore(
