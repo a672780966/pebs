@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T00:40:38",
+  "generated_at": "2026-09-20T01:48:43",
   "cases": [
     {
       "case_id": "A",
@@ -19,6 +19,8 @@
         "model_calls": 12.0,
         "runtime_seconds": 348.53,
         "automatic_issues": 11.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "direct_codex": {
@@ -37,6 +39,8 @@
         "model_calls": 1.0,
         "runtime_seconds": 167.42,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "dynamic": {
@@ -55,6 +59,8 @@
         "model_calls": 22.0,
         "runtime_seconds": 770.7,
         "automatic_issues": 3.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "dynamic [+external-media-A2]": {
@@ -73,6 +79,8 @@
         "model_calls": 22.0,
         "runtime_seconds": 1012.21,
         "automatic_issues": 3.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "dynamic [+external-media-A]": {
@@ -91,6 +99,8 @@
         "model_calls": 25.0,
         "runtime_seconds": 1466.48,
         "automatic_issues": 3.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "dynamic [+external-media]": {
@@ -109,6 +119,8 @@
         "model_calls": 28.0,
         "runtime_seconds": 1020.85,
         "automatic_issues": 3.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -128,6 +140,8 @@
         "model_calls": 1.0,
         "runtime_seconds": 210.04,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "dynamic": {
@@ -146,6 +160,8 @@
         "model_calls": 45.0,
         "runtime_seconds": 1235.35,
         "automatic_issues": 1.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "dynamic [+empty-claims-policy]": {
@@ -164,6 +180,28 @@
         "model_calls": 33.0,
         "runtime_seconds": 925.75,
         "automatic_issues": 3.0,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
+      },
+      "dynamic [+external-media-B]": {
+        "status": "interrupted",
+        "attempts": 1,
+        "succeeded": 0,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 40.0,
+        "runtime_seconds": 7826.67,
+        "automatic_issues": 3.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -185,6 +223,8 @@
         "model_calls": 48.0,
         "runtime_seconds": 1868.79,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -206,6 +246,8 @@
         "model_calls": 10.0,
         "runtime_seconds": 371.08,
         "automatic_issues": 1.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       },
       "dynamic [+external-assessment]": {
@@ -222,6 +264,8 @@
         "model_calls": 16.0,
         "runtime_seconds": 951.75,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -243,6 +287,8 @@
         "model_calls": 26.0,
         "runtime_seconds": 678.8,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -264,6 +310,8 @@
         "model_calls": 5.0,
         "runtime_seconds": 1964.68,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -285,6 +333,8 @@
         "model_calls": 9.0,
         "runtime_seconds": 2354.22,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -306,6 +356,8 @@
         "model_calls": 32.0,
         "runtime_seconds": 1570.97,
         "automatic_issues": 3.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     },
@@ -327,11 +379,13 @@
         "model_calls": 7.0,
         "runtime_seconds": 361.02,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
         "runs": 1
       }
     }
   ],
-  "runs": 17,
+  "runs": 18,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -351,6 +405,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 12,
       "research_calls": 5,
       "runtime_seconds": 348.53,
@@ -376,6 +433,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 1,
       "research_calls": 0,
       "runtime_seconds": 167.42,
@@ -401,6 +461,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 22,
       "research_calls": 0,
       "runtime_seconds": 770.7,
@@ -426,6 +489,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 28,
       "research_calls": 5,
       "runtime_seconds": 1020.85,
@@ -451,6 +517,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 25,
       "research_calls": 4,
       "runtime_seconds": 1466.48,
@@ -476,6 +545,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 22,
       "research_calls": 0,
       "runtime_seconds": 1012.21,
@@ -499,6 +571,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 1,
       "research_calls": 0,
       "runtime_seconds": 210.04,
@@ -524,6 +599,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 45,
       "research_calls": 33,
       "runtime_seconds": 1235.35,
@@ -549,9 +627,40 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 33,
       "research_calls": 24,
       "runtime_seconds": 925.75,
+      "skill_failure_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 3
+    },
+    {
+      "run_id": "run_810144e1835a",
+      "case_id": "B",
+      "mode": "dynamic",
+      "variant": "dynamic [+external-media-B]",
+      "experiment": "external-media-B",
+      "status": "interrupted",
+      "attempts": 1,
+      "succeeded": 0,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 40,
+      "research_calls": 28,
+      "runtime_seconds": 7826.67,
       "skill_failure_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 3
@@ -574,6 +683,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 48,
       "research_calls": 12,
       "runtime_seconds": 1868.79,
@@ -599,6 +711,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 10,
       "research_calls": 0,
       "runtime_seconds": 371.08,
@@ -622,6 +737,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 16,
       "research_calls": 12,
       "runtime_seconds": 951.75,
@@ -647,6 +765,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 26,
       "research_calls": 34,
       "runtime_seconds": 678.8,
@@ -672,6 +793,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 5,
       "research_calls": null,
       "runtime_seconds": 1964.68,
@@ -697,6 +821,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 9,
       "research_calls": null,
       "runtime_seconds": 2354.22,
@@ -722,6 +849,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 32,
       "research_calls": 30,
       "runtime_seconds": 1570.97,
@@ -747,6 +877,9 @@
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
       "model_calls": 7,
       "research_calls": 0,
       "runtime_seconds": 361.02,

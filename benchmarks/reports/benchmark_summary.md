@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-20T00:40:38；run 数（每 case×mode 取最新）：17
+生成时间：2026-09-20T01:48:43；run 数（每 case×mode 取最新）：18
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -13,6 +13,7 @@
 | B | direct_codex | succeeded | 1/1 | None | None | None | None | None | 1.0 | 210.04 | 0.0 |
 | B | dynamic | succeeded | 1/5 | None | None | None | None | None | 45.0 | 1235.35 | 1.0 |
 | B | dynamic [+empty-claims-policy] | blocked | 0/1 | None | None | None | None | None | 33.0 | 925.75 | 3.0 |
+| B | dynamic [+external-media-B] | interrupted | 0/1 | None | None | None | None | None | 40.0 | 7826.67 | 3.0 |
 | C | dynamic | succeeded | 3/5 | None | None | None | None | None | 48.0 | 1868.79 | 0.0 |
 | D | dynamic | succeeded | 2/3 | None | None | None | None | None | 10.0 | 371.08 | 1.0 |
 | D | dynamic [+external-assessment] | failed | 0/1 | None | None | None | None | None | 16.0 | 951.75 | 0.0 |

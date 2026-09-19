@@ -130,6 +130,16 @@ def record(engine: Any, payload: dict[str, Any], *, run_id: str = "", mode: str 
         rules_version=config.RULES_VERSION,
     )
     engine.store.set_accepted("human_eval", info["revision_id"])
+    # §40：评分必须绑定到具体 skill 版本，否则升级后历史数据失效。
+    # 之前 update_performance 只在测试里被调用，真实提交（CLI/API）从不更新 registry。
+    if run_id:
+        try:
+            from . import trace as trace_mod
+
+            skill_trace = trace_mod.build_trace(engine, run_id, mode=mode)
+            update_performance(engine, skill_trace, content)
+        except Exception:  # noqa: BLE001 - 评分本身已落库；绑定失败不应吞掉评分
+            pass
     return content
 
 

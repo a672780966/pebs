@@ -60,8 +60,10 @@ def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
     grouped: dict[tuple[str, str, str], list[tuple[tuple[str, float], dict[str, Any]]]] = {}
     for path in sorted(directory.glob("*/run.json")):
         try:
-            record = json.loads(path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
+            # 用 utf-8-sig 读取：Windows 上写出的 run.json 可能带 BOM，
+            # 带 BOM 时 json.loads 会抛 JSONDecodeError，这个 run 就会从报告里静默消失。
+            record = json.loads(path.read_text(encoding="utf-8-sig"))
+        except (json.JSONDecodeError, OSError):
             continue
         # §46：Builtin / External / Hybrid 是不同实验，必须分行对比而不是互相覆盖
         key = (
@@ -101,6 +103,9 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
         "evidence_errors": human.get("evidence_errors"),
         "routing_errors": human.get("routing_errors"),
         "plan_errors": human.get("plan_errors"),
+        "reviewer": human.get("reviewer"),
+        "human_eval_run_id": human.get("run_id"),
+        "human_eval_stale": bool(run.get("human_eval_stale")),
         "model_calls": metrics.get("model_calls"),
         "research_calls": metrics.get("research_calls"),
         "runtime_seconds": metrics.get("wall_time_seconds") or run.get("wall_time_seconds"),
@@ -110,8 +115,61 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def human_eval_for_run(run: dict[str, Any]) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    """§30/§33/§42：把项目里已接受的教师评分绑回它的 run。
+
+    评分以 Artifact 形式落在项目 Store（`human_eval`），而不是 run.json；
+    报告必须主动读回来，否则 Human Score / Edit Ratio / Evidence Errors 列永远是空的。
+    返回 `(bound, stale)`：评分记录的 run_id 为空或与该 run 一致时是 bound；
+    指向另一版产物时是 stale（仍然显示，但标明"评分针对另一版产物"，不静默丢弃）。
+    """
+    project_id = str(run.get("project_id") or "")
+    if not project_id:
+        return None, None
+    try:
+        from .. import config
+        from ..store import Store
+
+        base = config.project_dir(project_id)
+        if not (base / "state.db").exists():
+            return None, None
+        store = Store(project_id, base)
+    except Exception:  # noqa: BLE001 - 项目已被清理/不可读时视为未评分
+        return None, None
+    try:
+        content = store.accepted_content("human_eval")
+    except Exception:  # noqa: BLE001
+        content = None
+    finally:
+        try:
+            store.close()
+        except Exception:  # noqa: BLE001
+            pass
+    if not isinstance(content, dict):
+        return None, None
+    bound_run = str(content.get("run_id") or "")
+    if bound_run and bound_run != str(run.get("run_id") or ""):
+        return None, content
+    return content, None
+
+
+def _with_human_eval(run: dict[str, Any]) -> dict[str, Any]:
+    if run.get("human_eval") or run.get("human_eval_stale"):
+        return run
+    bound, stale = human_eval_for_run(run)
+    if bound is None and stale is None:
+        return run
+    enriched = dict(run)
+    if bound is not None:
+        enriched["human_eval"] = bound
+    if stale is not None:
+        enriched["human_eval_stale"] = stale
+    return enriched
+
+
 def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     runs = runs if runs is not None else load_runs()
+    runs = [_with_human_eval(run) for run in runs]
     rows = [_row_for(run) for run in runs]
     by_case: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
@@ -138,6 +196,8 @@ def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
                 "model_calls": _sum(row["model_calls"] for row in matching),
                 "runtime_seconds": _sum(row["runtime_seconds"] for row in matching),
                 "automatic_issues": _sum(row["automatic_issues"] for row in matching),
+                "reviewers": sorted({str(row["reviewer"]) for row in matching if row.get("reviewer")}),
+                "human_eval_stale": any(row.get("human_eval_stale") for row in matching),
                 "runs": len(matching),
             }
         table.append(entry)

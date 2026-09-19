@@ -78,21 +78,19 @@ def test_human_eval_is_recorded_as_artifact_and_updates_performance(engine, regi
     start, status = run_dynamic_build(engine, REQUEST_1)
     assert status["run"]["status"] == "succeeded"
     engine.accept(start["changeset_id"])
-    from pebs.benchmark import trace as trace_mod
-
-    skill_trace = trace_mod.build_trace(engine, start["run_id"])
     content = evaluation.record(engine, _valid_payload(), run_id=start["run_id"], mode="dynamic")
     assert content["overall"] == pytest.approx(3.857, abs=0.01)
     assert content["edit_ratio"] > 0
     assert content["edit_severities"] == {"S3": 1, "S1": 1}
     assert evaluation.latest(engine)["reviewer"] == "张老师"
 
-    evaluation.update_performance(engine, skill_trace, content)
+    # §40：record() 自身就必须把评分绑定到 skill 版本（真实提交路径不做第二次手动调用）
     performance_data = performance.load_performance()
     script_writer = performance_data["skills"].get("script-writer")
     assert script_writer, "performance registry 必须记录被评分的 skill"
     assert script_writer["runs"] >= 1
     assert script_writer["human_score"] is not None
+    assert script_writer["teacher_edit_ratio"] is not None
 
     promoted = performance.promotion_decision(script_writer)
     assert promoted["eligible"] in (True, False)
@@ -281,6 +279,63 @@ def test_representative_run_uses_run_timestamp_not_file_mtime(tmp_path, monkeypa
     assert len(reps) == 1
     assert reps[0]["run_id"] == "run_new"
     assert reps[0]["_attempts"] == 2 and reps[0]["_succeeded"] == 2
+
+
+def test_run_json_with_utf8_bom_is_still_loaded(tmp_path, monkeypatch):
+    """§41：带 BOM 的 run.json 曾让该 run 从报告里静默消失（Windows 写入常见）。"""
+    import json
+
+    from pebs.benchmark import cases
+    from pebs.benchmark import report as report_mod
+
+    runs = tmp_path / "runs"
+    target = runs / "20260101-000000-A-dynamic"
+    target.mkdir(parents=True)
+    payload = json.dumps({"case_id": "A", "mode": "dynamic", "run_id": "run_bom", "run_status": "succeeded"})
+    (target / "run.json").write_text(payload, encoding="utf-8-sig")
+    monkeypatch.setattr(cases, "runs_dir", lambda: runs)
+
+    reps = report_mod.load_runs()
+    assert [rep["run_id"] for rep in reps] == ["run_bom"]
+
+
+def test_report_reads_teacher_scores_back_from_the_project(engine, registry_env, tmp_path, monkeypatch):
+    """§30/§33/§42：教师评分落在项目 Store，报告必须读回来（否则指标列永远为空）。"""
+    from pebs import config
+    from pebs.benchmark import evaluation, report as report_mod
+
+    # 报告按 config.project_dir(project_id) 找 Store，这里让二者指向同一目录
+    monkeypatch.setattr(config, "PROJECTS_DIR", tmp_path)
+    engine.project_id = "proj"
+    engine.llm = FakeLLM()
+    start, status = run_dynamic_build(engine, REQUEST_1)
+    assert status["run"]["status"] == "succeeded"
+    engine.accept(start["changeset_id"])
+    evaluation.record(engine, _valid_payload(), run_id=start["run_id"], mode="dynamic")
+
+    run = {
+        "case_id": "A",
+        "mode": "dynamic",
+        "run_id": start["run_id"],
+        "run_status": "succeeded",
+        "project_id": "proj",
+        "metrics": {"model_calls": 7},
+    }
+    summary = report_mod.summarize([run])
+    entry = summary["cases"][0]["dynamic"]
+    assert entry["human_score"] == pytest.approx(3.857, abs=0.01)
+    assert entry["edit_ratio"] and entry["edit_ratio"] > 0
+    assert entry["evidence_errors"] == 1
+    assert entry["reviewers"] == ["张老师"]
+    assert entry["human_eval_stale"] is False
+    markdown = report_mod.render_markdown(summary)
+    assert "3.857" in markdown
+
+    # 评分指向另一版产物时必须标 stale，而不是静默丢弃
+    stale = dict(run, run_id="run_other")
+    stale_summary = report_mod.summarize([stale])
+    assert stale_summary["cases"][0]["dynamic"]["human_eval_stale"] is True
+    assert stale_summary["cases"][0]["dynamic"]["human_score"] is None
 
 
 def test_evaluation_endpoints_expose_trace_and_accept_scores(client):

@@ -170,6 +170,40 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 教师评分写进了 Store，却从未回到报告 / 也从未绑定 Skill 版本（EVALUATION §33/§40/§42）
+
+- **date**: 2026-09-20
+- **task**: M6.3/M6.4 人工评价闭环（Acceptance 5/6）
+- **symptom**: 提交教师评分后（CLI `--submit-eval` 或 `POST /evaluation`），
+  `benchmark_summary.md` 的 Human Score / Edit Ratio / Evidence Errors / Routing Errors 列
+  仍然全部是 `None`；`registry/performance.json` 里的 `human_score` 也一直是空的
+- **root_cause**: 两处断链。
+  (1) 评分以 Artifact 落在**项目 Store**（`human_eval`），而报告只读 `benchmarks/runs/*/run.json`，
+  从不回读 Store —— 指标列永远拿不到数据，M6 §73 的前三项核心指标实际不可观测；
+  (2) `evaluation.update_performance()`（§40 要求的 skill 版本绑定）**只在测试里被调用**，
+  真实提交路径（CLI `--submit-eval`、`POST /api/projects/<id>/evaluation`）从不触发它，
+  所以 §19/§68 的 promotion/demotion 判定拿不到人工分
+- **skill**: `benchmark-report` / `human-evaluation`
+- **artifact**: `pebs/benchmark/report.py`、`pebs/benchmark/evaluation.py`
+- **fix**: `summarize()` 通过 `config.project_dir(project_id)` 回读 `human_eval` Artifact 并按 run_id 绑定；
+  评分指向另一版产物时标记 `human_eval_stale`（显示但不静默丢弃）；
+  `evaluation.record()` 在落库后自动调用 `update_performance()` 绑定 skill 版本
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_report_reads_teacher_scores_back_from_the_project`、
+  `::test_human_eval_is_recorded_as_artifact_and_updates_performance`（改为断言 record() 自身完成绑定）
+
+## 2026-09-20 — 带 BOM 的 run.json 让该 run 从报告中静默消失（BENCHMARK §41）
+
+- **date**: 2026-09-20
+- **task**: M6.4 benchmark 报告生成
+- **symptom**: `benchmarks/runs/20260918-190433-B-dynamic/run.json`（`external-media-B` 实验，
+  interrupted）在报告中完全不存在，`B` 的 external-media 变体凭空少了一行
+- **root_cause**: 该文件带 UTF-8 BOM（Windows 工具写入），`load_runs()` 用 `encoding="utf-8"` 读取时
+  `json.loads` 抛 `JSONDecodeError`，被 `except JSONDecodeError: continue` 静默吞掉
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/report.py`
+- **fix**: 改用 `encoding="utf-8-sig"`（无 BOM 时行为不变），并把 `OSError` 一并计入跳过
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_run_json_with_utf8_bom_is_still_loaded`
+
 ## 2026-09-20 — `benchmark --report` 会覆盖教师已填写的工作表 / 代表 run 漂移 / 实验变体撞名（EVALUATION §30/§32/§41/§46）
 
 - **date**: 2026-09-20
