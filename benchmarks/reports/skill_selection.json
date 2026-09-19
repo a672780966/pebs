@@ -1,680 +1,5 @@
 [
   {
-    "case_id": "D",
-    "mode": "plan",
-    "variant": "plan [builtin]",
-    "experiment": "",
-    "run_status": "planned",
-    "route": {
-      "task_intent": "生成教学资材（确定性路由）",
-      "knowledge_types": [
-        "concept"
-      ],
-      "requested_outputs": [
-        "script"
-      ],
-      "research_need": "NONE",
-      "media_need": "STATIC",
-      "source": "deterministic_fallback"
-    },
-    "plan_nodes": [
-      [
-        "template-parser",
-        false
-      ],
-      [
-        "requirements-builder",
-        false
-      ],
-      [
-        "learning-designer",
-        false
-      ],
-      [
-        "claim-extractor",
-        false
-      ],
-      [
-        "evidence-reviewer",
-        false
-      ],
-      [
-        "pck-developer",
-        false
-      ],
-      [
-        "lesson-designer",
-        false
-      ],
-      [
-        "assessment-designer",
-        false
-      ],
-      [
-        "case-designer",
-        false
-      ],
-      [
-        "script-writer",
-        false
-      ],
-      [
-        "gate-runner",
-        false
-      ]
-    ],
-    "terminal_outputs": [
-      "script"
-    ],
-    "selection_trace": [
-      {
-        "artifact": "template_spec",
-        "selected": "template-parser",
-        "selected_score": 4.5,
-        "reason": "为产出 template_spec",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "requirements",
-        "selected": "requirements-builder",
-        "selected_score": 3.5,
-        "reason": "为产出 requirements",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "learning_design",
-        "selected": "learning-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "backwards-design-unit-planner",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "claims_set",
-        "selected": "claim-extractor",
-        "selected_score": 3.45,
-        "reason": "为产出 claims_set",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "evidence_index",
-        "selected": "evidence-reviewer",
-        "selected_score": 3.4,
-        "reason": "为产出 evidence_index",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "teaching_plan",
-        "selected": "pck-developer",
-        "selected_score": 3.45,
-        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "explicit-instruction-sequence-builder",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "learning-progression-builder",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "udl-options-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "lesson_plan",
-        "selected": "lesson-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "discipline-specific-critical-thinking-task-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "experiential-learning-cycle-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "worked-example-fading-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "assessment",
-        "selected": "assessment-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "checking-for-understanding-protocol-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "criterion-referenced-rubric-generator",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "hinge-question-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "case",
-        "selected": "case-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 case",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "script",
-        "selected": "script-writer",
-        "selected_score": 3.45,
-        "reason": "为产出 script",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "gate_result",
-        "selected": "gate-runner",
-        "selected_score": 3.4,
-        "reason": "为产出 gate_result",
-        "rejected_candidates": []
-      }
-    ],
-    "explicit_skills_note": [],
-    "metrics": {
-      "model_calls": 0,
-      "research_calls": 0,
-      "node_count": 11
-    }
-  },
-  {
-    "case_id": "D",
-    "mode": "plan",
-    "variant": "plan [+hinge-question-designer]",
-    "experiment": "hinge-question-designer",
-    "run_status": "planned",
-    "route": {
-      "task_intent": "生成教学资材（确定性路由）",
-      "knowledge_types": [
-        "concept"
-      ],
-      "requested_outputs": [
-        "script"
-      ],
-      "research_need": "NONE",
-      "media_need": "STATIC",
-      "source": "deterministic_fallback"
-    },
-    "plan_nodes": [
-      [
-        "template-parser",
-        false
-      ],
-      [
-        "requirements-builder",
-        false
-      ],
-      [
-        "learning-designer",
-        false
-      ],
-      [
-        "claim-extractor",
-        false
-      ],
-      [
-        "evidence-reviewer",
-        false
-      ],
-      [
-        "pck-developer",
-        false
-      ],
-      [
-        "case-designer",
-        false
-      ],
-      [
-        "hinge-question-designer",
-        false
-      ],
-      [
-        "lesson-designer",
-        false
-      ],
-      [
-        "script-writer",
-        false
-      ],
-      [
-        "gate-runner",
-        false
-      ]
-    ],
-    "terminal_outputs": [
-      "assessment",
-      "script"
-    ],
-    "selection_trace": [
-      {
-        "artifact": "template_spec",
-        "selected": "template-parser",
-        "selected_score": 4.5,
-        "reason": "为产出 template_spec",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "requirements",
-        "selected": "requirements-builder",
-        "selected_score": 3.5,
-        "reason": "为产出 requirements",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "learning_design",
-        "selected": "learning-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "backwards-design-unit-planner",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "claims_set",
-        "selected": "claim-extractor",
-        "selected_score": 3.45,
-        "reason": "为产出 claims_set",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "evidence_index",
-        "selected": "evidence-reviewer",
-        "selected_score": 3.4,
-        "reason": "为产出 evidence_index",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "teaching_plan",
-        "selected": "pck-developer",
-        "selected_score": 3.45,
-        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "explicit-instruction-sequence-builder",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "learning-progression-builder",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "udl-options-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "case",
-        "selected": "case-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 case",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "assessment",
-        "selected": "hinge-question-designer",
-        "selected_score": 3.45,
-        "reason": "用户显式指定（Explicit User Choice）；为产出 assessment；综合分 3.45 高于次优 assessment-designer（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "assessment-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "checking-for-understanding-protocol-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "criterion-referenced-rubric-generator",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "lesson_plan",
-        "selected": "lesson-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "discipline-specific-critical-thinking-task-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "experiential-learning-cycle-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "worked-example-fading-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "script",
-        "selected": "script-writer",
-        "selected_score": 3.45,
-        "reason": "为产出 script",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "gate_result",
-        "selected": "gate-runner",
-        "selected_score": 3.4,
-        "reason": "为产出 gate_result",
-        "rejected_candidates": []
-      }
-    ],
-    "explicit_skills_note": [
-      "显式调用 /hinge-question-designer → 加入 ['assessment']"
-    ],
-    "metrics": {
-      "model_calls": 0,
-      "research_calls": 0,
-      "node_count": 11
-    }
-  },
-  {
-    "case_id": "D",
-    "mode": "plan",
-    "variant": "plan [+dual-coding-designer]",
-    "experiment": "dual-coding-designer",
-    "run_status": "planned",
-    "route": {
-      "task_intent": "生成教学资材（确定性路由）",
-      "knowledge_types": [
-        "concept"
-      ],
-      "requested_outputs": [
-        "script"
-      ],
-      "research_need": "NONE",
-      "media_need": "STATIC",
-      "source": "deterministic_fallback"
-    },
-    "plan_nodes": [
-      [
-        "template-parser",
-        false
-      ],
-      [
-        "requirements-builder",
-        false
-      ],
-      [
-        "learning-designer",
-        false
-      ],
-      [
-        "claim-extractor",
-        false
-      ],
-      [
-        "evidence-reviewer",
-        false
-      ],
-      [
-        "pck-developer",
-        false
-      ],
-      [
-        "lesson-designer",
-        false
-      ],
-      [
-        "assessment-designer",
-        false
-      ],
-      [
-        "case-designer",
-        false
-      ],
-      [
-        "dual-coding-designer",
-        false
-      ],
-      [
-        "script-writer",
-        false
-      ],
-      [
-        "gate-runner",
-        false
-      ]
-    ],
-    "terminal_outputs": [
-      "media_plan",
-      "script"
-    ],
-    "selection_trace": [
-      {
-        "artifact": "template_spec",
-        "selected": "template-parser",
-        "selected_score": 4.5,
-        "reason": "为产出 template_spec",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "requirements",
-        "selected": "requirements-builder",
-        "selected_score": 3.5,
-        "reason": "为产出 requirements",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "learning_design",
-        "selected": "learning-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "backwards-design-unit-planner",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "claims_set",
-        "selected": "claim-extractor",
-        "selected_score": 3.45,
-        "reason": "为产出 claims_set",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "evidence_index",
-        "selected": "evidence-reviewer",
-        "selected_score": 3.4,
-        "reason": "为产出 evidence_index",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "teaching_plan",
-        "selected": "pck-developer",
-        "selected_score": 3.45,
-        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "explicit-instruction-sequence-builder",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "learning-progression-builder",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "udl-options-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "lesson_plan",
-        "selected": "lesson-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "discipline-specific-critical-thinking-task-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "experiential-learning-cycle-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "worked-example-fading-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "assessment",
-        "selected": "assessment-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
-        "rejected_candidates": [
-          {
-            "candidate": "checking-for-understanding-protocol-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "criterion-referenced-rubric-generator",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          },
-          {
-            "candidate": "hinge-question-designer",
-            "score": 3.45,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "case",
-        "selected": "case-designer",
-        "selected_score": 3.45,
-        "reason": "为产出 case",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "media_plan",
-        "selected": "dual-coding-designer",
-        "selected_score": 3.25,
-        "reason": "用户显式指定（Explicit User Choice）；为产出 media_plan；综合分 3.25 高于次优 media-router（3.25）",
-        "rejected_candidates": [
-          {
-            "candidate": "media-router",
-            "score": 3.25,
-            "status": "APPROVED",
-            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
-          }
-        ]
-      },
-      {
-        "artifact": "script",
-        "selected": "script-writer",
-        "selected_score": 3.45,
-        "reason": "为产出 script",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "gate_result",
-        "selected": "gate-runner",
-        "selected_score": 3.4,
-        "reason": "为产出 gate_result",
-        "rejected_candidates": []
-      }
-    ],
-    "explicit_skills_note": [
-      "显式调用 /dual-coding-designer → 加入 ['media_plan']"
-    ],
-    "metrics": {
-      "model_calls": 0,
-      "research_calls": 0,
-      "node_count": 12
-    }
-  },
-  {
     "case_id": "B",
     "mode": "plan",
     "variant": "plan [builtin]",
@@ -913,6 +238,798 @@
       "model_calls": 0,
       "research_calls": 0,
       "node_count": 14
+    }
+  },
+  {
+    "case_id": "B",
+    "mode": "plan",
+    "variant": "plan [+backwards-design-unit-planner]",
+    "experiment": "backwards-design-unit-planner",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "lesson_plan",
+        "pptx"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "backwards-design-unit-planner",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "media-router",
+        false
+      ],
+      [
+        "diagram-designer",
+        false
+      ],
+      [
+        "evidence-indexer",
+        false
+      ],
+      [
+        "presentation-planner",
+        false
+      ],
+      [
+        "presentation-composer",
+        false
+      ],
+      [
+        "preview-builder",
+        false
+      ],
+      [
+        "docx-exporter",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "export_manifest",
+      "learning_design",
+      "lesson_plan",
+      "pptx_deck"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "backwards-design-unit-planner",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 learning_design；综合分 3.45 高于次优 learning-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "learning-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "media_plan",
+        "selected": "media-router",
+        "selected_score": 3.25,
+        "reason": "为产出 media_plan；综合分 3.25 高于次优 dual-coding-designer（3.25）",
+        "rejected_candidates": [
+          {
+            "candidate": "dual-coding-designer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "diagrams",
+        "selected": "diagram-designer",
+        "selected_score": 3.25,
+        "reason": "为产出 diagrams",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_assets",
+        "selected": "evidence-indexer",
+        "selected_score": 3.5,
+        "reason": "为产出 evidence_assets",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "slide_plan",
+        "selected": "presentation-planner",
+        "selected_score": 3.25,
+        "reason": "为产出 slide_plan",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "pptx_deck",
+        "selected": "presentation-composer",
+        "selected_score": 3.3,
+        "reason": "为产出 pptx_deck",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "preview",
+        "selected": "preview-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 preview",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "export_manifest",
+        "selected": "docx-exporter",
+        "selected_score": 3.5,
+        "reason": "为产出 export_manifest",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /backwards-design-unit-planner → 加入 ['learning_design']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 14
+    }
+  },
+  {
+    "case_id": "B",
+    "mode": "plan",
+    "variant": "plan [+cognitive-load-analyser]",
+    "experiment": "cognitive-load-analyser",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "lesson_plan",
+        "pptx"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "cognitive-load-analyser",
+        false
+      ],
+      [
+        "media-router",
+        false
+      ],
+      [
+        "diagram-designer",
+        false
+      ],
+      [
+        "evidence-indexer",
+        false
+      ],
+      [
+        "presentation-planner",
+        false
+      ],
+      [
+        "presentation-composer",
+        false
+      ],
+      [
+        "preview-builder",
+        false
+      ],
+      [
+        "docx-exporter",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "export_manifest",
+      "lesson_plan",
+      "load_review",
+      "pptx_deck"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "load_review",
+        "selected": "cognitive-load-analyser",
+        "selected_score": 3.25,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 load_review；综合分 3.25 高于次优 udl-barrier-anticipator（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "udl-barrier-anticipator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-lesson-auditor",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "load-reviewer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "media_plan",
+        "selected": "media-router",
+        "selected_score": 3.25,
+        "reason": "为产出 media_plan；综合分 3.25 高于次优 dual-coding-designer（3.25）",
+        "rejected_candidates": [
+          {
+            "candidate": "dual-coding-designer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "diagrams",
+        "selected": "diagram-designer",
+        "selected_score": 3.25,
+        "reason": "为产出 diagrams",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_assets",
+        "selected": "evidence-indexer",
+        "selected_score": 3.5,
+        "reason": "为产出 evidence_assets",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "slide_plan",
+        "selected": "presentation-planner",
+        "selected_score": 3.25,
+        "reason": "为产出 slide_plan",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "pptx_deck",
+        "selected": "presentation-composer",
+        "selected_score": 3.3,
+        "reason": "为产出 pptx_deck",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "preview",
+        "selected": "preview-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 preview",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "export_manifest",
+        "selected": "docx-exporter",
+        "selected_score": 3.5,
+        "reason": "为产出 export_manifest",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /cognitive-load-analyser → 加入 ['load_review']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 15
+    }
+  },
+  {
+    "case_id": "B",
+    "mode": "plan",
+    "variant": "plan [+udl-lesson-auditor]",
+    "experiment": "udl-lesson-auditor",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "lesson_plan",
+        "pptx"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "media-router",
+        false
+      ],
+      [
+        "diagram-designer",
+        false
+      ],
+      [
+        "evidence-indexer",
+        false
+      ],
+      [
+        "presentation-planner",
+        false
+      ],
+      [
+        "presentation-composer",
+        false
+      ],
+      [
+        "preview-builder",
+        false
+      ],
+      [
+        "docx-exporter",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "udl-lesson-auditor",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "export_manifest",
+      "lesson_plan",
+      "load_review",
+      "pptx_deck"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "media_plan",
+        "selected": "media-router",
+        "selected_score": 3.25,
+        "reason": "为产出 media_plan；综合分 3.25 高于次优 dual-coding-designer（3.25）",
+        "rejected_candidates": [
+          {
+            "candidate": "dual-coding-designer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "diagrams",
+        "selected": "diagram-designer",
+        "selected_score": 3.25,
+        "reason": "为产出 diagrams",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_assets",
+        "selected": "evidence-indexer",
+        "selected_score": 3.5,
+        "reason": "为产出 evidence_assets",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "slide_plan",
+        "selected": "presentation-planner",
+        "selected_score": 3.25,
+        "reason": "为产出 slide_plan",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "pptx_deck",
+        "selected": "presentation-composer",
+        "selected_score": 3.3,
+        "reason": "为产出 pptx_deck",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "preview",
+        "selected": "preview-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 preview",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "export_manifest",
+        "selected": "docx-exporter",
+        "selected_score": 3.5,
+        "reason": "为产出 export_manifest",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "load_review",
+        "selected": "udl-lesson-auditor",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 load_review；综合分 3.45 高于次优 udl-barrier-anticipator（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "udl-barrier-anticipator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "cognitive-load-analyser",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "load-reviewer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /udl-lesson-auditor → 加入 ['load_review']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 15
     }
   },
   {
@@ -1190,10 +1307,10 @@
     }
   },
   {
-    "case_id": "B",
+    "case_id": "C",
     "mode": "plan",
-    "variant": "plan [+dual-coding-designer]",
-    "experiment": "dual-coding-designer",
+    "variant": "plan [builtin]",
+    "experiment": "",
     "run_status": "planned",
     "route": {
       "task_intent": "生成教学资材（确定性路由）",
@@ -1201,8 +1318,8 @@
         "concept"
       ],
       "requested_outputs": [
-        "lesson_plan",
-        "pptx"
+        "case",
+        "script"
       ],
       "research_need": "NONE",
       "media_need": "STATIC",
@@ -1234,43 +1351,29 @@
         false
       ],
       [
-        "dual-coding-designer",
-        false
-      ],
-      [
-        "diagram-designer",
-        false
-      ],
-      [
-        "evidence-indexer",
-        false
-      ],
-      [
-        "presentation-planner",
-        false
-      ],
-      [
-        "presentation-composer",
-        false
-      ],
-      [
-        "preview-builder",
-        false
-      ],
-      [
-        "docx-exporter",
-        false
-      ],
-      [
         "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
         false
       ]
     ],
     "terminal_outputs": [
-      "export_manifest",
-      "lesson_plan",
-      "media_plan",
-      "pptx_deck"
+      "case",
+      "script"
     ],
     "selection_trace": [
       {
@@ -1342,60 +1445,224 @@
         ]
       },
       {
-        "artifact": "media_plan",
-        "selected": "dual-coding-designer",
-        "selected_score": 3.25,
-        "reason": "用户显式指定（Explicit User Choice）；为产出 media_plan；综合分 3.25 高于次优 media-router（3.25）",
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
         "rejected_candidates": [
           {
-            "candidate": "media-router",
-            "score": 3.25,
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
             "status": "APPROVED",
             "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
           }
         ]
       },
       {
-        "artifact": "diagrams",
-        "selected": "diagram-designer",
-        "selected_score": 3.25,
-        "reason": "为产出 diagrams",
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
         "rejected_candidates": []
       },
       {
-        "artifact": "evidence_assets",
-        "selected": "evidence-indexer",
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 11
+    }
+  },
+  {
+    "case_id": "C",
+    "mode": "plan",
+    "variant": "plan [+backwards-design-unit-planner]",
+    "experiment": "backwards-design-unit-planner",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "case",
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "backwards-design-unit-planner",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "case",
+      "learning_design",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
         "selected_score": 3.5,
-        "reason": "为产出 evidence_assets",
+        "reason": "为产出 requirements",
         "rejected_candidates": []
       },
       {
-        "artifact": "slide_plan",
-        "selected": "presentation-planner",
-        "selected_score": 3.25,
-        "reason": "为产出 slide_plan",
+        "artifact": "learning_design",
+        "selected": "backwards-design-unit-planner",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 learning_design；综合分 3.45 高于次优 learning-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "learning-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
         "rejected_candidates": []
       },
       {
-        "artifact": "pptx_deck",
-        "selected": "presentation-composer",
-        "selected_score": 3.3,
-        "reason": "为产出 pptx_deck",
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
         "rejected_candidates": []
       },
       {
-        "artifact": "preview",
-        "selected": "preview-builder",
-        "selected_score": 3.5,
-        "reason": "为产出 preview",
-        "rejected_candidates": []
-      },
-      {
-        "artifact": "export_manifest",
-        "selected": "docx-exporter",
-        "selected_score": 3.5,
-        "reason": "为产出 export_manifest",
-        "rejected_candidates": []
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
       },
       {
         "artifact": "lesson_plan",
@@ -1422,15 +1689,1945 @@
             "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
           }
         ]
+      },
+      {
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
       }
     ],
     "explicit_skills_note": [
-      "显式调用 /dual-coding-designer → 加入 ['media_plan']"
+      "显式调用 /backwards-design-unit-planner → 加入 ['learning_design']"
     ],
     "metrics": {
       "model_calls": 0,
       "research_calls": 0,
-      "node_count": 14
+      "node_count": 11
+    }
+  },
+  {
+    "case_id": "C",
+    "mode": "plan",
+    "variant": "plan [+cognitive-load-analyser]",
+    "experiment": "cognitive-load-analyser",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "case",
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "cognitive-load-analyser",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "case",
+      "load_review",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "load_review",
+        "selected": "cognitive-load-analyser",
+        "selected_score": 3.25,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 load_review；综合分 3.25 高于次优 udl-barrier-anticipator（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "udl-barrier-anticipator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-lesson-auditor",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "load-reviewer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /cognitive-load-analyser → 加入 ['load_review']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 12
+    }
+  },
+  {
+    "case_id": "C",
+    "mode": "plan",
+    "variant": "plan [+udl-lesson-auditor]",
+    "experiment": "udl-lesson-auditor",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "case",
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "udl-lesson-auditor",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "case",
+      "load_review",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "load_review",
+        "selected": "udl-lesson-auditor",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 load_review；综合分 3.45 高于次优 udl-barrier-anticipator（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "udl-barrier-anticipator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "cognitive-load-analyser",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "load-reviewer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /udl-lesson-auditor → 加入 ['load_review']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 12
+    }
+  },
+  {
+    "case_id": "C",
+    "mode": "plan",
+    "variant": "plan [+hinge-question-designer]",
+    "experiment": "hinge-question-designer",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "case",
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "hinge-question-designer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "assessment",
+      "case",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "assessment",
+        "selected": "hinge-question-designer",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 assessment；综合分 3.45 高于次优 assessment-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "assessment-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /hinge-question-designer → 加入 ['assessment']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 11
+    }
+  },
+  {
+    "case_id": "D",
+    "mode": "plan",
+    "variant": "plan [builtin]",
+    "experiment": "",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 11
+    }
+  },
+  {
+    "case_id": "D",
+    "mode": "plan",
+    "variant": "plan [+backwards-design-unit-planner]",
+    "experiment": "backwards-design-unit-planner",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "backwards-design-unit-planner",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "learning_design",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "backwards-design-unit-planner",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 learning_design；综合分 3.45 高于次优 learning-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "learning-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /backwards-design-unit-planner → 加入 ['learning_design']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 11
+    }
+  },
+  {
+    "case_id": "D",
+    "mode": "plan",
+    "variant": "plan [+cognitive-load-analyser]",
+    "experiment": "cognitive-load-analyser",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "cognitive-load-analyser",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "load_review",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "load_review",
+        "selected": "cognitive-load-analyser",
+        "selected_score": 3.25,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 load_review；综合分 3.25 高于次优 udl-barrier-anticipator（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "udl-barrier-anticipator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-lesson-auditor",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "load-reviewer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /cognitive-load-analyser → 加入 ['load_review']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 12
+    }
+  },
+  {
+    "case_id": "D",
+    "mode": "plan",
+    "variant": "plan [+udl-lesson-auditor]",
+    "experiment": "udl-lesson-auditor",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "assessment-designer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "udl-lesson-auditor",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "load_review",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "assessment",
+        "selected": "assessment-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 assessment；综合分 3.45 高于次优 checking-for-understanding-protocol-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "hinge-question-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "load_review",
+        "selected": "udl-lesson-auditor",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 load_review；综合分 3.45 高于次优 udl-barrier-anticipator（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "udl-barrier-anticipator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "cognitive-load-analyser",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "load-reviewer",
+            "score": 3.25,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /udl-lesson-auditor → 加入 ['load_review']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 12
+    }
+  },
+  {
+    "case_id": "D",
+    "mode": "plan",
+    "variant": "plan [+hinge-question-designer]",
+    "experiment": "hinge-question-designer",
+    "run_status": "planned",
+    "route": {
+      "task_intent": "生成教学资材（确定性路由）",
+      "knowledge_types": [
+        "concept"
+      ],
+      "requested_outputs": [
+        "script"
+      ],
+      "research_need": "NONE",
+      "media_need": "STATIC",
+      "source": "deterministic_fallback"
+    },
+    "plan_nodes": [
+      [
+        "template-parser",
+        false
+      ],
+      [
+        "requirements-builder",
+        false
+      ],
+      [
+        "learning-designer",
+        false
+      ],
+      [
+        "claim-extractor",
+        false
+      ],
+      [
+        "evidence-reviewer",
+        false
+      ],
+      [
+        "pck-developer",
+        false
+      ],
+      [
+        "case-designer",
+        false
+      ],
+      [
+        "hinge-question-designer",
+        false
+      ],
+      [
+        "lesson-designer",
+        false
+      ],
+      [
+        "script-writer",
+        false
+      ],
+      [
+        "gate-runner",
+        false
+      ]
+    ],
+    "terminal_outputs": [
+      "assessment",
+      "script"
+    ],
+    "selection_trace": [
+      {
+        "artifact": "template_spec",
+        "selected": "template-parser",
+        "selected_score": 4.5,
+        "reason": "为产出 template_spec",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "requirements",
+        "selected": "requirements-builder",
+        "selected_score": 3.5,
+        "reason": "为产出 requirements",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "learning_design",
+        "selected": "learning-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 learning_design；综合分 3.45 高于次优 backwards-design-unit-planner（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "backwards-design-unit-planner",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "claims_set",
+        "selected": "claim-extractor",
+        "selected_score": 3.45,
+        "reason": "为产出 claims_set",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "evidence_index",
+        "selected": "evidence-reviewer",
+        "selected_score": 3.4,
+        "reason": "为产出 evidence_index",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "teaching_plan",
+        "selected": "pck-developer",
+        "selected_score": 3.45,
+        "reason": "为产出 teaching_plan；综合分 3.45 高于次优 explicit-instruction-sequence-builder（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "explicit-instruction-sequence-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "learning-progression-builder",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "udl-options-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "case",
+        "selected": "case-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 case",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "assessment",
+        "selected": "hinge-question-designer",
+        "selected_score": 3.45,
+        "reason": "用户显式指定（Explicit User Choice）；为产出 assessment；综合分 3.45 高于次优 assessment-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "assessment-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "checking-for-understanding-protocol-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "criterion-referenced-rubric-generator",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "lesson_plan",
+        "selected": "lesson-designer",
+        "selected_score": 3.45,
+        "reason": "为产出 lesson_plan；综合分 3.45 高于次优 discipline-specific-critical-thinking-task-designer（3.45）",
+        "rejected_candidates": [
+          {
+            "candidate": "discipline-specific-critical-thinking-task-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "experiential-learning-cycle-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          },
+          {
+            "candidate": "worked-example-fading-designer",
+            "score": 3.45,
+            "status": "APPROVED",
+            "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分"
+          }
+        ]
+      },
+      {
+        "artifact": "script",
+        "selected": "script-writer",
+        "selected_score": 3.45,
+        "reason": "为产出 script",
+        "rejected_candidates": []
+      },
+      {
+        "artifact": "gate_result",
+        "selected": "gate-runner",
+        "selected_score": 3.4,
+        "reason": "为产出 gate_result",
+        "rejected_candidates": []
+      }
+    ],
+    "explicit_skills_note": [
+      "显式调用 /hinge-question-designer → 加入 ['assessment']"
+    ],
+    "metrics": {
+      "model_calls": 0,
+      "research_calls": 0,
+      "node_count": 11
     }
   }
 ]
