@@ -169,6 +169,17 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-19 — 审阅类任务从"学习设计"提取 Claim，导致空证据阻塞全流程（EVIDENCE）
+
+- **date**: 2026-09-19
+- **task**: Golden Benchmark E（已有讲稿审阅，不要重写）
+- **symptom**: `claim-extractor FAILED: Claim 提取结果为空`，evidence/gates 级联阻塞；被审讲稿就在材料里，但模型说"没有可核验的实证性 Claim"
+- **root_cause**: `_claims_prompt` 只给"学习设计 + 材料摘录"。audit-only 任务没有新学习设计，被审对象是已有讲稿/论文，模型看不到待审内容
+- **skill**: `claim-extractor`
+- **artifact**: `pebs/pipeline.py`
+- **fix**: 已有 script 时把分节正文（截断 4000 字）加入 Claim 提取 prompt，并注明"审阅任务的事实性 Claim 必须来自这里"
+- **regression_test**: `tests/test_claims_extraction_guard.py`、`tests/test_qualify.py`；E 真实运行（script-writer 复用、无 pptx/storyboard、gates 执行）
+
 ## 2026-09-19 — 长文步骤在 240s 超时（RUNTIME）
 
 - **date**: 2026-09-19
