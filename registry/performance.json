@@ -10,7 +10,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 27,
+      "runs": 28,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -18,7 +18,8 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "requirements-builder": {
       "skill": "requirements-builder",
@@ -28,7 +29,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 27,
+      "runs": 28,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -36,7 +37,8 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "learning-designer": {
       "skill": "learning-designer",
@@ -46,7 +48,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 27,
+      "runs": 28,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -54,7 +56,8 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "claim-extractor": {
       "skill": "claim-extractor",
@@ -64,8 +67,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 27,
-      "success_rate": 0.8889,
+      "runs": 28,
+      "success_rate": 0.8571,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -74,7 +77,8 @@
       "known_failure_modes": [
         "Claim 提取结果为空：模型未返回可核验的实证性 Claim。请检查请求是否包含可核验的心理学事实，或补充材料后重试（系统不会用空证据继续生产）。"
       ],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "evidence-reviewer": {
       "skill": "evidence-reviewer",
@@ -84,8 +88,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 27,
-      "success_rate": 0.8519,
+      "runs": 29,
+      "success_rate": 0.7931,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -93,9 +97,12 @@
       "average_latency": 0.0,
       "known_failure_modes": [
         "依赖未成功：claim-extractor",
-        "预算耗尽：research request budget exhausted"
+        "预算耗尽：research request budget exhausted",
+        "依赖步骤未成功：claims",
+        "依赖步骤未成功：worksheets"
       ],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "pck-developer": {
       "skill": "pck-developer",
@@ -105,8 +112,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 24,
-      "success_rate": 0.75,
+      "runs": 25,
+      "success_rate": 0.72,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -117,9 +124,11 @@
         "执行前置条件未满足：证据索引为空：没有可消费的 SUPPORTED Claim",
         "依赖未成功：evidence-reviewer",
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
-        "执行前置条件未满足：证据契约范围内没有可用于 PCK 的 Claim"
+        "执行前置条件未满足：证据契约范围内没有可用于 PCK 的 Claim",
+        "依赖步骤未成功：evidence"
       ],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "media-router": {
       "skill": "media-router",
@@ -129,17 +138,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 6,
-      "success_rate": 0.3333,
+      "runs": 7,
+      "success_rate": 0.2857,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [
-        "依赖未成功：pck-developer"
+        "依赖未成功：pck-developer",
+        "依赖步骤未成功：scripts"
       ],
-      "last_verified": "2026-09-19T11:16:50"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "diagram-designer": {
       "skill": "diagram-designer",
@@ -149,17 +160,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 7,
-      "success_rate": 0.2857,
+      "runs": 8,
+      "success_rate": 0.25,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [
-        "依赖未成功：media-router"
+        "依赖未成功：media-router",
+        "依赖步骤未成功：media_plan"
       ],
-      "last_verified": "2026-09-19T11:16:50"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "evidence-indexer": {
       "skill": "evidence-indexer",
@@ -169,8 +182,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 7,
-      "success_rate": 0.2857,
+      "runs": 8,
+      "success_rate": 0.25,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -178,9 +191,11 @@
       "average_latency": 0.0,
       "known_failure_modes": [
         "依赖未成功：diagram-designer",
-        "依赖未成功：diagram-designer、evidence-reviewer"
+        "依赖未成功：diagram-designer、evidence-reviewer",
+        "依赖步骤未成功：diagrams"
       ],
-      "last_verified": "2026-09-19T11:16:50"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "presentation-planner": {
       "skill": "presentation-planner",
@@ -190,17 +205,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 7,
-      "success_rate": 0.2857,
+      "runs": 8,
+      "success_rate": 0.25,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [
-        "依赖未成功：evidence-indexer"
+        "依赖未成功：evidence-indexer",
+        "依赖步骤未成功：evidence_assets"
       ],
-      "last_verified": "2026-09-19T11:16:50"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "presentation-composer": {
       "skill": "presentation-composer",
@@ -210,17 +227,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 7,
-      "success_rate": 0.2857,
+      "runs": 8,
+      "success_rate": 0.25,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [
-        "依赖未成功：diagram-designer、presentation-planner"
+        "依赖未成功：diagram-designer、presentation-planner",
+        "依赖步骤未成功：slide_plan"
       ],
-      "last_verified": "2026-09-19T11:16:50"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "preview-builder": {
       "skill": "preview-builder",
@@ -230,17 +249,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 16,
-      "success_rate": 0.9375,
+      "runs": 17,
+      "success_rate": 0.8824,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [
-        "依赖未成功：gate-runner"
+        "依赖未成功：gate-runner",
+        "依赖步骤未成功：gates"
       ],
-      "last_verified": "2026-09-19T20:04:03"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "docx-exporter": {
       "skill": "docx-exporter",
@@ -250,8 +271,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 16,
-      "success_rate": 0.625,
+      "runs": 17,
+      "success_rate": 0.5882,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -259,9 +280,11 @@
       "average_latency": 0.0,
       "known_failure_modes": [
         "依赖未成功：presentation-composer",
-        "依赖未成功：preview-builder"
+        "依赖未成功：preview-builder",
+        "依赖步骤未成功：preview"
       ],
-      "last_verified": "2026-09-19T20:04:03"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "lesson-designer": {
       "skill": "lesson-designer",
@@ -271,8 +294,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 23,
-      "success_rate": 0.6957,
+      "runs": 24,
+      "success_rate": 0.6667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -281,9 +304,11 @@
       "known_failure_modes": [
         "依赖未成功：pck-developer",
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
-        "lesson_plan: codex exec 失败（lesson_plan）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com"
+        "lesson_plan: codex exec 失败（lesson_plan）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com",
+        "依赖步骤未成功：teaching_plan"
       ],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "assessment-designer": {
       "skill": "assessment-designer",
@@ -293,8 +318,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 16,
-      "success_rate": 0.875,
+      "runs": 17,
+      "success_rate": 0.8235,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -302,9 +327,11 @@
       "average_latency": 0.0,
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
-        "依赖未成功：lesson-designer"
+        "依赖未成功：lesson-designer",
+        "依赖步骤未成功：cases"
       ],
-      "last_verified": "2026-09-19T20:04:03"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "case-designer": {
       "skill": "case-designer",
@@ -314,8 +341,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 12,
-      "success_rate": 0.75,
+      "runs": 13,
+      "success_rate": 0.6923,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -324,9 +351,11 @@
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "依赖未成功：pck-developer",
-        "case: codex exec 失败（case）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro),"
+        "case: codex exec 失败（case）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro),",
+        "依赖步骤未成功：lesson_plans"
       ],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "script-writer": {
       "skill": "script-writer",
@@ -336,8 +365,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 21,
-      "success_rate": 0.7619,
+      "runs": 22,
+      "success_rate": 0.7273,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -347,9 +376,11 @@
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "script: codex exec 超时（script）",
         "依赖未成功：assessment-designer、case-designer、evidence-reviewer、lesson-designer、pck-developer",
-        "依赖未成功：case-designer、hinge-question-designer、lesson-designer"
+        "依赖未成功：case-designer、hinge-question-designer、lesson-designer",
+        "依赖步骤未成功：evidence_topup"
       ],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "gate-runner": {
       "skill": "gate-runner",
@@ -359,8 +390,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 20,
-      "success_rate": 0.7,
+      "runs": 21,
+      "success_rate": 0.6667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -371,9 +402,11 @@
         "依赖未成功：dual-coding-designer、script-writer",
         "依赖未成功：assessment-designer、case-designer、claim-extractor、evidence-reviewer、lesson-designer、pck-developer、script-writer",
         "依赖未成功：claim-extractor、evidence-reviewer",
-        "依赖未成功：case-designer、hinge-question-designer、lesson-designer、script-writer"
+        "依赖未成功：case-designer、hinge-question-designer、lesson-designer、script-writer",
+        "依赖步骤未成功：storyboard"
       ],
-      "last_verified": "2026-09-19T22:43:26"
+      "last_verified": "2026-09-20T04:15:14",
+      "schema_repair_rate": 0.0
     },
     "dual-coding-designer": {
       "skill": "dual-coding-designer",
@@ -414,6 +447,69 @@
         "未预期错误：codex exec 失败（external_skill:hinge-question-designer）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro "
       ],
       "last_verified": "2026-09-19T22:43:26"
+    },
+    "worksheet-designer": {
+      "skill": "worksheet-designer",
+      "version": "0.1.0",
+      "provider_sha": "",
+      "package_sha256": "",
+      "patch": "",
+      "domain": "",
+      "status": "EXPERIMENTAL",
+      "runs": 1,
+      "success_rate": 0.0,
+      "schema_failure_rate": 0.0,
+      "schema_repair_rate": 0.0,
+      "human_score": null,
+      "teacher_edit_ratio": null,
+      "average_model_calls": 0.0,
+      "average_latency": 0.0,
+      "known_failure_modes": [
+        "依赖步骤未成功：assessments"
+      ],
+      "last_verified": "2026-09-20T04:15:14"
+    },
+    "load-reviewer": {
+      "skill": "load-reviewer",
+      "version": "0.1.0",
+      "provider_sha": "",
+      "package_sha256": "",
+      "patch": "",
+      "domain": "",
+      "status": "EXPERIMENTAL",
+      "runs": 1,
+      "success_rate": 0.0,
+      "schema_failure_rate": 0.0,
+      "schema_repair_rate": 0.0,
+      "human_score": null,
+      "teacher_edit_ratio": null,
+      "average_model_calls": 0.0,
+      "average_latency": 0.0,
+      "known_failure_modes": [
+        "依赖步骤未成功：diagrams"
+      ],
+      "last_verified": "2026-09-20T04:15:14"
+    },
+    "animation-gate": {
+      "skill": "animation-gate",
+      "version": "0.1.0",
+      "provider_sha": "",
+      "package_sha256": "",
+      "patch": "",
+      "domain": "",
+      "status": "EXPERIMENTAL",
+      "runs": 1,
+      "success_rate": 0.0,
+      "schema_failure_rate": 0.0,
+      "schema_repair_rate": 0.0,
+      "human_score": null,
+      "teacher_edit_ratio": null,
+      "average_model_calls": 0.0,
+      "average_latency": 0.0,
+      "known_failure_modes": [
+        "依赖步骤未成功：load_review"
+      ],
+      "last_verified": "2026-09-20T04:15:14"
     }
   }
 }

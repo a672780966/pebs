@@ -222,13 +222,47 @@ def test_benchmark_report_renders_status_and_issues():
     assert "22" in markdown and "770.7" in markdown
 
 
+def test_worksheets_are_only_written_for_runs_that_produced_a_course(tmp_path):
+    """§30/§32：失败且无产物的 run 不生成评分表（否则诱导教师给不存在的课程打分）。"""
+    from pebs.benchmark import report as report_mod
+
+    runs = [
+        {"case_id": "B", "mode": "builtin", "run_id": "r_failed", "run_status": "failed"},
+        {
+            "case_id": "B",
+            "mode": "builtin",
+            "run_id": "r_blocked",
+            "run_status": "blocked",
+            "artifact_hashes": {"x": "h"},  # 有 2 个系统产物也不算完成课程
+        },
+    ]
+    assert report_mod.write_worksheets(runs, directory=tmp_path) == []
+    assert not list(tmp_path.glob("*-human_eval.yaml"))
+
+    ok = {
+        "case_id": "B",
+        "mode": "dynamic",
+        "run_id": "r_ok",
+        "run_status": "succeeded",
+        "artifact_hashes": {"lesson_plan:sec1": "h"},
+    }
+    written = report_mod.write_worksheets([ok], directory=tmp_path)
+    assert [p.name for p in written] == ["B-dynamic-human_eval.yaml"]
+
+
 def test_worksheet_regeneration_never_overwrites_teacher_scores(tmp_path):
     """§30–§32：教师评分是不可再生的外部输入，重新生成报告不得清空已填工作表。"""
     import yaml
 
     from pebs.benchmark import report as report_mod
 
-    run = {"case_id": "C", "mode": "dynamic", "run_id": "run_1", "run_status": "succeeded"}
+    run = {
+        "case_id": "C",
+        "mode": "dynamic",
+        "run_id": "run_1",
+        "run_status": "succeeded",
+        "artifact_hashes": {"script:sec1": "h"},
+    }
     report_mod.write_worksheets([run], directory=tmp_path)
     path = tmp_path / "C-dynamic-human_eval.yaml"
     filled = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -238,7 +272,7 @@ def test_worksheet_regeneration_never_overwrites_teacher_scores(tmp_path):
     path.write_text(yaml.safe_dump(filled, allow_unicode=True, sort_keys=False), encoding="utf-8")
 
     report_mod.write_worksheets(
-        [{**run, "run_id": "run_2", "run_status": "failed", "artifact_hashes": {"a": "h"}}],
+        [{**run, "run_id": "run_2", "artifact_hashes": {"script:sec1": "h2"}}],
         directory=tmp_path,
     )
     kept = yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -247,11 +281,22 @@ def test_worksheet_regeneration_never_overwrites_teacher_scores(tmp_path):
     assert kept["run"]["run_id"] == "run_1"
 
     # 空白工作表仍然要刷新到最新 run（否则教师会评错产物）
-    report_mod.write_worksheets([{**run, "run_id": "run_2", "run_status": "failed"}], directory=tmp_path)
+    report_mod.write_worksheets([{**run, "run_id": "run_2"}], directory=tmp_path)
     assert yaml.safe_load(path.read_text(encoding="utf-8"))["run"]["run_id"] == "run_1"
     blank = tmp_path / "D-dynamic-human_eval.yaml"
     assert not blank.exists()
-    report_mod.write_worksheets([{"case_id": "D", "mode": "dynamic", "run_id": "run_9"}], directory=tmp_path)
+    report_mod.write_worksheets(
+        [
+            {
+                "case_id": "D",
+                "mode": "dynamic",
+                "run_id": "run_9",
+                "run_status": "succeeded",
+                "artifact_hashes": {"script:sec1": "h"},
+            }
+        ],
+        directory=tmp_path,
+    )
     assert yaml.safe_load(blank.read_text(encoding="utf-8"))["run"]["run_id"] == "run_9"
 
 

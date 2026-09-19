@@ -398,6 +398,21 @@ def _worksheet_is_filled(data: dict[str, Any]) -> bool:
     return any(item.get("category") or item.get("severity") for item in (edits.get("items") or []))
 
 
+def is_evaluable(run: dict[str, Any]) -> bool:
+    """§30/§32：只有真正产出了课程产物的 run 才值得教师评分。
+
+    失败的基线（0 产物）也生成工作表，会诱导教师给一份不存在的课程打 14 个维度分；
+    这类 run 应该在报告的 Status/Attempts 列里被看到，而不是变成一张评分表。
+    direct_codex 的产物是 run 目录里的 direct_output.md，不是 store 产物。
+    """
+    if str(run.get("run_status") or "") != "succeeded":
+        return False
+    if run.get("artifact_hashes"):
+        return True
+    run_dir = str(run.get("run_dir") or "")
+    return bool(run_dir) and (Path(run_dir) / "direct_output.md").exists()
+
+
 def write_worksheets(
     runs: list[dict[str, Any]] | None = None,
     *,
@@ -416,6 +431,10 @@ def write_worksheets(
     target_dir.mkdir(parents=True, exist_ok=True)
     written: list[Path] = []
     for run in runs:
+        if not is_evaluable(run):
+            # 失败/无产物的 run 不生成评分表：教师无法给一份不存在的课程打 14 个维度分，
+            # 它的信息已经在报告的 Status / Attempts / Auto Issues 列里
+            continue
         case_id = str(run.get("case_id") or "?")
         mode = str(run.get("mode") or "?")
         # §46：实验变体（external-assessment 等）是不同产物，工作表必须分开命名，

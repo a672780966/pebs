@@ -170,6 +170,44 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 失败的 run 也会生成教师评分表（EVALUATION §30/§32）
+
+- **date**: 2026-09-20
+- **task**: M6.4 教师评分工作表生成
+- **symptom**: `B / builtin` 失败后（第 2 次调用即 fail-closed，0 产物、12 条自动问题），
+  `benchmark --report` 仍然为它生成了 `B-builtin-human_eval.yaml`；
+  已提交的 `A-builtin-human_eval.yaml`（blocked、0 产物）同样存在，
+  教师打开后会被要求给一份**不存在的课程**打 14 个维度分
+- **root_cause**: `write_worksheets()` 对 `load_runs()` 的每个代表 run 生成工作表，
+  没有区分"完成并产出课程"与"失败/阻塞"
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/report.py`、`benchmarks/reports/worksheets/`
+- **fix**: 新增 `is_evaluable(run)`：只对 `succeeded` 且真正有产物的 run 生成工作表
+  （PEBS 看 `artifact_hashes`，direct_codex 看 `run_dir/direct_output.md`）；
+  删除已提交的 A-builtin 工作表；失败 run 的信息保留在报告的 Status / Attempts / Auto Issues 列
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_worksheets_are_only_written_for_runs_that_produced_a_course`
+
+## 2026-09-20 — Builtin 基线在 case B 上 fail-closed，Dynamic 可完成（BENCHMARK §17/§28）
+
+- **date**: 2026-09-20
+- **task**: M6.4 真实三模式对照（Acceptance 4）
+- **symptom**: `B / builtin`（静态 Pipeline 基线）在第 2 次模型调用后失败：
+  `claims` 步骤报"Claim 提取结果为空；模型未返回可核验的实证 Claim"，
+  后续 18 个步骤全部 BLOCKED，run 记为 failed（12 条自动问题）；
+  同一 case 的 `B / dynamic` 第 41 次运行成功提取 3 条 Claim（descriptive / speculative）并完成全链路
+- **root_cause**: 不是结构缺陷，而是**模型波动 + fail-closed 契约**：
+  `claims` 一次返回空集合即按冻结的 Stage E 证据契约失败（`PCK_REQUIRED_STATUS=SUPPORTED`，
+  空契约不允许放行）；动态侧同一 Skill 在成功那次返回了非空 Claim。
+  证据：`B / dynamic` 记录为 `1/5`（五次里只成功一次），`A / builtin` 为 `0/5`
+- **skill**: `claim-extractor` / `evidence-reviewer`
+- **artifact**: `benchmarks/runs/20260920-041319-B-builtin/run.json`、
+  `benchmarks/reports/benchmark_summary.md`
+- **fix**: 不改代码。**明确不恢复**被上游冻结移除的 `allow_empty_claims` 开关——
+  空 Claim 必须 fail closed；此处的正确处置是如实记录基线失败与尝试次数，
+  而不是放宽证据门禁（§48/§67 的反面教训）
+- **regression_test**: 无（这是基准观测，不是代码缺陷）；对照数据由
+  `benchmarks/reports/benchmark_summary.md` 的 `Attempts` 列持续跟踪
+
 ## 2026-09-20 — Resolver 的拒选理由为空话，且并列时谎称"分数更高"（ROUTER §64）
 
 - **date**: 2026-09-20
