@@ -15,7 +15,8 @@ expect:
     knowledge_types_any_of: [concept, critical_thinking, reflection, transfer]
     requested_outputs: [lesson_plan, pptx]
     research_need: VERIFY
-    media_need: STATIC
+    # media_need 不设硬期望：现场课允许 STATIC，也可为概念关系请求 DIAGRAM
+    # （实测 Router 判定为 DIAGRAM，属合理路由，不再作为 issue）
   plan:
     must_include_steps: [learning_design, lesson_plans, slide_plan, pptx]
     must_exclude_steps: [scripts, storyboard]

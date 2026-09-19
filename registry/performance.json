@@ -10,7 +10,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 15,
+      "runs": 16,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -18,7 +18,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-19T08:11:00"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "requirements-builder": {
       "skill": "requirements-builder",
@@ -28,7 +28,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 15,
+      "runs": 16,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -36,7 +36,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-19T08:11:00"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "learning-designer": {
       "skill": "learning-designer",
@@ -46,7 +46,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 15,
+      "runs": 16,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -54,7 +54,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-19T08:11:00"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "claim-extractor": {
       "skill": "claim-extractor",
@@ -64,8 +64,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 15,
-      "success_rate": 0.8667,
+      "runs": 16,
+      "success_rate": 0.875,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -74,7 +74,7 @@
       "known_failure_modes": [
         "Claim 提取结果为空：模型未返回可核验的实证性 Claim。请检查请求是否包含可核验的心理学事实，或补充材料后重试（系统不会用空证据继续生产）。"
       ],
-      "last_verified": "2026-09-19T08:11:00"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "evidence-reviewer": {
       "skill": "evidence-reviewer",
@@ -84,8 +84,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 15,
-      "success_rate": 0.8,
+      "runs": 16,
+      "success_rate": 0.8125,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -95,7 +95,7 @@
         "依赖未成功：claim-extractor",
         "预算耗尽：research request budget exhausted"
       ],
-      "last_verified": "2026-09-19T08:11:00"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "pck-developer": {
       "skill": "pck-developer",
@@ -105,8 +105,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 15,
-      "success_rate": 0.6,
+      "runs": 16,
+      "success_rate": 0.625,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -119,7 +119,7 @@
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "执行前置条件未满足：证据契约范围内没有可用于 PCK 的 Claim"
       ],
-      "last_verified": "2026-09-19T08:11:00"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "media-router": {
       "skill": "media-router",
@@ -129,8 +129,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 4,
-      "success_rate": 0.0,
+      "runs": 5,
+      "success_rate": 0.2,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -139,7 +139,7 @@
       "known_failure_modes": [
         "依赖未成功：pck-developer"
       ],
-      "last_verified": "2026-09-19T00:21:46"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "diagram-designer": {
       "skill": "diagram-designer",
@@ -149,8 +149,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 5,
-      "success_rate": 0.0,
+      "runs": 6,
+      "success_rate": 0.1667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -159,7 +159,7 @@
       "known_failure_modes": [
         "依赖未成功：media-router"
       ],
-      "last_verified": "2026-09-19T00:21:46"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "evidence-indexer": {
       "skill": "evidence-indexer",
@@ -169,8 +169,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 5,
-      "success_rate": 0.0,
+      "runs": 6,
+      "success_rate": 0.1667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -180,7 +180,7 @@
         "依赖未成功：diagram-designer",
         "依赖未成功：diagram-designer、evidence-reviewer"
       ],
-      "last_verified": "2026-09-19T00:21:46"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "presentation-planner": {
       "skill": "presentation-planner",
@@ -190,8 +190,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 5,
-      "success_rate": 0.0,
+      "runs": 6,
+      "success_rate": 0.1667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -200,7 +200,7 @@
       "known_failure_modes": [
         "依赖未成功：evidence-indexer"
       ],
-      "last_verified": "2026-09-19T00:21:46"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "presentation-composer": {
       "skill": "presentation-composer",
@@ -210,8 +210,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 5,
-      "success_rate": 0.0,
+      "runs": 6,
+      "success_rate": 0.1667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -220,7 +220,7 @@
       "known_failure_modes": [
         "依赖未成功：diagram-designer、presentation-planner"
       ],
-      "last_verified": "2026-09-19T00:21:46"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "preview-builder": {
       "skill": "preview-builder",
@@ -230,7 +230,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 5,
+      "runs": 6,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -238,7 +238,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-19T00:21:46"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "docx-exporter": {
       "skill": "docx-exporter",
@@ -248,8 +248,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 5,
-      "success_rate": 0.0,
+      "runs": 6,
+      "success_rate": 0.1667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -258,7 +258,7 @@
       "known_failure_modes": [
         "依赖未成功：presentation-composer"
       ],
-      "last_verified": "2026-09-19T00:21:46"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "lesson-designer": {
       "skill": "lesson-designer",
@@ -268,8 +268,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 15,
-      "success_rate": 0.6,
+      "runs": 16,
+      "success_rate": 0.625,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -279,7 +279,7 @@
         "依赖未成功：pck-developer",
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）"
       ],
-      "last_verified": "2026-09-19T08:11:00"
+      "last_verified": "2026-09-19T09:03:59"
     },
     "assessment-designer": {
       "skill": "assessment-designer",
