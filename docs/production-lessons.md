@@ -170,6 +170,26 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — Resolver 的拒选理由为空话，且并列时谎称"分数更高"（ROUTER §64）
+
+- **date**: 2026-09-20
+- **task**: M6 §63/§64 Resolver Explainability
+- **symptom**: `selection_trace` 里每个被拒候选的理由都是同一句模板
+  "更低的 contract/status/domain/risk/cost/regression 综合分"，
+  无法回答"为什么没选它"；更严重的是当候选分数**并列**时
+  （内置 Skill 与外部 Skill 常常同为 3.45），理由写成
+  "综合分 3.45 高于次优 xxx（3.45）"——一个不成立的比较
+- **root_cause**: `rank_report()` 只返回总分，没有得分构成；
+  `_selection_trace()` 直接用 `selected > runner_up` 的模板描述，
+  没有区分 `>` 与 `==`
+- **skill**: `skill-resolver`
+- **artifact**: `pebs/planner/resolver.py`、`pebs/planner/planner.py`、`pebs/benchmark/report.py`
+- **fix**: `_breakdown()` 输出产生分数的各项（产物匹配/状态/领域/风险/成本/回归），
+  `rejection_reason()` 给出主要差距与构成；并列时明确写"得分并列；由显式指定或
+  registry 顺序决定"；选中理由附带得分构成；报告里被拒候选最多展示 3 个并带理由
+- **regression_test**: `tests/test_golden_benchmark_plan.py::test_rejection_reasons_are_honest_about_ties`
+  （以及 golden plan 测试新增"被拒候选必须有理由"）
+
 ## 2026-09-20 — Schema 修复发生了却不可观测，§35 的 Schema Repair Rate 拿不到数（BENCHMARK §35）
 
 - **date**: 2026-09-20

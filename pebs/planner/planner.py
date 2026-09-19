@@ -58,12 +58,18 @@ def _selection_trace(
         if not ranked:
             continue
         selected = next((item for item in ranked if item["name"] == node["skill"]), None)
+        selected_score = (selected or {}).get("score")
         rejected = [
             {
                 "candidate": item["name"],
                 "score": item["score"],
                 "status": item["status"],
-                "rejected_because": "更低的 contract/status/domain/risk/cost/regression 综合分",
+                # 并列时不能编造"它更低"：并列的决策依据是显式指定/registry 顺序
+                "rejected_because": (
+                    resolver_mod.rejection_reason(selected, item)
+                    if selected_score is not None and item["score"] < selected_score
+                    else "得分并列；由显式指定或 registry 顺序决定"
+                ),
             }
             for item in ranked
             if item["name"] != node["skill"]
@@ -75,7 +81,18 @@ def _selection_trace(
             reasons.append("项目 pin")
         reasons.append(f"为产出 {outputs[0]}")
         if selected and rejected:
-            reasons.append(f"综合分 {selected['score']} 高于次优 {rejected[0]['candidate']}（{rejected[0]['score']}）")
+            runner_up = rejected[0]
+            if selected_score is not None and runner_up["score"] < selected_score:
+                reasons.append(f"综合分 {selected_score} 高于次优 {runner_up['candidate']}（{runner_up['score']}）")
+            else:
+                reasons.append(f"与次优 {runner_up['candidate']} 并列（{runner_up['score']}）")
+        if selected:
+            breakdown = selected.get("breakdown") or {}
+            if breakdown:
+                reasons.append(
+                    "得分构成："
+                    + "、".join(f"{key}={value:+.2f}" for key, value in breakdown.items())
+                )
         trace.append(
             {
                 "artifact": outputs[0],

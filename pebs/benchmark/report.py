@@ -584,7 +584,14 @@ def render_selection_report(records: list[dict[str, Any]]) -> str:
         lines.append("| 产物 | 选中 Skill | 分数 | 被拒候选（分数） | 理由 |")
         lines.append("| --- | --- | ---: | --- | --- |")
         for entry in trace:
-            rejected = "、".join(f"{item['candidate']}({item['score']})" for item in entry.get("rejected_candidates", []))
+            rejected_items = entry.get("rejected_candidates", [])
+            rejected = "；".join(
+                f"{item['candidate']}({item['score']})"
+                + (f" — {item['rejected_because']}" if item.get("rejected_because") else "")
+                for item in rejected_items[:3]
+            )
+            if len(rejected_items) > 3:
+                rejected += f"；等 {len(rejected_items)} 个候选"
             lines.append(
                 f"| {entry.get('artifact')} | {entry.get('selected')} | {entry.get('selected_score')} | {rejected or '—'} | {entry.get('reason')} |"
             )

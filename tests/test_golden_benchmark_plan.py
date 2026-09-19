@@ -133,6 +133,33 @@ def test_golden_case_plan_is_runnable_and_skips_unneeded_capabilities(bench_proj
     assert trace, f"{case_id}: 缺少 selection_trace"
     for entry in trace:
         assert entry["selected"] and entry["reason"]
+        for rejected in entry.get("rejected_candidates", []):
+            assert rejected.get("rejected_because"), f"{case_id}: 被拒候选缺少理由"
+
+
+def test_rejection_reasons_are_honest_about_ties():
+    """§64：并列时不能说"综合分更低"，也不能编造差距。"""
+    from pebs.planner import resolver
+
+    same = {
+        "breakdown": {
+            "produces_match": 2.0,
+            "status": 1.0,
+            "domain_fit": 0.5,
+            "risk_fit": 0.0,
+            "cost_penalty": 0.0,
+            "regression": 0.0,
+        }
+    }
+    tie = resolver.rejection_reason(dict(same), dict(same))
+    assert "并列" in tie and "更低" not in tie
+    assert "+0.00" in tie
+
+    weaker = {"breakdown": {**same["breakdown"], "status": 0.5, "domain_fit": 0.0}}
+    gap = resolver.rejection_reason(dict(same), weaker)
+    assert "更低" in gap
+    assert "Skill 状态" in gap
+    assert "-0.50" in gap
 
 
 def test_benchmark_case_b_avoids_script_and_storyboard(bench_projects):
