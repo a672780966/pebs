@@ -319,6 +319,54 @@ def performance_section(*, provider_skills: set[str] | None = None) -> list[str]
     ]
 
 
+def render_selection_report(records: list[dict[str, Any]]) -> str:
+    """§46 Skill Selection Experiment（零模型调用）：Builtin vs 显式外部 Skill 的 DAG 差异。"""
+    lines = [
+        "# M6 Skill Selection Experiment（plan-only）",
+        "",
+        "同一任务在不同 Skill 组合下的 DAG 与选择理由；不调用任何模型，可离线复现（§46/§47）。",
+        "",
+        "| Case | Variant | Nodes | Terminal outputs | Explicit-skill note |",
+        "| --- | --- | ---: | --- | --- |",
+    ]
+    for record in records:
+        lines.append(
+            "| {case} | {variant} | {nodes} | {terminals} | {note} |".format(
+                case=record.get("case_id"),
+                variant=record.get("variant"),
+                nodes=len(record.get("plan_nodes") or []),
+                terminals="、".join(record.get("terminal_outputs") or []),
+                note="；".join(record.get("explicit_skills_note") or []) or "—",
+            )
+        )
+    lines.append("")
+    for record in records:
+        trace = record.get("selection_trace") or []
+        if not trace:
+            continue
+        lines.append(f"## {record.get('case_id')} / {record.get('variant')}")
+        lines.append("")
+        lines.append("| 产物 | 选中 Skill | 分数 | 被拒候选（分数） | 理由 |")
+        lines.append("| --- | --- | ---: | --- | --- |")
+        for entry in trace:
+            rejected = "、".join(f"{item['candidate']}({item['score']})" for item in entry.get("rejected_candidates", []))
+            lines.append(
+                f"| {entry.get('artifact')} | {entry.get('selected')} | {entry.get('selected_score')} | {rejected or '—'} | {entry.get('reason')} |"
+            )
+        lines.append("")
+    return "\n".join(lines)
+
+
+def write_selection_report(records: list[dict[str, Any]], *, path: Path | None = None) -> Path:
+    target = path or (cases.reports_dir() / "skill_selection.md")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(render_selection_report(records), encoding="utf-8")
+    (target.parent / "skill_selection.json").write_text(
+        json.dumps(records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return target
+
+
 def write_report(summary: dict[str, Any] | None = None, *, path: Path | None = None) -> Path:
     summary = summary or summarize()
     target = path or (cases.reports_dir() / "benchmark_summary.md")

@@ -44,6 +44,24 @@ def _isolate(tmp_path, monkeypatch):
     _patch_providers(monkeypatch)
 
 
+def test_plan_only_selection_experiment_swaps_the_producer(tmp_path, monkeypatch):
+    """§46：零模型调用的 Builtin vs 显式外部 Skill 对照应显示产出者被替换。"""
+    monkeypatch.setattr(config, "PROJECTS_DIR", tmp_path / "projects")
+    records = runner.plan_only_case("D")
+    changed = runner.plan_only_case("D", extra_skills=["hinge-question-designer"])
+    builtin_assessment = next(
+        trace for trace in records["selection_trace"] if trace["artifact"] == "assessment"
+    )
+    external_assessment = next(
+        trace for trace in changed["selection_trace"] if trace["artifact"] == "assessment"
+    )
+    assert builtin_assessment["selected"] == "assessment-designer"
+    assert external_assessment["selected"] == "hinge-question-designer"
+    assert "显式指定" in external_assessment["reason"] or "Explicit" in external_assessment["reason"]
+    assert "assessment" in changed["terminal_outputs"]
+    assert changed["metrics"]["model_calls"] == 0
+
+
 def test_local_edit_scenario_reports_locality(tmp_path, monkeypatch):
     _isolate(tmp_path, monkeypatch)
 

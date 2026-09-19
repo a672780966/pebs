@@ -230,6 +230,75 @@ def _fixture_hashes(case: dict[str, Any]) -> dict[str, str]:
     return hashes
 
 
+class _UnavailableLLM:
+    """§46 无配额对照：只走确定性路由 + Planner，不调用任何模型。"""
+
+    def availability(self) -> dict[str, Any]:
+        return {"available": False, "reasons": ["benchmark plan-only：不调用 provider"], "id": "plan-only"}
+
+
+def plan_only_case(case_id: str, *, extra_skills: list[str] | None = None, budgets: dict[str, int] | None = None) -> dict[str, Any]:
+    """§46：对比同一任务在 Builtin / 显式外部 Skill 下的 DAG 与选择理由（零模型调用）。"""
+    from .. import planner, router_v2
+
+    case = cases.get_case(case_id)
+    extra_skills = [str(item) for item in (extra_skills or [])]
+    request = case["request"]
+    if extra_skills:
+        request = request.rstrip() + " " + " ".join(f"/{name}" for name in extra_skills)
+    template_spec = None
+    template_path = cases.fixture_path(case, "template_fixture")
+    if template_path:
+        from ..template_parse import parse_template
+
+        try:
+            template_spec = parse_template(template_path)
+        except Exception:  # noqa: BLE001 - 解析失败时按无模板处理
+            template_spec = None
+    llm = _UnavailableLLM()
+    route = router_v2.route(
+        request,
+        llm=llm,
+        template_spec=template_spec,
+        materials=[str(cases.benchmark_dir() / name) for name in case.get("material_fixtures") or []],
+        explicit_skills=extra_skills,
+    )
+    plan = planner.plan(
+        route=route,
+        goal=request,
+        existing_artifacts=[],
+        budgets=budgets or dict(config.RULES.get("budgets") or {}),
+        prefer=extra_skills,
+        pinned=_pinned_skill_names(),
+    )
+    return {
+        "case_id": case["id"],
+        "mode": "plan",
+        "variant": ("plan [+" + ",".join(extra_skills) + "]") if extra_skills else "plan [builtin]",
+        "experiment": ",".join(extra_skills),
+        "run_status": "planned",
+        "route": {
+            "task_intent": route.get("task_intent"),
+            "knowledge_types": route.get("knowledge_types"),
+            "requested_outputs": route.get("requested_outputs"),
+            "research_need": route.get("research_need"),
+            "media_need": route.get("media_need"),
+            "source": route.get("source"),
+        },
+        "plan_nodes": [(node.get("skill"), bool(node.get("reused"))) for node in plan.get("nodes", [])],
+        "terminal_outputs": plan.get("terminal_outputs", []),
+        "selection_trace": plan.get("selection_trace", []),
+        "explicit_skills_note": (plan.get("route_notes") or {}).get("explicit_skills", []),
+        "metrics": {"model_calls": 0, "research_calls": 0, "node_count": len(plan.get("nodes", []))},
+    }
+
+
+def _pinned_skill_names() -> list[str]:
+    from ..engine import _pinned_skill_names as engine_pinned
+
+    return engine_pinned()
+
+
 def run_case(
     case_id: str,
     *,

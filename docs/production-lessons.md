@@ -170,6 +170,18 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-19 — Codex 配额耗尽：真实运行暂时不可用（RUNTIME/COST）
+
+- **date**: 2026-09-19
+- **task**: §17/§46 的第三个 A/B（case D + `/hinge-question-designer`）
+- **symptom**: `codex exec 失败 rc=1: You've hit your usage limit … try again at Sep 23rd, 2026 5:48 PM`；case-designer / hinge-question-designer / lesson-designer 全部 FAILED
+- **root_cause**: 本机 Codex 账号配额用尽（外部约束）
+- **skill**: n/a
+- **artifact**: `benchmarks/runs/20260919-222735-D-dynamic/run.json`（如实记录失败原因，未伪造产物、未静默降级）
+- **fix（在配额之外仍可推进的部分）**: 新增零模型调用的 §46 对照 `benchmark --plan-only`，用确定性路由 + Planner 输出
+  `benchmarks/reports/skill_selection.md`（Builtin vs 显式外部 Skill 的 DAG 与选择理由）；配额恢复后按同一 case×mode×experiment 约定补跑真实对照
+- **regression_test**: `tests/test_benchmark_scenarios.py::test_plan_only_selection_experiment_swaps_the_producer`
+
 ## 2026-09-19 — 安全基准把"被审阅对象"误判为违规：139 → 0（Gate False Positive）
 
 - **date**: 2026-09-19

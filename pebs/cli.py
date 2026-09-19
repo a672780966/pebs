@@ -301,6 +301,21 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
             )
         )
         return 0
+    if args.plan_only:
+        from .benchmark import report as report_mod
+
+        skills = [item.strip() for item in args.skills.split(",") if item.strip()]
+        case_ids = [item.strip() for item in args.cases.split(",") if item.strip()]
+        records = []
+        for case_id in case_ids:
+            records.append(runner.plan_only_case(case_id))
+            for skill in skills:
+                records.append(runner.plan_only_case(case_id, extra_skills=[skill]))
+        path = report_mod.write_selection_report(records)
+        for record in records:
+            print(f"{record['case_id']} {record['variant']}: {len(record['plan_nodes'])} nodes")
+        print(f"selection report: {path}")
+        return 0
     if args.promotions:
         from .benchmark import performance as performance_mod
 
@@ -441,6 +456,7 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--submit-eval", default="", help="回收教师填写的工作表 YAML（需配合 --project）")
     bench.add_argument("--export-eval-kit", action="store_true", help="导出待评课程材料包 + 评分表到 benchmarks/reports/evaluation_kit/")
     bench.add_argument("--promotions", action="store_true", help="§68/§69：查看 skill 升降级判定（只观察，不影响路由）")
+    bench.add_argument("--plan-only", action="store_true", help="§46：零模型调用的 Builtin vs 显式外部 Skill 选择对照")
     bench.add_argument("--project", default="", help="--submit-eval 的目标项目")
     bench.add_argument("--strict", action="store_true", help="存在失败/自动问题时以非零退出")
     bench.add_argument("--max-model-calls", type=int, default=0)
