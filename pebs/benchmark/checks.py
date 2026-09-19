@@ -333,6 +333,15 @@ def ppt_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
     return issues
 
 
+def media_consistency_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
+    """§57：仅在 case 显式声明 media.check_consistency 时检查知识功能与媒体形式的一致性。"""
+    from . import safety as safety_mod
+
+    if not (expect.get("media") or {}).get("check_consistency"):
+        return []
+    return safety_mod.diagram_checks(store)
+
+
 def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None = None, route: dict[str, Any] | None = None) -> dict[str, Any]:
     issues = (
         plan_checks(plan or {}, expect)
@@ -341,6 +350,7 @@ def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None 
         + safety_fixture_checks(store, expect)
         + animation_checks(store, expect)
         + ppt_checks(store, expect)
+        + media_consistency_checks(store, expect)
     )
     counts: dict[str, int] = {}
     for issue in issues:

@@ -83,7 +83,60 @@ def test_ppt_metrics_report_density_and_repetition():
     assert metrics["missing_notes"] == [2]
 
 
-def test_case_h_declares_safety_fixtures():
+def test_diagram_checks_flag_media_inconsistency():
+    """§57：关系型知识用纯文本、非时序知识默认动画都应被指出。"""
+    from pebs.benchmark import safety
+
+    class _Store:
+        def list_artifacts(self):
+            return [{"artifact_id": "media_plan:sec1", "artifact_type": "media_plan", "accepted_rev": "media_plan:sec1@r1"}]
+
+        def accepted_content(self, artifact_id):
+            return {
+                "items": [
+                    {"item_id": "m1", "knowledge_function": "causality", "recommended_medium": "text"},
+                    {"item_id": "m2", "knowledge_function": "comparison", "recommended_medium": "diagram"},
+                    {"item_id": "m3", "knowledge_function": "example", "recommended_medium": "animation"},
+                ]
+            }
+
+    issues = safety.diagram_checks(_Store())
+    details = " ".join(issue["detail"] for issue in issues)
+    assert "m1" in details and "关系型知识" in details
+    assert "m3" in details and "时序" in details
+    assert "m2" not in details
+
+
+def test_oral_lecture_metrics_report_distribution_not_thresholds():
+    """§54：口语自然度以频率/分布呈现，不做硬失败。"""
+    from pebs.benchmark import safety
+
+    class _Store:
+        def list_artifacts(self):
+            return [{"artifact_id": "script:sec1", "artifact_type": "script", "accepted_rev": "script:sec1@r1"}]
+
+        def accepted_content(self, artifact_id):
+            return {
+                "units": [
+                    {"kind": "narration", "text": "我们来看一个例子，你觉得他会怎么做？"},
+                    {"kind": "narration", "text": "综上所述，该现象具有重要意义，值得我们注意的是其背后机制。"},
+                    {"kind": "visual", "text": "图示说明"},
+                ]
+            }
+
+    metrics = safety.oral_lecture_metrics(_Store())
+    assert metrics["narration_units"] == 2
+    assert metrics["spoken_marker_ratio"] > 0
+    assert metrics["written_only_marker_count"] >= 1
+    assert "不设自动阈值" in metrics["note"]
+
+
+def test_case_i_requests_media_consistency():
+    case = cases.get_case("I")
+    assert case["expect"]["media"]["check_consistency"] is True
+    assert case["expect"]["animation"]["max_approved"] == 3
+    assert not cases.validate_case(case)
+
     case = cases.get_case("H")
     assert case["expect"]["safety_cases"]
     assert not cases.validate_case(case)

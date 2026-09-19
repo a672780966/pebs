@@ -120,8 +120,7 @@ def record(engine: Any, payload: dict[str, Any], *, run_id: str = "", mode: str 
         "plan_errors": int(payload.get("plan_errors") or 0),
         "run_id": run_id,
         "mode": mode,
-        "created_at": now_iso(),
-        "rubric": "benchmarks/rubrics/human_eval.yaml",
+        "created_at": now_iso(),        "rubric": "benchmarks/rubrics/human_eval.yaml",
     }
     info = engine.store.add_revision(
         artifact_id="human_eval",

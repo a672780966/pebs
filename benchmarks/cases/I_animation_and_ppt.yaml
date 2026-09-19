@@ -24,6 +24,9 @@ expect:
     max_dense_ratio: 0.5
     require_notes: true
     max_repeated_layout: 4
+  media:
+    # §57：知识功能与媒体形式的一致性（关系型知识不应只用纯文本；非时序知识不应默认动画）
+    check_consistency: true
 rubric: rubrics/human_eval.yaml
 notes: |
   §56/§58：验证 PEBS 不满足"每页都加动画"的字面要求，而是由 Animation Gate 决定；

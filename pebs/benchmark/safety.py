@@ -107,6 +107,76 @@ def content_metrics(store: Any) -> dict[str, Any]:
     return {
         "language": language_metrics(text) if text else {},
         "ppt": ppt_metrics(slides) if slides else {},
+        "oral": oral_lecture_metrics(store),
+    }
+
+
+# §57：知识功能 → 媒体形式的预期一致性（内容本身决定图文是否有价值）
+RELATIONAL_FUNCTIONS = ("causality", "state_change", "sequence", "hierarchy", "spatial_relation", "comparison")
+TEMPORAL_FUNCTIONS = ("state_change", "sequence")
+
+
+def diagram_checks(store: Any) -> list[dict[str, Any]]:
+    """§57：Diagram 是否真的比文字有价值——关系型知识不该只用纯文本；非时序知识不该默认动画。"""
+    issues: list[dict[str, Any]] = []
+    for item in store.list_artifacts():
+        if item["artifact_type"] != "media_plan" or not item.get("accepted_rev"):
+            continue
+        content = store.accepted_content(item["artifact_id"]) or {}
+        for row in content.get("items", []):
+            function = str(row.get("knowledge_function") or "")
+            medium = str(row.get("recommended_medium") or "")
+            if function in RELATIONAL_FUNCTIONS and medium == "text":
+                issues.append(
+                    {
+                        "kind": "MEDIA",
+                        "detail": f"{item['artifact_id']}/{row.get('item_id')}：{function} 关系型知识建议图示而非纯文本",
+                    }
+                )
+            if medium == "animation" and function not in TEMPORAL_FUNCTIONS and function:
+                issues.append(
+                    {
+                        "kind": "MEDIA",
+                        "detail": f"{item['artifact_id']}/{row.get('item_id')}：{function} 非时序知识不应默认动画（应说明时序必要性）",
+                    }
+                )
+    return issues
+
+
+# §54：口语讲稿 ≠ 文章。这里给出可解释的度量，供人工评分参考（不做硬门）。
+SPOKEN_MARKERS = ("我们", "你", "大家", "想想", "请", "一起", "来看", "试试")
+WRITTEN_ONLY_MARKERS = ("综上所述", "由此可见", "具有重要意义", "值得注意的是", "如上所述")
+
+
+def oral_lecture_metrics(store: Any) -> dict[str, Any]:
+    sentences: list[str] = []
+    narration = 0
+    for item in store.list_artifacts():
+        if item["artifact_type"] != "script" or not item.get("accepted_rev"):
+            continue
+        content = store.accepted_content(item["artifact_id"]) or {}
+        for unit in content.get("units", []):
+            if str(unit.get("kind")) != "narration":
+                continue
+            narration += 1
+            sentences.extend(
+                part.strip()
+                for part in re.split(r"[。！？!?]", str(unit.get("text") or ""))
+                if part.strip()
+            )
+    if not sentences:
+        return {}
+    long_sentences = [text for text in sentences if len(text) > 50]
+    spoken = sum(1 for text in sentences if any(marker in text for marker in SPOKEN_MARKERS))
+    written = sum(1 for text in sentences if any(marker in text for marker in WRITTEN_ONLY_MARKERS))
+    return {
+        "narration_units": narration,
+        "sentences": len(sentences),
+        "avg_sentence_chars": round(sum(len(text) for text in sentences) / len(sentences), 1),
+        "long_sentence_ratio": round(len(long_sentences) / len(sentences), 3),
+        "spoken_marker_ratio": round(spoken / len(sentences), 3),
+        "written_only_marker_count": written,
+        "note": "口语自然度以频率/分布呈现，供人工评分；不设自动阈值（§53/§54）",
     }
 
 
