@@ -555,6 +555,22 @@ def step_learning_design(ctx: PipelineContext) -> dict[str, Any]:
 def step_claims(ctx: PipelineContext) -> dict[str, Any]:
     _check_cancel(ctx)
     designs = [ctx.content(f"learning_design:{s['section_id']}") for s in ctx.sections()]
+    # M6：审阅类任务（audit_only）的被审对象是已有讲稿/论文，Claim 必须从**被审产物**提取；
+    # 只看学习设计会让模型因为"没有课程内容"而返回空列表。
+    existing_scripts = {
+        s["section_id"]: ctx.content(f"script:{s['section_id']}") for s in ctx.sections()
+    }
+    existing_scripts = {key: value for key, value in existing_scripts.items() if value}
+    audit_scope = ""
+    if existing_scripts:
+        excerpts = []
+        for section_id, content in existing_scripts.items():
+            units = content.get("units") or []
+            text = "\n".join(str(unit.get("text", "")) for unit in units)[:4000]
+            excerpts.append(f"[{section_id}]\n{text}")
+        audit_scope = (
+            "\n待审阅的已有内容（审阅任务的事实性 Claim 必须来自这里）：\n" + "\n".join(excerpts)
+        )
     prompt = f"""任务：提取本节课程中必须核验的事实性 Claim（将进入讲解、案例、评价的事实陈述）。
 判定标准：Claim 必须是可被研究文献支持或反驳的实证性陈述——群体规律、心理机制、干预/教学法效果、相关或因果结论、数据。
 以下内容不是 Claim，禁止提取：教学安排与课堂组织方式、写作与记录规范建议、价值倡导、定义性说明、虚构案例情节、开放反思问题。
@@ -563,7 +579,7 @@ def step_claims(ctx: PipelineContext) -> dict[str, Any]:
 claim_type 取 descriptive/correlational/predictive/causal/mechanistic/theoretical/speculative 之一。
 课程要求：{ctx.request}
 材料（截断）：{_materials_excerpt(ctx, 3000) or '无'}
-学习设计：{designs}
+学习设计：{designs}{audit_scope}
 输出 JSON：{{"claims": [{{"text": "...", "claim_type": "descriptive", "population": "...", "usage": "讲解/案例/评价"}}]}}"""
     data = _llm_json(ctx, task="claims", prompt=prompt)
     claims: list[dict[str, Any]] = []

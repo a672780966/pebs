@@ -16,10 +16,12 @@ seed_artifacts:
     from_markdown: fixtures/lecture/existing_psychology_lecture.md
 expect:
   routing:
-    requested_outputs: [review]
+    # 审阅任务的 Router 输出沿用既有产物词汇（script），真正的判据是 Plan 不进入
+    # Authoring 链（下方 must_exclude_steps）以及 script 节点被复用而非重写。
+    requested_outputs: [script]
   plan:
     must_include_steps: [claims, evidence, gates]
-    must_exclude_steps: [scripts, pptx]
+    must_exclude_steps: [scripts, pptx, storyboard]
   content:
     artifact_types: [gate_result, evidence_index]
     banned_regex: []

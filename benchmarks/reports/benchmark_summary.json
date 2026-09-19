@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-19T09:03:59",
+  "generated_at": "2026-09-19T10:03:09",
   "cases": [
     {
       "case_id": "A",
@@ -165,24 +165,6 @@
         "runtime_seconds": 925.75,
         "automatic_issues": 3.0,
         "runs": 1
-      },
-      "dynamic [+external-media-B]": {
-        "status": "running",
-        "attempts": 1,
-        "succeeded": 0,
-        "evidence_policy": [
-          "SUPPORTED"
-        ],
-        "human_score": null,
-        "edit_ratio": null,
-        "major_edit_rate": null,
-        "evidence_errors": null,
-        "routing_errors": null,
-        "plan_errors": null,
-        "model_calls": 40.0,
-        "runtime_seconds": 7826.67,
-        "automatic_issues": 3.0,
-        "runs": 1
       }
     },
     {
@@ -223,6 +205,27 @@
         "plan_errors": null,
         "model_calls": 10.0,
         "runtime_seconds": 371.08,
+        "automatic_issues": 1.0,
+        "runs": 1
+      }
+    },
+    {
+      "case_id": "E",
+      "dynamic": {
+        "status": "succeeded",
+        "attempts": 2,
+        "succeeded": 1,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 26.0,
+        "runtime_seconds": 681.2,
         "automatic_issues": 1.0,
         "runs": 1
       }
@@ -496,31 +499,6 @@
       "automatic_issues": 3
     },
     {
-      "run_id": "run_810144e1835a",
-      "case_id": "B",
-      "mode": "dynamic",
-      "variant": "dynamic [+external-media-B]",
-      "experiment": "external-media-B",
-      "status": "running",
-      "attempts": 1,
-      "succeeded": 0,
-      "evidence_policy": [
-        "SUPPORTED"
-      ],
-      "human_score": null,
-      "edit_ratio": null,
-      "major_edit_rate": null,
-      "evidence_errors": null,
-      "routing_errors": null,
-      "plan_errors": null,
-      "model_calls": 40,
-      "research_calls": 28,
-      "runtime_seconds": 7826.67,
-      "skill_failure_rate": 0.0,
-      "locality_preservation_rate": null,
-      "automatic_issues": 3
-    },
-    {
       "run_id": "run_ec5bff2ee0c1",
       "case_id": "C",
       "mode": "dynamic",
@@ -566,6 +544,31 @@
       "model_calls": 10,
       "research_calls": 0,
       "runtime_seconds": 371.08,
+      "skill_failure_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 1
+    },
+    {
+      "run_id": "run_17960183a8e6",
+      "case_id": "E",
+      "mode": "dynamic",
+      "variant": "dynamic",
+      "experiment": "",
+      "status": "succeeded",
+      "attempts": 2,
+      "succeeded": 1,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "model_calls": 26,
+      "research_calls": 37,
+      "runtime_seconds": 681.2,
       "skill_failure_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 1
