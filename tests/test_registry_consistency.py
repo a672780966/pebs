@@ -223,3 +223,36 @@ def test_saving_the_registry_refreshes_the_runtime_index(registry_env):
     on_disk = json.loads((Path(config.REGISTRY_DIR) / "runtime_index.json").read_text(encoding="utf-8"))
     assert on_disk == registry.build_runtime_index()
     assert on_disk["skills"][name]["status"] == "DISABLED"
+
+
+def test_builtin_function_metadata_matches_the_registered_step_callable():
+    """handler.steps -> pipeline.STEPS stays the runtime authority; builtin_function is metadata.
+
+    Every builtin skill's declared pointer must resolve to the identical callable that
+    pipeline.STEPS registers for at least one of its declared handler.steps, and a
+    non-builtin runtime must not declare one at all. Nothing dispatches through it.
+    """
+    import importlib
+
+    checked = 0
+    for name, record in sorted(registry.load_skills().items()):
+        handler = record.get("handler") or {}
+        runtime_kind = str(record.get("runtime", "builtin"))
+        pointer = str(handler.get("builtin_function") or "")
+        steps = list(handler.get("steps") or [])
+        if runtime_kind != "builtin":
+            assert not pointer, f"{name}: 非 builtin runtime 不应声明 builtin_function"
+            continue
+        assert pointer, f"{name}: builtin skill 必须声明 builtin_function"
+        module_name, separator, function_name = pointer.partition(":")
+        assert separator and module_name and function_name, (
+            f"{name}: builtin_function 格式应为 module:function（{pointer}）"
+        )
+        resolved = getattr(importlib.import_module(module_name), function_name, None)
+        assert resolved is not None, f"{name}: builtin_function 无法解析 {pointer}"
+        assert steps, f"{name}: builtin skill 必须声明 handler.steps"
+        assert any(pipeline.STEPS.get(step) is resolved for step in steps), (
+            f"{name}: builtin_function {pointer} 与 handler.steps {steps} 指向的可调用对象不一致"
+        )
+        checked += 1
+    assert checked, "expected at least one builtin skill in the registry"
