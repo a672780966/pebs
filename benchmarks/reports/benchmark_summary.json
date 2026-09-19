@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T05:18:22",
+  "generated_at": "2026-09-20T05:33:07",
   "cases": [
     {
       "case_id": "A",
@@ -309,7 +309,7 @@
       },
       "dynamic [+external-assessment]": {
         "status": "failed",
-        "attempts": 1,
+        "attempts": 2,
         "succeeded": 0,
         "evidence_policy": null,
         "human_score": null,
@@ -318,10 +318,10 @@
         "evidence_errors": null,
         "routing_errors": null,
         "plan_errors": null,
-        "model_calls": 16.0,
-        "runtime_seconds": 951.75,
-        "skill_failure_rate": 0.273,
-        "schema_repair_rate": null,
+        "model_calls": 24.0,
+        "runtime_seconds": 845.15,
+        "skill_failure_rate": 0.091,
+        "schema_repair_rate": 0.0,
         "locality_preservation_rate": null,
         "automatic_issues": 0.0,
         "reviewers": [],
@@ -857,13 +857,13 @@
       "automatic_issues": 1
     },
     {
-      "run_id": "run_7091fc9e5d77",
+      "run_id": "run_cfaf6124c7d7",
       "case_id": "D",
       "mode": "dynamic",
       "variant": "dynamic [+external-assessment]",
       "experiment": "external-assessment",
       "status": "failed",
-      "attempts": 1,
+      "attempts": 2,
       "succeeded": 0,
       "evidence_policy": null,
       "human_score": null,
@@ -875,11 +875,11 @@
       "reviewer": null,
       "human_eval_run_id": null,
       "human_eval_stale": false,
-      "model_calls": 16,
+      "model_calls": 24,
       "research_calls": 12,
-      "runtime_seconds": 951.75,
-      "skill_failure_rate": 0.2727,
-      "schema_repair_rate": null,
+      "runtime_seconds": 845.15,
+      "skill_failure_rate": 0.0909,
+      "schema_repair_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 0
     },
@@ -1093,11 +1093,11 @@
       "routing_errors": null,
       "plan_errors": null,
       "schema_repair_rate": 0.0,
-      "skill_failure_rate": 0.031,
-      "model_calls": 371.0,
-      "runtime_seconds": 20780.75,
+      "skill_failure_rate": 0.018,
+      "model_calls": 379.0,
+      "runtime_seconds": 20674.15,
       "succeeded": 19.0,
-      "attempts": 38.0
+      "attempts": 39.0
     },
     "scenario": {
       "variants": 2,

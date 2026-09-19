@@ -170,6 +170,35 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 动态链路下门禁读不到产物并静默 PASS（Gate False Negative）（GATES §71-8）
+
+- **date**: 2026-09-20
+- **task**: M6.4 真实外部 Skill A/B（D + `/hinge-question-designer`）
+- **symptom**: 真实运行为 `gate-runner FAILED：Subagent 契约违规：qa-agent 不允许产出
+  artifact 类型：script（契约产出：['gate_result']）`。追查时又发现更严重的问题：
+  同一次运行里 G1 对一个 25 字、字数要求 100–200 字的脚本给出 **PASS 且无任何 issue**，
+  而在运行外用同一份产物直接调用 `g1_requirements` 却得到 FAIL（"字数 25 不在范围 100–200"）
+- **root_cause**: 两个叠加缺陷。
+  (1) `RestrictedContext.outputs` 只暴露 `allowed_inputs | produces`，而 gate-runner 的
+  `requires` 里没有 `requirements`；`step_gates` 用 `dict(ctx.outputs)` 作为
+  `GateContext.overrides`，于是门禁读 `requirements` 时回退到 `store.accepted_content()`
+  ——本轮尚未 accept 的 changeset 恒为 None，G1 的字数检查被整体跳过（静默 PASS）。
+  受影响的不止 `requirements`：`learning_design`/`teaching_plan`/`assessment`/
+  `template_spec` 等同样不在契约内。
+  (2) QA 自动修正（AUTO_FIX_GATES = G1/G4/G7）会在门禁节点内 `emit("script:<sec>")`，
+  但 gate-runner 只声明了 `produces: [gate_result]`，契约直接拒绝写入
+- **skill**: `gate-runner`
+- **artifact**: `pebs/pipeline.py`、`pebs/agents/base.py`、`registry/skills.json`
+- **fix**:
+  (a) `_run_overrides()`：overrides 改为"本轮 run 产出的全部产物（最新 revision）"，
+  门禁不再受节点契约过滤影响；用 `emits: [gate_result, script]`（不进 `produces`，
+  以免 Planner 以为 gate-runner 能生产 script 而污染 DAG）放行自动修正写入；
+  (b) 契约输入纳入 `optional_requires`（已声明的可选输入不该被当成未声明）；
+  (c) 预算不足时自动修正降级（保留 FAIL 待人工），而不是把"内容已产出、只剩重试"的
+  运行判为 BLOCKED
+- **regression_test**: `tests/test_autofix.py::test_dynamic_gate_reads_artifacts_outside_its_contract`、
+  `::test_dynamic_auto_fix_survives_the_subagent_contract`
+
 ## 2026-09-20 — provider 的 `_usage` 元数据被 emit 进外部 Skill 产物（RUNTIME §11/§39）
 
 - **date**: 2026-09-20

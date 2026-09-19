@@ -963,7 +963,11 @@
       "model_calls": 2,
       "research_calls": 0
     },
-    "self_implemented": true
+    "self_implemented": true,
+    "emits": [
+      "gate_result",
+      "script"
+    ]
   },
   "preview-builder": {
     "name": "preview-builder",

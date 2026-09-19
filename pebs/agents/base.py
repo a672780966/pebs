@@ -166,9 +166,15 @@ class Subagent:
 
     def contract_for(self, record: dict[str, Any], *, strict_reads: bool = False) -> AgentContract:
         domain = str(record.get("domain") or self.domain)
+        # `optional_requires` 是**已声明**的可选输入，必须算进契约输入：
+        # RestrictedContext.outputs 只暴露 allowed_inputs | produces，若把可选输入排除，
+        # 依赖它们的步骤（例如 gate-runner 读 requirements/teaching_plan 做 G1/G3）
+        # 会拿到空产物并静默跳过检查——动态链路下门禁被悄悄削弱。
+        required = list(record.get("requires") or self.default_inputs or ())
+        optional = [item for item in (record.get("optional_requires") or []) if item not in required]
         return AgentContract(
             agent=self.name,
-            inputs=tuple(record.get("requires") or self.default_inputs),
+            inputs=tuple(required + optional),
             outputs=tuple(record.get("emits") or record.get("produces") or self.default_produces),
             output_schema=record.get("output_schema"),
             domain=domain,

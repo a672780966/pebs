@@ -2167,6 +2167,29 @@ def step_load_review(ctx: PipelineContext) -> dict[str, Any]:
     return {"notes": notes}
 
 
+def _run_overrides(ctx: PipelineContext) -> dict[str, str]:
+    """门禁需要看到**本轮 run 产出的全部产物**，而不只是节点契约里声明过的那些。
+
+    `ctx.outputs` 是 Subagent 契约过滤后的视图（`RestrictedContext.outputs`
+    只暴露 allowed_inputs | produces）。门禁要读 requirements / teaching_plan /
+    learning_design 等大量产物，这些不在 gate-runner 的 requires 里，
+    于是 `GateContext.content()` 回退到 `store.accepted_content()`——对本轮
+    尚未 accept 的 changeset 恒为 None，检查被静默跳过（Gate False Negative）。
+    """
+    latest: dict[str, str] = {}
+    run_id = getattr(ctx, "run_id", "")
+    for artifact in ctx.store.list_artifacts():
+        for revision_id in ctx.store.revisions_of(artifact["artifact_id"]):
+            try:
+                info = ctx.store.get_revision(revision_id)
+            except StoreError:
+                continue
+            if run_id and info.get("produced_by_run") == run_id:
+                latest[artifact["artifact_id"]] = revision_id
+    latest.update(dict(ctx.outputs))
+    return latest
+
+
 def step_gates(ctx: PipelineContext) -> dict[str, Any]:
     _check_cancel(ctx)
     _skill(ctx, "gate-runner")
@@ -2175,7 +2198,7 @@ def step_gates(ctx: PipelineContext) -> dict[str, Any]:
         evidence=ctx.evidence,
         run_id=ctx.run_id,
         environment=ctx.environment,
-        overrides=dict(ctx.outputs),
+        overrides=_run_overrides(ctx),
     )
     max_rounds = int(config.RULES.get("retries", {}).get("qa_fix_rounds", 2))
     notes: list[str] = []
@@ -2188,10 +2211,21 @@ def step_gates(ctx: PipelineContext) -> dict[str, Any]:
         fixable: list[dict[str, Any]] = []
         while True:
             _check_cancel(ctx)
-            gate_ctx.overrides = dict(ctx.outputs)
+            gate_ctx.overrides = _run_overrides(ctx)
             results = gates.run_section_gates(gate_ctx, artifact_id)
             fixable = [r for r in results if r["gate_id"] in AUTO_FIX_GATES and r["status"] == "FAIL"]
             if not fixable or rounds >= max_rounds:
+                break
+            # 自动修正是可选优化，不是交付物：预算不够时应降级（保留 FAIL 待人工/正式导出前处理），
+            # 而不是让一个"内容已全部产出、只剩重试"的运行以 BLOCKED 收场。
+            try:
+                remaining = ctx.store.budget_remaining(ctx.run_id)
+            except Exception:  # noqa: BLE001 - 拿不到预算时按原有行为继续
+                remaining = None
+            if remaining is not None and int(remaining.get("model_calls", 0)) <= 0:
+                notes.append(
+                    f"{artifact_id}: 剩余模型预算不足，跳过自动修正（保留 {len(fixable)} 个 FAIL 待人工处理）"
+                )
                 break
             rounds += 1
             try:

@@ -107,7 +107,14 @@ def test_agent_contract_comes_from_the_registry_record():
     agent = default_agents()["pedagogy-agent"]
     record = registry.get("script-writer")
     contract = agent.contract_for(record)
-    assert contract.inputs == tuple(record["requires"])
+    # 契约输入 = requires + optional_requires：可选输入也是"已声明"的，
+    # 若不纳入，依赖可选输入的步骤会拿不到产物并静默跳过检查（见 §71-8）
+    expected_inputs = tuple(
+        list(record["requires"])
+        + [item for item in (record.get("optional_requires") or []) if item not in record["requires"]]
+    )
+    assert contract.inputs == expected_inputs
+    assert set(record["requires"]) <= set(contract.inputs)
     assert set(contract.outputs) == set(record.get("emits") or record["produces"])
 
 
