@@ -301,6 +301,14 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
             )
         )
         return 0
+    if args.export_eval_kit:
+        from .benchmark import evaluation as evaluation_mod
+
+        exported = evaluation_mod.export_kit()
+        for item in exported:
+            print(f"{item['case_id']}/{item['variant']}: {item['dir']}")
+        print(f"共导出 {len(exported)} 份待评课程包（含 human_eval.yaml 评分表）")
+        return 0
     if args.report:
         path = report_mod.write_report()
         worksheets = report_mod.write_worksheets()
@@ -425,6 +433,7 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--no-accept", action="store_true")
     bench.add_argument("--report", action="store_true", help="只根据已有 runs 生成对比报告与教师评分工作表")
     bench.add_argument("--submit-eval", default="", help="回收教师填写的工作表 YAML（需配合 --project）")
+    bench.add_argument("--export-eval-kit", action="store_true", help="导出待评课程材料包 + 评分表到 benchmarks/reports/evaluation_kit/")
     bench.add_argument("--project", default="", help="--submit-eval 的目标项目")
     bench.add_argument("--strict", action="store_true", help="存在失败/自动问题时以非零退出")
     bench.add_argument("--max-model-calls", type=int, default=0)

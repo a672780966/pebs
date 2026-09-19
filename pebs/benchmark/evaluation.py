@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from .. import config
@@ -131,6 +132,67 @@ def record(engine: Any, payload: dict[str, Any], *, run_id: str = "", mode: str 
     )
     engine.store.set_accepted("human_eval", info["revision_id"])
     return content
+
+
+def export_kit(runs: list[dict[str, Any]] | None = None, *, directory: Any = None) -> list[dict[str, Any]]:
+    """§30/§31：把待评课程导出成教师可直接阅读的材料包 + 评分表。
+
+    教师不需要运行 PEBS：每个 run 一个目录，含 course.md（关键产物）、run.json 摘要与
+    human_eval.yaml（待填）。
+    """
+    from pathlib import Path
+
+    from ..store import Store
+    from . import report as report_mod
+
+    runs = runs if runs is not None else report_mod.load_runs()
+    target_dir = Path(directory) if directory else (Path(__file__).resolve().parents[2] / "benchmarks" / "reports" / "evaluation_kit")
+    target_dir.mkdir(parents=True, exist_ok=True)
+    exported: list[dict[str, Any]] = []
+    for run in runs:
+        project_id = str(run.get("project_id") or "")
+        if not project_id:
+            continue
+        case_id = str(run.get("case_id") or "?")
+        variant = str(run.get("_variant") or run.get("mode") or "?")
+        slug = f"{case_id}-{variant}".replace(" ", "").replace("[", "").replace("]", "").replace("+", "_")
+        base = target_dir / slug
+        base.mkdir(parents=True, exist_ok=True)
+        try:
+            store = Store(project_id, config.project_dir(project_id))
+        except Exception:  # noqa: BLE001 - 项目已被清理时跳过
+            continue
+        lines = [
+            f"# {case_id} / {variant}",
+            "",
+            f"- run: {run.get('run_id')} status={run.get('run_status')}",
+            f"- 模式：{run.get('mode')} 实验：{run.get('experiment') or '（无）'}",
+            f"- 模型调用：{(run.get('metrics') or {}).get('model_calls')} 研究请求：{(run.get('metrics') or {}).get('research_calls')}",
+            f"- 证据政策：{run.get('evidence_policy')}",
+            "",
+            "> 评分说明见同目录 human_eval.yaml 与 benchmarks/reports/evaluation_kit/README.md",
+            "",
+        ]
+        for artifact_id in (
+            "lesson_plan:sec1", "lesson_plan:sec2", "lesson_plan:sec3", "lesson_plan:sec4",
+            "script:sec1", "script:sec2", "script:sec3", "script:sec4",
+            "slide_plan", "pptx_deck", "assessment:sec1", "case:sec1:1",
+        ):
+            content = store.accepted_content(artifact_id)
+            if content is None:
+                continue
+            lines.append(f"## {artifact_id}")
+            lines.append("")
+            lines.append("```json")
+            lines.append(json.dumps(content, ensure_ascii=False, indent=2)[:20000])
+            lines.append("```")
+            lines.append("")
+        (base / "course.md").write_text("\n".join(lines), encoding="utf-8")
+        (base / "run.json").write_text(json.dumps(run, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        worksheets = report_mod.write_worksheets([run], directory=base)
+        exported.append({"case_id": case_id, "variant": variant, "dir": str(base), "worksheet": str(worksheets[0]) if worksheets else ""})
+        store.close()
+    return exported
 
 
 def latest(engine: Any) -> dict[str, Any] | None:
