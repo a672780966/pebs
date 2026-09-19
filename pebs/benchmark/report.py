@@ -222,6 +222,38 @@ def _now() -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
 
 
+def failure_category_section(runs: list[dict[str, Any]] | None = None) -> list[str]:
+    """§65：把自动失败按 taxonomy 类别分布写进报告。
+
+    只统计"当前代表 run"的自动问题；类别为空的 case 不占行。
+    若出现不在 `failure_taxonomy.yaml` 里的 kind，单独列出（不静默丢弃）。
+    """
+    runs = runs if runs is not None else load_runs()
+    totals: dict[str, int] = {}
+    unknown: dict[str, list[str]] = {}
+    for run in runs:
+        automatic = run.get("automatic_issues") or {}
+        for kind, count in (automatic.get("counts") or {}).items():
+            totals[str(kind)] = totals.get(str(kind), 0) + int(count)
+        for kind in automatic.get("unknown_categories") or []:
+            unknown.setdefault(str(kind), []).append(str(run.get("case_id")))
+    if not totals and not unknown:
+        return []
+    lines = ["", "## 失败类别分布（§65 failure taxonomy；仅统计代表 run 的自动问题）", ""]
+    if totals:
+        lines.append("| 类别 | 次数 |")
+        lines.append("| --- | ---: |")
+        for kind in sorted(totals, key=lambda item: (-totals[item], item)):
+            lines.append(f"| {kind} | {totals[kind]} |")
+        lines.append("")
+    if unknown:
+        lines.append("> ⚠ 以下 kind 不在 failure_taxonomy.yaml 中（分类无效）：")
+        for kind, case_ids in sorted(unknown.items()):
+            lines.append(f"> - {kind}（{ '、'.join(sorted(set(case_ids))) }）")
+        lines.append("")
+    return lines
+
+
 def _base_mode(variant: str) -> str:
     """把 `dynamic [+external-media]` 这类实验变体归回它的基础模式（§28/§46）。"""
     return variant.split(" ", 1)[0].strip() or variant
@@ -337,6 +369,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             if reviewers or note:
                 lines.append(f"| | 教师：{('、'.join(reviewers)) or '—'}{note} | | | | | | | | | | |")
     lines.extend(render_mode_comparison(summary))
+    lines.extend(failure_category_section())
     lines.extend(quality_section())
     lines.extend(performance_section())
     lines.append("")

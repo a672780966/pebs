@@ -342,6 +342,33 @@ def media_consistency_checks(store: Any, expect: dict[str, Any]) -> list[dict[st
     return safety_mod.diagram_checks(store)
 
 
+def taxonomy_categories() -> set[str]:
+    """§65：失败类别以 `benchmarks/failure_taxonomy.yaml` 为唯一来源。
+
+    自动检查产出的每个 `kind` 都必须落在这 15 个类别里，否则"每条失败都可归类"
+    就只是口号（拼错的类别会变成一个永不被统计的孤儿类别）。
+    """
+    import yaml
+
+    from . import cases as cases_mod
+
+    path = cases_mod.benchmark_dir() / "failure_taxonomy.yaml"
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError):  # pragma: no cover - 仓库缺文件时不做强校验
+        return set()
+    return {str(item.get("id")) for item in (data.get("categories") or []) if item.get("id")}
+
+
+def categorize(issues: list[dict[str, Any]]) -> dict[str, int]:
+    """§35/§65：按失败类别聚合自动问题（Routing Error Rate / Plan Error Rate 由此得出）。"""
+    counts: dict[str, int] = {}
+    for issue in issues:
+        kind = str(issue.get("kind") or "RUNTIME")
+        counts[kind] = counts.get(kind, 0) + 1
+    return dict(sorted(counts.items()))
+
+
 def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None = None, route: dict[str, Any] | None = None) -> dict[str, Any]:
     issues = (
         plan_checks(plan or {}, expect)
@@ -352,7 +379,13 @@ def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None 
         + ppt_checks(store, expect)
         + media_consistency_checks(store, expect)
     )
-    counts: dict[str, int] = {}
-    for issue in issues:
-        counts[issue["kind"]] = counts.get(issue["kind"], 0) + 1
-    return {"issues": issues, "counts": counts, "ok": not issues}
+    counts = categorize(issues)
+    known = taxonomy_categories()
+    unknown = sorted(kind for kind in counts if known and kind not in known)
+    return {
+        "issues": issues,
+        "counts": counts,
+        "by_category": categorize(issues),
+        "unknown_categories": unknown,
+        "ok": not issues,
+    }

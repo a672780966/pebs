@@ -331,6 +331,50 @@ def test_reproducibility_records_commit_and_skill_provenance():
     assert reproducible["skill_patches"] == ["dual-coding-designer@dual-coding-pebs-1"]
 
 
+def test_failure_taxonomy_categories_match_emitted_issue_kinds():
+    """§65：自动检查产出的每个 kind 都必须能落进 failure_taxonomy 的类别。"""
+    known = checks.taxonomy_categories()
+    assert known, "failure_taxonomy.yaml 必须可读"
+    assert "ROUTING" in known and "LOCALITY" in known and "PRIVACY" in known
+
+    # 各检查路径实际会产出的 kind（漏一个就意味着报告里出现孤儿类别）
+    emitted = {
+        "PLANNING",
+        "ROUTING",
+        "CONTENT",
+        "SAFETY",
+        "MEDIA",
+        "PEDAGOGY",
+        "EVIDENCE",
+    }
+    assert emitted <= known, f"未登记的失败类别：{sorted(emitted - known)}"
+    assert checks.categorize([{"kind": "ROUTING"}, {"kind": "ROUTING"}, {"kind": "SAFETY"}]) == {
+        "ROUTING": 2,
+        "SAFETY": 1,
+    }
+
+
+def test_report_lists_failure_categories_and_surfaces_unknown_ones():
+    """§65：报告要有类别分布；不在 taxonomy 里的 kind 必须显式列出而不是消失。"""
+    runs = [
+        {
+            "case_id": "A",
+            "mode": "dynamic",
+            "run_id": "r1",
+            "metrics": {},
+            "automatic_issues": {
+                "issues": [{}, {}],
+                "counts": {"ROUTING": 1, "BOGUS": 1},
+                "unknown_categories": ["BOGUS"],
+            },
+        }
+    ]
+    section = "\n".join(report.failure_category_section(runs))
+    assert "失败类别分布" in section
+    assert "| ROUTING | 1 |" in section
+    assert "BOGUS" in section and "分类无效" in section
+
+
 def test_performance_registry_records_versions_and_promotion(tmp_path, monkeypatch):
     from pebs import config
 

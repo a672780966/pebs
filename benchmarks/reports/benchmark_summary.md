@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-20T01:52:46；run 数（每 case×mode 取最新）：18
+生成时间：2026-09-20T02:39:38；run 数（每 case×mode 取最新）：18
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -35,6 +35,17 @@
 | Model Calls（合计） | 2.0 | 12.0 | 354.0 | 14.0 |
 | Runtime(s)（合计） | 377.46 | 348.53 | 20060.42 | 4318.9 |
 | Succeeded / Attempts | 2.0 / 2.0 | 0 / 5.0 | 18.0 / 37.0 | 3.0 / 3.0 |
+
+
+## 失败类别分布（§65 failure taxonomy；仅统计代表 run 的自动问题）
+
+| 类别 | 次数 |
+| --- | ---: |
+| CONTENT | 10 |
+| SAFETY | 10 |
+| ROUTING | 6 |
+| PLANNING | 5 |
+| EVIDENCE | 3 |
 
 
 ## 质量指标（§53/§54/§58；频度与分布，人工评分参考，不设自动阈值）

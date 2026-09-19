@@ -170,6 +170,25 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — failure taxonomy 只是文档：没有代码引用，类别写错也不会被发现（BENCHMARK §35/§65）
+
+- **date**: 2026-09-20
+- **task**: M6 失败分类
+- **symptom**: `benchmarks/failure_taxonomy.yaml` 定义了 15 个类别，但只有
+  `test_failure_taxonomy_covers_required_categories` 校验"类别齐全"；
+  检查器产出的 `kind` 与 taxonomy 之间**没有任何代码关联**，
+  报告也没有按类别分布（只有一列 `Auto Issues` 总数），
+  Routing Error Rate / Plan Error Rate 无法从报告直接读出
+- **root_cause**: taxonomy 被当成文档资产而不是被消费的契约；`evaluate()` 直接用 kind 计数，
+  拼错一个 kind（如 `PLANING`）会静默生成一个永不被统计的孤儿类别
+- **skill**: `benchmark-checks`
+- **artifact**: `pebs/benchmark/checks.py`、`pebs/benchmark/report.py`
+- **fix**: `taxonomy_categories()` 从 YAML 读取唯一定义；`evaluate()` 增加
+  `by_category` 与 `unknown_categories`；报告增加"失败类别分布（§65）"章节，
+  并把不在 taxonomy 里的 kind 显式列出（不静默丢弃）
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_failure_taxonomy_categories_match_emitted_issue_kinds`、
+  `::test_report_lists_failure_categories_and_surfaces_unknown_ones`
+
 ## 2026-09-20 — run 记录里没有 PEBS commit / provider SHA / patch，§41 复现信息不完整（BENCHMARK §41）
 
 - **date**: 2026-09-20
