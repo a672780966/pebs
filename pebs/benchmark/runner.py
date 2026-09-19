@@ -127,7 +127,6 @@ def run_scenario(
         "base_run_id": base_start["run_id"],
         "base_run_status": base_status["run"]["status"],
         "project_id": project,
-        "evidence_policy": list((config.RULES.get("evidence") or {}).get("pck_claim_statuses") or ["SUPPORTED"]),
     }
     if base_status["run"]["status"] != "succeeded":
         record.update(
@@ -238,9 +237,6 @@ def run_case(
     project_id: str | None = None,
     budgets: dict[str, int] | None = None,
     accept: bool = True,
-    allow_qualified_claims: bool = False,
-    allow_empty_claims: bool = False,
-    allow_unverified_pck: bool = False,
     extra_skills: list[str] | None = None,
     experiment: str = "",
 ) -> dict[str, Any]:
@@ -269,33 +265,10 @@ def run_case(
     target.mkdir(parents=True, exist_ok=True)
     started = time.time()
 
-    original_rules = config.RULES
-    effective_policy = list((original_rules.get("evidence") or {}).get("pck_claim_statuses") or ["SUPPORTED"])
-    effective_empty_policy = bool((original_rules.get("evidence") or {}).get("allow_empty_claims"))
-    effective_unverified_policy = bool((original_rules.get("evidence") or {}).get("allow_unverified_pck"))
-    if allow_qualified_claims or allow_empty_claims or allow_unverified_pck:
-        # M6 §13/§48：操作者显式放行（限定语必须保留 / 无实证 Claim 必须声明限制）；
-        # 该设置会写进 run.json，保证可复现与可审计。
-        evidence = dict(original_rules.get("evidence") or {})
-        if allow_qualified_claims:
-            evidence["pck_claim_statuses"] = ["SUPPORTED", "QUALIFY_REQUIRED"]
-            effective_policy = ["SUPPORTED", "QUALIFY_REQUIRED"]
-        if allow_empty_claims:
-            evidence["allow_empty_claims"] = True
-            effective_empty_policy = True
-        if allow_unverified_pck:
-            evidence["allow_unverified_pck"] = True
-            effective_unverified_policy = True
-        relaxed = dict(original_rules)
-        relaxed["evidence"] = evidence
-        config.RULES = relaxed
-    try:
-        if mode == "direct_codex":
-            record = _run_direct(case, target)
-        else:
-            record = _run_pebs(case, mode=mode, project=project, budgets=effective_budgets, accept=accept)
-    finally:
-        config.RULES = original_rules
+    if mode == "direct_codex":
+        record = _run_direct(case, target)
+    else:
+        record = _run_pebs(case, mode=mode, project=project, budgets=effective_budgets, accept=accept)
 
     record.update(
         {
@@ -306,9 +279,6 @@ def run_case(
             "wall_time_seconds": round(time.time() - started, 2),
             "fixtures": _fixture_hashes(case),
             "reproducibility": trace.reproducibility(fixture_hashes=_fixture_hashes(case)),
-            "evidence_policy": effective_policy,
-            "empty_claims_policy": effective_empty_policy,
-            "unverified_pck_policy": effective_unverified_policy,
             "experiment": experiment or ("+".join(extra_skills) if extra_skills else ""),
             "extra_skills": extra_skills,
             "run_dir": str(target),

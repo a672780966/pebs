@@ -100,7 +100,7 @@
 - **root_cause**: `evidence_index.claims` 登记了全部 Claim，而它是"PCK 可消费契约"
 - **skill**: `evidence-reviewer` / `pck-developer`
 - **artifact**: `pebs/pipeline.py`、`pebs/preconditions.py`
-- **fix**: 契约只登记可消费状态（`rules.evidence.pck_claim_statuses`，默认 SUPPORTED）；不可消费的显式写入 `excluded_claims`（含状态与原因，不隐藏）；另修正 `usage_scope` 按多值 token 交集匹配
+- **fix**: 契约只登记可消费状态（冻结常量 `pebs.preconditions.PCK_REQUIRED_STATUS = "SUPPORTED"`，不可配置）；不可消费的显式写入 `excluded_claims`（含状态与原因，不隐藏）；另修正 `usage_scope` 按多值 token 交集匹配
 - **regression_test**: `tests/test_evidence_status_policy.py`、`tests/test_usage_scope_matching.py`
 
 ## 2026-09-18 — 真实 Codex 运行：PCK 前置条件因 usage 多值而永远阻塞（EVIDENCE/RUNTIME）
@@ -121,8 +121,9 @@
 - **symptom**: B/dynamic 与 A/builtin 在 PCK 处 blocked；A/dynamic 只有加入合成材料 fixture 后才成功
 - **root_cause**: 实践型断言（"观察记录应区分事实与判断"）在真实文献中通常只能到 QUALIFY_REQUIRED 或无直接引文；严格 quote-grounding 下没有可用 SUPPORTED 证据
 - **skill**: `evidence-reviewer` / `pck-developer`
-- **artifact**: `benchmarks/fixtures/materials/observation_recording_handbook.md`、`config/rules.yaml`（`evidence.pck_claim_statuses`）
-- **fix**: (1) 证据检索优先选择有摘要/全文的来源（空摘要按 metadata 排序，不占用核验名额）；(2) 提供操作者显式政策 `--allow-qualified-claims`（放行 QUALIFY_REQUIRED，限定语必须保留，写入 run.json 的 evidence_policy）；(3) benchmark 材料化证据（教师上传手册/标准 → user_material 可定位引文）
+- **artifact**: `benchmarks/fixtures/materials/observation_recording_handbook.md`（历史记录：当时 `config/rules.yaml` 中的证据政策开关已在 baseline recovery 中移除）
+- **fix**: (1) 证据检索优先选择有摘要/全文的来源（空摘要按 metadata 排序，不占用核验名额）；(2) 【历史/已废止】当时提供过操作者政策 `--allow-qualified-claims` 放行 QUALIFY_REQUIRED —— baseline recovery 已冻结证据契约，该 CLI 开关、`rules.evidence.pck_claim_statuses` 配置键、以及对应的 benchmark 放宽路径全部移除，不再可用；(3) benchmark 材料化证据（教师上传手册/标准 → user_material 可定位引文）
+- **current_guidance（baseline recovery 之后的唯一正确做法）**: PCK 因证据不足阻塞时——① 改进来源选择；② 收窄或改写该事实性 Claim，直到它真正获得 SUPPORTED；③ 使用教师提供的权威材料作为可定位证据；④ 删除该不受支持的事实依赖；⑤ 以上都做不到时保持 BLOCK。系统不提供任何放行开关（含空证据与未核验证据）。
 - **regression_test**: `tests/test_evidence_status_policy.py`；真实运行记录见 `benchmarks/reports/benchmark_summary.md`
 
 ## 2026-09-18 — 预算感知只在规划层，执行层仍会中途耗尽（RUNTIME）
