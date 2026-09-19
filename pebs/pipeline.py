@@ -2193,12 +2193,14 @@ def _run_overrides(ctx: PipelineContext) -> dict[str, str]:
 def step_gates(ctx: PipelineContext) -> dict[str, Any]:
     _check_cancel(ctx)
     _skill(ctx, "gate-runner")
+    # 只在该步骤开始时扫一次 run 产物：每个 section × 每轮都全量扫会很慢
+    _gate_overrides_base = dict(_run_overrides(ctx))
     gate_ctx = gates.GateContext(
         store=ctx.store,
         evidence=ctx.evidence,
         run_id=ctx.run_id,
         environment=ctx.environment,
-        overrides=_run_overrides(ctx),
+        overrides=dict(_gate_overrides_base),
     )
     max_rounds = int(config.RULES.get("retries", {}).get("qa_fix_rounds", 2))
     notes: list[str] = []
@@ -2211,7 +2213,8 @@ def step_gates(ctx: PipelineContext) -> dict[str, Any]:
         fixable: list[dict[str, Any]] = []
         while True:
             _check_cancel(ctx)
-            gate_ctx.overrides = _run_overrides(ctx)
+            # 本轮新产出的 revision（含自动修正后的脚本）优先于步骤开始时的快照
+            gate_ctx.overrides = {**dict(_gate_overrides_base), **dict(ctx.outputs)}
             results = gates.run_section_gates(gate_ctx, artifact_id)
             fixable = [r for r in results if r["gate_id"] in AUTO_FIX_GATES and r["status"] == "FAIL"]
             if not fixable or rounds >= max_rounds:
