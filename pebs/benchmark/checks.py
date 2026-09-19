@@ -90,6 +90,18 @@ QUOTED_EXAMPLE_PATTERNS = (
 )
 
 
+# §50：练习/判断题里的选项本身就是"待判定的错误写法"，不算产物在主张它
+OPTION_MARKER = re.compile(r"(?:^|[。；;！!？?：:\n])\s*[A-DＡ-Ｄa-d][.、．)）]\s*")
+
+
+def _in_exercise_option(text: str, start: int, *, window: int = 24, question_window: int = 80) -> bool:
+    prefix = text[max(0, start - window) : start]
+    if not OPTION_MARKER.search(prefix):
+        return False
+    question = text[max(0, start - question_window) : start]
+    return "？" in question or "?" in question or "判断" in question or "选择" in question
+
+
 def _in_example_context(text: str, start: int, pattern: str, *, window: int = 16) -> bool:
     import re as _re
 
@@ -125,7 +137,7 @@ def content_checks(store: Any, expect: dict[str, Any]) -> list[dict[str, Any]]:
     for artifact_id, text in texts.items():
         for pattern in content.get("banned_regex", []):
             for match in re.finditer(pattern, text):
-                if _in_example_context(text, match.start(), pattern):
+                if _in_example_context(text, match.start(), pattern) or _in_exercise_option(text, match.start()):
                     continue
                 issues.append({"kind": "SAFETY", "detail": f"{artifact_id} 命中禁用表达：{pattern}"})
                 break

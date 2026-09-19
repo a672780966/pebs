@@ -86,6 +86,20 @@ def test_banned_regex_ignores_quoted_error_examples():
     assert bad["issues"][0]["kind"] == "SAFETY"
 
 
+def test_banned_regex_ignores_exercise_options():
+    """§50：判断题选项中的错误写法是待判定对象，不算产物在主张它。"""
+    store = _StubStore(
+        {
+            "script:sec1": {
+                "artifact_id": "script:sec1",
+                "content": "判断：下面哪一句改写没有加入因果暗示？ A. 手机使用导致焦虑。 B. 手机使用是焦虑的原因。 C. 在大学生群体中两者相关，但不能确定因果。",
+            }
+        }
+    )
+    expect = {"content": {"artifact_types": ["script"], "banned_regex": ["导致焦虑"]}}
+    assert checks.evaluate(store, expect)["ok"] is True
+
+
 def test_banned_regex_ignores_negative_examples():
     """教学反例（"不要写'这个孩子就是…'"）不应被判为标签化违规。"""
     store = _StubStore(
