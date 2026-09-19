@@ -264,6 +264,49 @@ def test_acceptance_1_and_2_external_skill_needs_no_pipeline_change(
     ]
 
 
+def test_schema_repair_is_visible_in_trace_and_performance(synthetic_provider, provider_engine, registry_env):
+    """§35：外部 Skill 第一次输出不合法、重生成后通过——必须留痕，否则 Repair Rate 无从计算。"""
+    from pebs.benchmark import performance, trace as trace_mod
+
+    engine = provider_engine
+    engine.llm = FakeLLM(
+        external_skill_payloads=[
+            {"section_id": "sec1", "items": [{"assessment_id": "q1"}]},  # 缺 kind/question/answer/target_goal
+            {
+                "section_id": "sec1",
+                "items": [
+                    {
+                        "assessment_id": "q1",
+                        "kind": "hinge_question",
+                        "question": "?",
+                        "options": ["a", "b"],
+                        "answer": "a",
+                        "target_goal": "g1",
+                    }
+                ],
+            },
+        ]
+    )
+    start, status = run_dynamic_build(engine, REQUEST_1 + " /synthetic-rubric-designer")
+    assert status["run"]["status"] == "succeeded", [
+        (step["step_id"], step["status"], step["error"]) for step in status["steps"]
+    ]
+
+    skill_trace = trace_mod.build_trace(engine, start["run_id"])
+    entry = next(item for item in skill_trace["skills"] if item["skill"] == "synthetic-rubric-designer")
+    assert entry["schema_repairs"] == 1, entry["note"]
+
+    from pebs.benchmark import metrics
+
+    summary = metrics.summarize_run(skill_trace)
+    assert summary["schema_repairs"] == 1
+    assert summary["schema_repair_rate"] > 0
+
+    performance.record_trace(skill_trace)
+    record = performance.load_performance()["skills"]["synthetic-rubric-designer"]
+    assert record["schema_repair_rate"] > 0
+
+
 def test_restricted_context_enforces_declared_only_access():
     class Inner:
         def __init__(self):

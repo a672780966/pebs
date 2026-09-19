@@ -331,6 +331,23 @@ def test_reproducibility_records_commit_and_skill_provenance():
     assert reproducible["skill_patches"] == ["dual-coding-designer@dual-coding-pebs-1"]
 
 
+def test_schema_repair_rate_is_recorded_from_step_notes():
+    """§35：外部 Skill 重生成一次才通过 Schema 的情况必须可统计。"""
+    trace_record = {
+        "skills": [
+            {"skill": "dual-coding-designer", "status": "SUCCEEDED", "schema_repairs": 2},
+            {"skill": "script-writer", "status": "SUCCEEDED"},
+        ],
+        "gates": [],
+        "plan": {},
+    }
+    summary = metrics.summarize_run(trace_record)
+    assert summary["schema_repairs"] == 2
+    assert summary["schema_repair_rate"] == 0.5
+    assert trace._schema_repairs("外部 Skill 执行：x；产出 1 个产物；Schema 修复 2 次") == 2
+    assert trace._schema_repairs("外部 Skill 执行：x；产出 1 个产物") == 0
+
+
 def test_failure_taxonomy_categories_match_emitted_issue_kinds():
     """§65：自动检查产出的每个 kind 都必须能落进 failure_taxonomy 的类别。"""
     known = checks.taxonomy_categories()

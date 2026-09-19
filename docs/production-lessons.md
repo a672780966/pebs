@@ -170,6 +170,26 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — Schema 修复发生了却不可观测，§35 的 Schema Repair Rate 拿不到数（BENCHMARK §35）
+
+- **date**: 2026-09-20
+- **task**: M6 核心生产指标（§35）
+- **symptom**: 外部 Skill 第一次输出没通过 Schema 校验时会自动重生成一次
+  （`prompt_skill._execute_one`），但这次修复**不留任何痕迹**：
+  trace 里只有成功/失败，`performance.json` 只有 `schema_failure_rate`，
+  §35 明确要求的 **Schema Repair Rate** 无法计算
+- **root_cause**: 修复逻辑写在执行器内部，结果只用于"通过/放弃"，没有回写 step note，
+  也没有进入 trace/registry 的字段
+- **skill**: `external-skill-runtime` / `benchmark-trace`
+- **artifact**: `pebs/runtime/prompt_skill.py`、`pebs/runtime/executor.py`、
+  `pebs/benchmark/{trace,metrics,performance,report}.py`
+- **fix**: 修复次数记在 plan node 上（不是 executor 实例，避免并行节点互相污染），
+  executor 把它追加到 step note（`Schema 修复 N 次`）；trace 解析出 `schema_repairs`，
+  `summarize_run` 产出 `schema_repair_rate`，`performance.json` 记录 `schema_repair_rate`，
+  §42 模式对比表增加 `Schema Repair Rate` 行
+- **regression_test**: `tests/test_external_skill_acceptance.py::test_schema_repair_is_visible_in_trace_and_performance`、
+  `tests/test_benchmark_scaffold.py::test_schema_repair_rate_is_recorded_from_step_notes`
+
 ## 2026-09-20 — failure taxonomy 只是文档：没有代码引用，类别写错也不会被发现（BENCHMARK §35/§65）
 
 - **date**: 2026-09-20

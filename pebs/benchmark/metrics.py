@@ -52,6 +52,7 @@ def summarize_run(trace: dict[str, Any]) -> dict[str, Any]:
     total = len(skills)
     failed = [skill for skill in skills if skill.get("status") == "FAILED"]
     blocked = [skill for skill in skills if skill.get("status") == "BLOCKED"]
+    repaired = [skill for skill in skills if int(skill.get("schema_repairs") or 0) > 0]
     gates = trace.get("gates", [])
     gate_fail = [gate for gate in gates if gate.get("status") == "FAIL"]
     gate_review = [gate for gate in gates if gate.get("status") == "NEEDS_REVIEW"]
@@ -65,6 +66,9 @@ def summarize_run(trace: dict[str, Any]) -> dict[str, Any]:
         "skill_count": total,
         "skill_failure_rate": round(len(failed) / total, 4) if total else 0.0,
         "skill_blocked_rate": round(len(blocked) / total, 4) if total else 0.0,
+        # §35：外部 Skill 输出经一次重生成才通过 Schema 的比例
+        "schema_repair_rate": round(len(repaired) / total, 4) if total else 0.0,
+        "schema_repairs": sum(int(skill.get("schema_repairs") or 0) for skill in skills),
         "reuse_rate": round(len(reuse) / total, 4) if total else 0.0,
         "gate_fail_count": len(gate_fail),
         "gate_review_count": len(gate_review),

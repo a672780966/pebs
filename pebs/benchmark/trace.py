@@ -104,6 +104,14 @@ def _skill_identity(name: str) -> dict[str, Any]:
     }
 
 
+def _schema_repairs(note: str) -> int:
+    """§35：从 step note 里读出 Schema 修复次数（外部 Skill 第二次生成）。"""
+    import re
+
+    match = re.search(r"Schema 修复 (\d+) 次", note or "")
+    return int(match.group(1)) if match else 0
+
+
 def _all_revisions(store: Any) -> list[dict[str, Any]]:
     revisions: list[dict[str, Any]] = []
     for artifact in store.list_artifacts():
@@ -199,6 +207,7 @@ def build_trace(
                 "status": step["status"],
                 "attempts": step.get("attempts", 0),
                 "duration": _step_duration(step),
+                "schema_repairs": _schema_repairs(str(step.get("note") or "")),
                 "started_at": step.get("started_at"),
                 "ended_at": step.get("ended_at"),
                 "note": step.get("note") or "",

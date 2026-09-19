@@ -54,6 +54,7 @@ def _empty_record(skill: str, version: str) -> dict[str, Any]:
         "runs": 0,
         "success_rate": 0.0,
         "schema_failure_rate": 0.0,
+        "schema_repair_rate": 0.0,
         "human_score": None,
         "teacher_edit_ratio": None,
         "average_model_calls": 0.0,
@@ -73,6 +74,7 @@ def record_run(
     domain: str = "",
     success: bool,
     schema_failure: bool = False,
+    schema_repair: bool = False,
     model_calls: int = 0,
     latency: float = 0.0,
     failure_mode: str = "",
@@ -94,6 +96,7 @@ def record_run(
     runs = int(record.get("runs", 0)) + 1
     successes = round(float(record.get("success_rate", 0.0)) * (runs - 1)) + (1 if success else 0)
     schema_failures = round(float(record.get("schema_failure_rate", 0.0)) * (runs - 1)) + (1 if schema_failure else 0)
+    schema_repairs = round(float(record.get("schema_repair_rate", 0.0)) * (runs - 1)) + (1 if schema_repair else 0)
     model_total = float(record.get("average_model_calls", 0.0)) * (runs - 1) + max(int(model_calls), 0)
     latency_total = float(record.get("average_latency", 0.0)) * (runs - 1) + max(float(latency), 0.0)
     record.update(
@@ -101,6 +104,7 @@ def record_run(
             "runs": runs,
             "success_rate": round(successes / runs, 4),
             "schema_failure_rate": round(schema_failures / runs, 4),
+            "schema_repair_rate": round(schema_repairs / runs, 4),
             "average_model_calls": round(model_total / runs, 2),
             "average_latency": round(latency_total / runs, 2),
             "last_verified": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
@@ -155,6 +159,7 @@ def record_trace(
                 domain=str(skill.get("domain") or ""),
                 success=status == "SUCCEEDED",
                 schema_failure=bool(status == "FAILED" and "Schema" in error),
+                schema_repair=int(skill.get("schema_repairs") or 0) > 0,
                 model_calls=int(model_calls_by_skill.get(name, 0) or 0),
                 latency=float(latency_by_skill.get(name, 0.0) or 0.0),
                 failure_mode=(error[:120] if status in ("FAILED", "BLOCKED") else ""),

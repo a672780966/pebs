@@ -12,6 +12,9 @@ from .prompt_skill import PromptSkillExecutor, SkillExecutionFailed
 from .sandbox_skill import SandboxSkillExecutor
 from .skill_loader import SkillRuntimeBlocked
 
+# step note 里标记 Schema 修复的稳定前缀（trace 以此计算 §35 Schema Repair Rate）
+SCHEMA_REPAIR_NOTE = "Schema 修复 "
+
 
 def _node_kind(record: dict[str, Any]) -> str:
     runtime_kind = str(record.get("runtime", "builtin"))
@@ -113,7 +116,11 @@ class _Runner:
         content = self.prompt.execute(ctx, node, skill_record=record)
         with self.write_lock:
             revisions = _emit_external_artifacts(ctx, record, content)
-        return {"content": content, "revisions": revisions}
+        return {
+            "content": content,
+            "revisions": revisions,
+            "schema_repairs": int(node.get("_schema_repairs", 0) or 0),
+        }
 
     def _sandbox_handler(self, ctx: Any, node: dict[str, Any], record: dict[str, Any]) -> dict[str, Any]:
         outputs = self.sandbox.execute(ctx, node, skill_record=record)
@@ -194,6 +201,9 @@ class _Runner:
                         + ("、".join(report.get("included", [])) or "无")
                         + f"；产出 {len(revisions)} 个产物"
                     )
+                    # §35：Schema 修复次数必须出现在 trace 里（否则 Repair Rate 无从计算）
+                    if int(result.get("schema_repairs") or 0) > 0:
+                        note += f"；{SCHEMA_REPAIR_NOTE}{result['schema_repairs']} 次"
                 elif runtime_kind == "sandbox_skill":
                     outcome = agent.run_node(
                         self.ctx, node=node, record=record, handler=self._sandbox_handler

@@ -194,6 +194,9 @@ class PromptSkillExecutor:
                 raise SkillExecutionFailed(
                     f"外部 Skill 输出两次均未通过 Schema 校验：{'；'.join(errors[:3])}"
                 )
+            # §35：Schema Repair Rate 必须可观测——修复过一次才算，且要能写进 trace。
+            # 记在 node 上（不是 executor 实例）以免并行节点互相污染。
+            node["_schema_repairs"] = int(node.get("_schema_repairs", 0) or 0) + 1
         return data
 
     def _generate(self, ctx: Any, *, task: str, prompt: str) -> dict[str, Any]:
