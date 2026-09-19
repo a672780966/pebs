@@ -293,3 +293,19 @@ def test_planner_orders_an_applicable_evaluator_after_every_observed_producer():
         assert producer in evaluator["depends_on"], (observed, producer, evaluator["depends_on"])
     assert evaluator["parallel_group"] > nodes["animation-gate"]["parallel_group"]
     assert evaluator["parallel_group"] > nodes["storyboard-designer"]["parallel_group"]
+
+
+def test_gate_scope_incompatible_with_the_declaring_skill_is_invalid():
+    """A gate whose scope the declarer does not consume can never be evaluated for it."""
+    nodes = _script_route(
+        _node(
+            "preview-builder",
+            steps=["preview"],
+            inputs=["slide_plan"],  # deliberately without the G6 scope: script
+            outputs=["preview"],
+            gate_before=["G6"],
+            depends_on=["gate-runner"],  # ordering is satisfied; only the scope is wrong
+        )
+    )
+    errors = validation.validate_plan(_plan(nodes, ["script"]))
+    assert any("目标范围 script 不在该 skill 的输入中" in error for error in errors), errors
