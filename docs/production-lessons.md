@@ -198,6 +198,15 @@
   运行判为 BLOCKED
 - **regression_test**: `tests/test_autofix.py::test_dynamic_gate_reads_artifacts_outside_its_contract`、
   `::test_dynamic_auto_fix_survives_the_subagent_contract`
+- **影响范围（重要）**: 本修复之前完成的真实 benchmark run（A–I 的全部既有记录）其门禁结论
+  **由偏弱的门禁得出**，凡"读契约外产物的检查"（G1 字数/术语、G3 教学法、G6 媒体、
+  G7 模板……）都可能被静默跳过。这些 run 的 `run_status`/产物仍然有效，
+  但**门禁状态不可与修复后的 run 直接比较**；`benchmark_summary.md` 不区分修复前后，
+  比较时需按本节日期切分
+- **修复后的验证状态**: 目前只有 hermetic（FakeLLM）验证（471 项测试全绿）。
+  真实 provider 复跑在 2026-09-20 因配额再次耗尽而失败
+  （`learning_design: codex exec rc=1 … You've hit your usage limit`，
+  run `20260920-064316-D-dynamic`）——真实链路验证待配额恢复后进行
 
 ## 2026-09-20 — provider 的 `_usage` 元数据被 emit 进外部 Skill 产物（RUNTIME §11/§39）
 
