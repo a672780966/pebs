@@ -170,6 +170,27 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — §35 要求的 Gate FP/FN Rate 没有任何计算口径（METRICS §35）
+
+- **date**: 2026-09-20
+- **task**: M6 §35 核心生产指标
+- **symptom**: §35 明确要求记录 Gate False Positive Rate 与 Gate False Negative Rate，
+  但仓库里没有任何代码/命令能算出这两个数；先前只能靠 ad-hoc 脚本一次性统计
+- **root_cause**: 门禁对错只在"用同一套产物重放"时才能判定，而 `gate_result` 一旦写入
+  就不再有第二种口径；缺少把"当时结论"与"当前门禁结论"对照的常设工具
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/gates_audit.py`、`pebs/cli.py`、`pebs/benchmark/report.py`、
+  `benchmarks/reports/gate_audit.json`
+- **fix**: 新增 `python -m pebs.cli benchmark --gate-audit`：用当前门禁重放已存项目，
+  输出 `gate_false_negative_rate`（当时 PASS → 重放 FAIL）与
+  `gate_false_positive_rate`（当时 FAIL/NEEDS_REVIEW → 重放 PASS），结果写入
+  `benchmarks/reports/gate_audit.json`；报告读取该文件渲染"门禁重放审计"小节
+- **首次实测**: 175 条判定 / 20 个 run，Gate FN Rate **0.1618**、Gate FP Rate **0.5122**
+  （即 5f99507 之前的门禁既漏检也误报）；口径已在报告中标注为"相对当前门禁实现"，
+  不是绝对真值
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_gate_audit_computes_false_negative_and_positive_rates`、
+  `::test_report_renders_gate_audit_section`
+
 ## 2026-09-20 — Skill Trace 的 per-skill 产物与调用量全是空的（TRACE §19/§35/§39）
 
 - **date**: 2026-09-20

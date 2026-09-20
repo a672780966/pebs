@@ -316,6 +316,26 @@ def cmd_benchmark(args: argparse.Namespace) -> int:
             print(f"{record['case_id']} {record['variant']}: {len(record['plan_nodes'])} nodes")
         print(f"selection report: {path}")
         return 0
+    if args.gate_audit:
+        from .benchmark import gates_audit
+
+        path = gates_audit.write_audit()
+        summary = json.loads(Path(path).read_text(encoding="utf-8"))
+        print(
+            json.dumps(
+                {
+                    "checked": summary["checked"],
+                    "runs": summary["runs"],
+                    "runs_with_changes": summary["runs_with_changes"],
+                    "gate_false_negative_rate": summary["gate_false_negative_rate"],
+                    "gate_false_positive_rate": summary["gate_false_positive_rate"],
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        print(f"gate audit: {path}")
+        return 0
     if args.promotions:
         from .benchmark import performance as performance_mod
 
@@ -456,6 +476,7 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--submit-eval", default="", help="回收教师填写的工作表 YAML（需配合 --project）")
     bench.add_argument("--export-eval-kit", action="store_true", help="导出待评课程材料包 + 评分表到 benchmarks/reports/evaluation_kit/")
     bench.add_argument("--promotions", action="store_true", help="§68/§69：查看 skill 升降级判定（只观察，不影响路由）")
+    bench.add_argument("--gate-audit", action="store_true", help="§35：用当前门禁重放已存项目，算 Gate FP/FN（不调用模型）")
     bench.add_argument("--plan-only", action="store_true", help="§46：零模型调用的 Builtin vs 显式外部 Skill 选择对照")
     bench.add_argument("--project", default="", help="--submit-eval 的目标项目")
     bench.add_argument("--strict", action="store_true", help="存在失败/自动问题时以非零退出")

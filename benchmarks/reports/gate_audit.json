@@ -1,0 +1,1746 @@
+{
+  "checked": 175,
+  "runs": 20,
+  "runs_with_changes": 9,
+  "gate_false_negative_rate": 0.1618,
+  "gate_false_positive_rate": 0.5122,
+  "false_negative": 11,
+  "false_positive": 42,
+  "per_gate": {
+    "G1": {
+      "checked": 25,
+      "false_negative": 11,
+      "false_positive": 0
+    },
+    "G2": {
+      "checked": 25,
+      "false_negative": 0,
+      "false_positive": 0
+    },
+    "G3": {
+      "checked": 25,
+      "false_negative": 0,
+      "false_positive": 19
+    },
+    "G4": {
+      "checked": 25,
+      "false_negative": 0,
+      "false_positive": 0
+    },
+    "G5": {
+      "checked": 25,
+      "false_negative": 0,
+      "false_positive": 23
+    },
+    "G6": {
+      "checked": 25,
+      "false_negative": 0,
+      "false_positive": 0
+    },
+    "G7": {
+      "checked": 25,
+      "false_negative": 0,
+      "false_positive": 0
+    }
+  },
+  "caveat": "重放口径：以当前门禁实现为准衡量历史 run 的门禁结论漂移，不是绝对真值",
+  "reports": [
+    {
+      "project": "bench-a-builtin-174101",
+      "skipped": "",
+      "rows": []
+    },
+    {
+      "project": "bench-a-direct_codex",
+      "skipped": "no artifacts",
+      "rows": []
+    },
+    {
+      "project": "bench-a-dynamic",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 1975 不在要求范围 1500–1800"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "评价题目指向未知目标：g2、g3"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-a-dynamic-184245",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "评价题目指向未知目标：g1,g2",
+            "评价题目指向未知目标：g2,g3"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "评价题目指向未知目标：g1,g2",
+            "评价题目指向未知目标：g2,g3"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-a-dynamic-211546",
+      "skipped": "",
+      "rows": []
+    },
+    {
+      "project": "bench-a-dynamic-215759",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2043 不在要求范围 1500–1800"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g1_contrast）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g2_record_frame）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g3_fact_inference_columns）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g1_same_event_pair）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g2_case_evidence_map）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g3_rewrite_steps）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g4_dual_column_checklist）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g1_label_boundary）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g2_three_way_sort）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g3_faded_rewrite）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g4_cross_context_matrix）",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g1_contrast）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g2_record_frame）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g3_fact_inference_columns）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g1_same_event_pair）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g2_case_evidence_map）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g3_rewrite_steps）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g4_dual_column_checklist）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g1_label_boundary）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g2_three_way_sort）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g3_faded_rewrite）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g4_cross_context_matrix）",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g1_contrast）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g2_record_frame）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec1_g3_fact_inference_columns）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g1_same_event_pair）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g2_case_evidence_map）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g3_rewrite_steps）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec2_g4_dual_column_checklist）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g1_label_boundary）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g2_three_way_sort）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g3_faded_rewrite）",
+            "媒体选型推荐图示但未生成对应 SVG 资产（media_sec3_g4_cross_context_matrix）",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-b-builtin-041319",
+      "skipped": "",
+      "rows": []
+    },
+    {
+      "project": "bench-b-direct_codex",
+      "skipped": "no artifacts",
+      "rows": []
+    },
+    {
+      "project": "bench-b-dynamic-084324",
+      "skipped": "",
+      "rows": []
+    },
+    {
+      "project": "bench-b-dynamic-000620",
+      "skipped": "",
+      "rows": []
+    },
+    {
+      "project": "bench-b-dynamic-190433",
+      "skipped": "",
+      "rows": []
+    },
+    {
+      "project": "bench-c-dynamic-170741",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2361 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "案例引用了未获支持的 Claim：clm_c1482d4ee6",
+            "案例引用了未获支持的 Claim：clm_9888f312b7",
+            "案例引用了未获支持的 Claim：clm_007501ee22"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2157 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2710 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_949ec8536b@v3（状态 QUALIFY_REQUIRED）"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-d-dynamic-080449",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-d-dynamic-064316",
+      "skipped": "",
+      "rows": []
+    },
+    {
+      "project": "bench-d-dynamic-044426",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_1fb64d9efb@v1（状态 PENDING）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_f76bfae81f@v1（状态 PENDING）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_4af6bfc4e0@v1（状态 PENDING）"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-e-dynamic-101936",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "目标 g1 没有对应教学策略",
+            "目标 g2 没有对应教学策略",
+            "目标 g3 没有对应教学策略",
+            "目标 g4 没有对应教学策略",
+            "目标 g5 没有对应教学策略",
+            "缺少 PCK 教学说明"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "缺少 UDL 障碍与替代路径分析"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-f-051411",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G1",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "字数 2120 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_cf25e62b94@v1（状态 PENDING）",
+            "引用了未获支持的 Claim：clm_59c0b8b44c@v1（状态 PENDING）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_0519e53a8f@v1（状态 PENDING）"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G3",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G5",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2350 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2214 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_73a9509657@v1（状态 UNSUPPORTED）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_73a9509657@v1（状态 UNSUPPORTED）"
+          ]
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策",
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-g-061238",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2314 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2214 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_283d6b8492@v3（状态 QUALIFY_REQUIRED）"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec2",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2171 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "评价题目指向未知目标：g2,g3,g4"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec3",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "字数 2446 不在要求范围 1800–2100"
+          ]
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G2",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "要求包含动画，但 Animation Gate 没有任何候选或决策"
+          ]
+        },
+        {
+          "artifact": "script:sec4",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-h-dynamic-193752",
+      "skipped": "",
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_76232dfe1c@v1（状态 UNSUPPORTED）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_76232dfe1c@v1（状态 UNSUPPORTED）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_51dba08c13@v2（状态 UNSUPPORTED）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_f9de732eaf@v1（状态 PENDING）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_9f2f940eff@v1（状态 DISPUTED）"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "NEEDS_REVIEW",
+          "now": "FAIL",
+          "changed": true,
+          "issues": [
+            "心理诊断措辞：命中“患有抑郁症”",
+            "涉及个体推断，须标注为教学假设或人工复核：命中“这名学生”",
+            "涉及个体推断，须标注为教学假设或人工复核：命中“这个学生”",
+            "涉及个体推断，须标注为教学假设或人工复核：命中“该学生”"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "FAIL",
+          "now": "PASS",
+          "changed": true,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
+    },
+    {
+      "project": "bench-i-dynamic-111049",
+      "skipped": "",
+      "rows": []
+    }
+  ]
+}

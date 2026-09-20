@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-20T06:44:19；run 数（每 case×mode 取最新）：20
+生成时间：2026-09-20T09:03:37；run 数（每 case×mode 取最新）：20
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -50,6 +50,14 @@
 | ROUTING | 11 |
 | SAFETY | 10 |
 | EVIDENCE | 3 |
+
+
+## 门禁重放审计（§35 Gate FP/FN；以当前门禁实现为准，非绝对真值）
+
+- 重放覆盖：175 条 gate 判定 / 20 个 run；9 个 run 结论发生变化
+- Gate False Negative Rate（当时 PASS，重放 FAIL）：0.1618（11 条）
+- Gate False Positive Rate（当时 FAIL/NEEDS_REVIEW，重放 PASS）：0.5122（42 条）
+- 口径说明：重放口径：以当前门禁实现为准衡量历史 run 的门禁结论漂移，不是绝对真值
 
 
 ## 质量指标（§53/§54/§58；频度与分布，人工评分参考，不设自动阈值）

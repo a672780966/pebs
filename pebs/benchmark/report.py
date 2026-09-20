@@ -258,6 +258,16 @@ def failure_category_section(runs: list[dict[str, Any]] | None = None) -> list[s
     return lines
 
 
+def _gate_audit_section() -> list[str]:
+    """§35 Gate FP/FN：读已生成的 gate_audit.json（重放昂贵，不在生成报告时重跑）。"""
+    from . import gates_audit
+
+    try:
+        return gates_audit.section()
+    except Exception:  # noqa: BLE001 - 审计缺失不应让报告生成失败
+        return []
+
+
 def _base_mode(variant: str) -> str:
     """把 `dynamic [+external-media]` 这类实验变体归回它的基础模式（§28/§46）。"""
     return variant.split(" ", 1)[0].strip() or variant
@@ -378,6 +388,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 lines.append(f"| | 教师：{('、'.join(reviewers)) or '—'}{note} | | | | | | | | | | |")
     lines.extend(render_mode_comparison(summary))
     lines.extend(failure_category_section())
+    lines.extend(_gate_audit_section())
     lines.extend(quality_section())
     lines.extend(performance_section())
     lines.append("")

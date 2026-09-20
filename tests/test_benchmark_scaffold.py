@@ -392,6 +392,63 @@ def test_report_lists_failure_categories_and_surfaces_unknown_ones():
     assert "BOGUS" in section and "分类无效" in section
 
 
+def test_gate_audit_computes_false_negative_and_positive_rates(tmp_path, monkeypatch):
+    """§35：Gate FP/FN 来自"用当前门禁重放已存项目"的比对。"""
+    from pebs.benchmark import gates_audit
+
+    records = [
+        {
+            "project": "p1",
+            "rows": [
+                {"artifact": "script:sec1", "gate": "G1", "stored": "PASS", "now": "FAIL", "changed": True},
+                {"artifact": "script:sec1", "gate": "G3", "stored": "FAIL", "now": "PASS", "changed": True},
+                {"artifact": "script:sec1", "gate": "G4", "stored": "PASS", "now": "PASS", "changed": False},
+                {"artifact": "script:sec1", "gate": "G5", "stored": "FAIL", "now": "FAIL", "changed": False},
+            ],
+        }
+    ]
+    summary = gates_audit.gate_rates(records)
+    assert summary["checked"] == 4
+    assert summary["runs_with_changes"] == 1
+    # 2 条当时 PASS，其中 1 条被重放翻成 FAIL
+    assert summary["gate_false_negative_rate"] == 0.5
+    # 2 条当时 FAIL，其中 1 条被重放翻成 PASS
+    assert summary["gate_false_positive_rate"] == 0.5
+    assert summary["per_gate"]["G1"]["false_negative"] == 1
+
+    path = gates_audit.write_audit(summary, path=tmp_path / "gate_audit.json")
+    section = "\n".join(gates_audit.section(path=path))
+    assert "Gate False Negative Rate" in section and "0.5" in section
+    assert "重放口径" in section
+
+
+def test_report_renders_gate_audit_section(tmp_path, monkeypatch):
+    import json
+
+    from pebs.benchmark import cases
+
+    monkeypatch.setattr(cases, "reports_dir", lambda: tmp_path)
+    (tmp_path / "gate_audit.json").write_text(
+        json.dumps(
+            {
+                "checked": 10,
+                "runs": 3,
+                "runs_with_changes": 2,
+                "gate_false_negative_rate": 0.1,
+                "gate_false_positive_rate": 0.2,
+                "false_negative": 1,
+                "false_positive": 2,
+                "caveat": "重放口径",
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    section = "\n".join(report._gate_audit_section())
+    assert "门禁重放审计" in section
+    assert "0.1" in section and "0.2" in section
+
+
 def test_performance_registry_records_versions_and_promotion(tmp_path, monkeypatch):
     from pebs import config
 
