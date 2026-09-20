@@ -190,6 +190,24 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — 模型把标量返回成数组 → `x not in set` 抛 unhashable，整条运行 failed（RUNTIME §67）
+
+- **date**: 2026-09-20
+- **task**: M6.4 Builtin 基线真实 run（`D / builtin`，为 §17 三对外部 A/B 补共同对照）
+- **symptom**: `slide_plan FAILED：未预期错误：unhashable type: 'list'`，
+  15 次调用后运行整体 failed，pptx 与后续步骤全部 BLOCKED
+- **root_cause**: `_enforce_slide_plan()` 用集合成员判断校验模型输出
+  （`row["section_id"] not in valid_sections`、`diagram_id not in valid_diagrams`），
+  模型这次把 `section_id` 返回成了**数组**，列表做集合成员判断直接抛
+  `TypeError: unhashable type: 'list'`——本该是"清理脏输出"的函数反而崩了
+- **skill**: `presentation-planner`
+- **artifact**: `pebs/pipeline.py`、`pebs/engine.py`
+- **fix**: 做集合判断前先把这两个字段归一化成字符串（不改变正常输入行为）；
+  另外把未预期错误的 step error 附上**最后一帧位置**（`_last_frame()`），
+  否则错误信息里只有 `unhashable type`，无从定位（本次排查就卡在这里）
+- **regression_test**: `tests/test_pipeline.py::test_slide_plan_enforcement_survives_list_typed_model_fields`、
+  `::test_unexpected_step_error_records_the_offending_frame`
+
 ## 2026-09-20 — 静态 Pipeline 同样被凭空判 2 条 ROUTING 错误（CHECKS §28/§36）
 
 - **date**: 2026-09-20

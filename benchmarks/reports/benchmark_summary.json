@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T19:35:55",
+  "generated_at": "2026-09-20T20:15:13",
   "cases": [
     {
       "case_id": "A",
@@ -377,6 +377,29 @@
     },
     {
       "case_id": "D",
+      "builtin": {
+        "status": "failed",
+        "attempts": 1,
+        "succeeded": 0,
+        "evidence_policy": null,
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 15.0,
+        "runtime_seconds": 775.31,
+        "skill_failure_rate": 0.045,
+        "schema_repair_rate": 0.0,
+        "locality_preservation_rate": null,
+        "automatic_issues": 0.0,
+        "gate_fail": 0.0,
+        "gate_review": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
+      },
       "dynamic": {
         "status": "succeeded",
         "attempts": 3,
@@ -636,7 +659,7 @@
       }
     }
   ],
-  "runs": 25,
+  "runs": 26,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -1094,6 +1117,35 @@
       "gate_review": 0
     },
     {
+      "run_id": "run_954a86277c5a",
+      "case_id": "D",
+      "mode": "builtin",
+      "variant": "builtin",
+      "experiment": "",
+      "status": "failed",
+      "attempts": 1,
+      "succeeded": 0,
+      "evidence_policy": null,
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 15,
+      "research_calls": 0,
+      "runtime_seconds": 775.31,
+      "skill_failure_rate": 0.0455,
+      "schema_repair_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 0,
+      "gate_fail": 0,
+      "gate_review": 0
+    },
+    {
       "run_id": "run_e065d4c09320",
       "case_id": "D",
       "mode": "dynamic",
@@ -1412,18 +1464,18 @@
       "attempts": 3.0
     },
     "builtin": {
-      "variants": 3,
+      "variants": 4,
       "human_score": null,
       "edit_ratio": null,
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
       "schema_repair_rate": 0.0,
-      "skill_failure_rate": 0.015,
-      "model_calls": 61.0,
-      "runtime_seconds": 3031.91,
+      "skill_failure_rate": 0.022,
+      "model_calls": 76.0,
+      "runtime_seconds": 3807.22,
       "succeeded": 1.0,
-      "attempts": 8.0
+      "attempts": 9.0
     },
     "dynamic": {
       "variants": 17,

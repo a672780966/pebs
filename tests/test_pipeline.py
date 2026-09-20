@@ -55,6 +55,60 @@ def test_failed_provider_call_is_still_counted_as_consumption(engine):
     assert int(engine.store.get_run(run_id)["calls_used"]) >= 1
 
 
+def test_slide_plan_enforcement_survives_list_typed_model_fields(engine):
+    """真实 run 缺陷：模型把 section_id 返回成数组时，`x not in set` 抛 unhashable，
+    整条运行判 failed。归一化后应正常降级而不是崩溃。"""
+    from pebs import pipeline
+
+    class _Ctx:
+        outputs = {"requirements": "requirements@r1", "diagrams:sec1": "diagrams:sec1@r1"}
+
+        def content(self, artifact_id):
+            if artifact_id == "requirements":
+                return {"sections": [{"section_id": "sec1", "title": "t"}]}
+            if artifact_id == "diagrams:sec1":
+                return {"diagrams": [{"diagram_id": "d1"}]}
+            return None
+
+    data = {
+        "rows": [
+            {
+                "slide": 1,
+                "title": "标题",
+                "narrative_section": "s",
+                "communication_task": "c",
+                "core_message": "m",
+                "layout_archetype": ["bullets"],
+                "density": ["medium"],
+                "section_id": ["sec1"],
+                "diagram_id": ["d1"],
+                "claim_refs": [],
+            }
+        ]
+    }
+    notes = pipeline._enforce_slide_plan(_Ctx(), data)
+    row = data["rows"][0]
+    assert row["section_id"] == ""
+    assert row["layout_archetype"] == "bullets"
+    assert row["density"] == "medium"
+    assert isinstance(notes, list)
+
+
+def test_unexpected_step_error_records_the_offending_frame(engine, monkeypatch):
+    """未预期错误的 step error 要带定位信息，否则只有 `unhashable type` 无从排查。"""
+    from pebs import pipeline
+
+    def boom(ctx):
+        raise TypeError("unhashable type: 'list'")
+
+    monkeypatch.setitem(pipeline.STEPS, "requirements", boom)
+    run_id, _ = run_build(engine, REQUEST_1)
+    step = next(s for s in engine.store.get_steps(run_id) if s["step_id"] == "requirements")
+    assert step["status"] == "FAILED"
+    assert "unhashable type" in step["error"]
+    assert ":32" in step["error"] or "boom" in step["error"]
+
+
 def test_malformed_json_response_is_retried_once_then_fails(engine):
     """A14：畸形 JSON（长输出被截断）应有界重试一次；再失败则如实失败，不伪造内容。"""
     from pebs.providers import ProviderError

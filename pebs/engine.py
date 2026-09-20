@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import difflib
 import json
+import sys
 import threading
 from pathlib import Path
 from typing import Any
@@ -45,6 +46,17 @@ class PiiBlocked(Exception):
 
 class ExplicitSkillDenied(Exception):
     pass
+
+
+def _last_frame() -> str:
+    """最后一个 traceback 帧的 `文件:行号`（便于从 step 错误直接定位语句）。"""
+    import traceback
+
+    frames = traceback.extract_tb(sys.exc_info()[2])
+    if not frames:
+        return "无 traceback"
+    last = frames[-1]
+    return f"{Path(last.filename).name}:{last.lineno} {last.name}"
 
 
 class Engine:
@@ -402,7 +414,11 @@ class Engine:
                 self.store.set_step(run_id, step_id, status="CANCELLED", error="运行已取消")
                 continue
             except Exception as exc:  # noqa: BLE001 - unexpected failures must be recorded
-                self.store.set_step(run_id, step_id, status="FAILED", error=f"未预期错误：{exc}")
+                # 记下最后一帧位置：`未预期错误：unhashable type: 'list'` 这种信息无法定位，
+                # 但加上 `pipeline.py:1901` 就能直接找到出问题的语句。
+                self.store.set_step(
+                    run_id, step_id, status="FAILED", error=f"未预期错误：{exc}（{_last_frame()}）"
+                )
         statuses = [s["status"] for s in self.store.get_steps(run_id)]
         final = self._compute_run_status(statuses)
         self.store.set_run_status(run_id, final)

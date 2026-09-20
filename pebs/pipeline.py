@@ -1894,11 +1894,18 @@ def _enforce_slide_plan(ctx: PipelineContext, data: dict[str, Any]) -> list[str]
         for key in ("title", "narrative_section", "communication_task", "core_message", "risk"):
             if not isinstance(row.get(key), str):
                 row[key] = str(row.get(key) or "")
-        if row.get("layout_archetype") == "diagram" and row.get("diagram_id") not in valid_diagrams:
-            row["layout_archetype"] = "bullets"
-            row["asset_handling"] = (str(row.get("asset_handling", "")) + "；图示缺失，已降级为要点页").lstrip("；")
-            notes.append(f"slide{index}: diagram_id 无效，降级为要点页")
-        if row.get("section_id") and row["section_id"] not in valid_sections:
+        # 模型偶尔把标量字段返回成数组（真实 run `20260920-200217-D-builtin`：
+        # section_id 是 list 时 `x not in set` 直接抛 unhashable，整条运行 failed）。
+        # 这里先归一化成字符串再做集合判断，不改变正常输入的行为。
+        row["section_id"] = str(row.get("section_id") or "")
+        if row.get("layout_archetype") == "diagram":
+            diagram_id = str(row.get("diagram_id") or "")
+            row["diagram_id"] = diagram_id
+            if diagram_id not in valid_diagrams:
+                row["layout_archetype"] = "bullets"
+                row["asset_handling"] = (str(row.get("asset_handling", "")) + "；图示缺失，已降级为要点页").lstrip("；")
+                notes.append(f"slide{index}: diagram_id 无效，降级为要点页")
+        if row["section_id"] and row["section_id"] not in valid_sections:
             row["section_id"] = ""
         for ref in list(row.get("claim_refs", [])):
             if "@v" not in str(ref) or not ctx.evidence.is_supported(str(ref)):
