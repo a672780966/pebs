@@ -190,6 +190,20 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — `evidence_policy` 只被读、从未被写（REPORT §35/§41）
+
+- **date**: 2026-09-20
+- **task**: M6.4 A/builtin 真实 run 复核
+- **symptom**: 报告表格、Evaluation Tab、教师材料包、`/evaluation` API 都在显示
+  `evidence_policy`，但所有 run 的该字段恒为 `None`——A/B/C/D 抽查一致
+- **root_cause**: 字段在四处被读取，**没有任何一处写入**；证据政策实际由冻结契约的
+  `preconditions.PCK_REQUIRED_STATUS` 决定，却没有被记进 run
+- **skill**: `benchmark-runner`
+- **artifact**: `pebs/benchmark/runner.py`
+- **fix**: `run_case()` 记录 `evidence_policy: [PCK_REQUIRED_STATUS]`（从唯一权威常量取值，
+  不硬编码字符串）；历史 run 不回填（避免改写已有证据），新旧差异由本条目说明
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_benchmark_run_records_the_effective_evidence_policy`
+
 ## 2026-09-20 — Builtin 基线首次完整跑通，形成 case D 的 §17 共同对照（BENCHMARK §17）
 
 - **date**: 2026-09-20

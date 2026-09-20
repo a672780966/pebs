@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from .. import config, providers
+from .. import config, preconditions, providers
 from ..engine import Engine
 from . import cases, checks, metrics, trace
 
@@ -396,6 +396,9 @@ def run_case(
             "case_title": case.get("title", ""),
             "mode": mode,
             "project_id": project,
+            # §35/§41：本次运行实际生效的证据政策（来自冻结契约的唯一权威常量），
+            # 该字段此前只被报告/UI/材料包/API 读取，从未写过分毫。
+            "evidence_policy": [preconditions.PCK_REQUIRED_STATUS],
             "wall_time_seconds": round(time.time() - started, 2),
             "fixtures": _fixture_hashes(case),
             "reproducibility": (record.get("trace") or {}).get("reproducibility")

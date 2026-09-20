@@ -608,6 +608,21 @@ def test_case_quality_checks_are_wired_into_evaluate():
     assert checks.case_checks(good) == []
 
 
+def test_benchmark_run_records_the_effective_evidence_policy(tmp_path, monkeypatch):
+    """§35/§41：run 记录必须写明本次生效的证据政策。
+
+    该字段此前被报告/UI/材料包/API 读取，却从来没有被写过（恒为 None）。
+    """
+    from pebs import preconditions
+    from pebs.benchmark import runner
+
+    monkeypatch.setattr(runner, "_run_pebs", lambda *a, **k: {"run_status": "succeeded", "metrics": {}})
+    monkeypatch.setattr(runner, "run_dir", lambda case_id, mode: tmp_path / f"{case_id}-{mode}")
+    record = runner.run_case("D", mode="dynamic", project_id="probe")
+    assert record["evidence_policy"] == [preconditions.PCK_REQUIRED_STATUS]
+    assert record["run_status"] == "succeeded"
+
+
 def test_direct_baseline_prompt_receives_the_same_materials_as_pebs():
     """§29：不做不公平对比——baseline 必须拿到同样的用户材料（模板 + 素材）。"""
     from pebs.benchmark import runner
