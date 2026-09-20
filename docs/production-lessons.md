@@ -170,6 +170,22 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — Direct 基线产物进不了教师材料包，三模式对比少一条腿（EVALUATION §28）
+
+- **date**: 2026-09-20
+- **task**: M6 Acceptance 4/5 的人工评分准备
+- **symptom**: `export_kit` 只处理有项目 Store 的 run；`direct_codex` 基线不建 Engine、
+  没有 Store，于是它的产物（`run_dir/direct_output.md`）从不进入
+  `evaluation_kit/`——教师根本无法给 Direct 基线打分，
+  「Direct / Builtin / Dynamic」在**人工评分**维度上只有两条腿
+- **root_cause**: `export_kit` 把"打开 Store 失败"当成"跳过该 run"
+  （`except: continue`），而 Direct 基线恰恰永远打不开 Store
+- **skill**: `human-evaluation`
+- **artifact**: `pebs/benchmark/evaluation.py`
+- **fix**: Store 打不开时不再跳过；无 Store 产物且存在 `run_dir/direct_output.md` 时，
+  把该文件正文写进 `course.md` 的「direct_output.md（Direct Codex 基线原始输出）」
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_evaluation_kit_includes_the_direct_baseline_output`
+
 ## 2026-09-20 — 教师材料包里看不到门禁结论与自动问题（EVALUATION §30–§32/§73）
 
 - **date**: 2026-09-20

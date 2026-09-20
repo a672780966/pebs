@@ -215,10 +215,11 @@ def export_kit(runs: list[dict[str, Any]] | None = None, *, directory: Any = Non
         slug = f"{case_id}-{variant}".replace(" ", "").replace("[", "").replace("]", "").replace("+", "_")
         base = target_dir / slug
         base.mkdir(parents=True, exist_ok=True)
+        store = None
         try:
             store = Store(project_id, config.project_dir(project_id))
-        except Exception:  # noqa: BLE001 - 项目已被清理时跳过
-            continue
+        except Exception:  # noqa: BLE001 - direct_codex 没有项目 Store
+            store = None
         lines = [
             f"# {case_id} / {variant}",
             "",
@@ -231,13 +232,22 @@ def export_kit(runs: list[dict[str, Any]] | None = None, *, directory: Any = Non
             "",
         ]
         lines.extend(_auto_issue_lines(run))
-        lines.extend(_gate_lines(store))
+        if store is not None:
+            lines.extend(_gate_lines(store))
+        # direct_codex 基线没有 Store：它的产物是 run 目录里的 direct_output.md。
+        # 教师必须能评到它，否则 §28 的三模式对比在人工评分维度上是缺一条腿的。
+        direct_output = _direct_output_text(run)
+        if direct_output and not _has_store_artifacts(store):
+            lines.append("## direct_output.md（Direct Codex 基线原始输出）")
+            lines.append("")
+            lines.append(direct_output)
+            lines.append("")
         for artifact_id in (
             "lesson_plan:sec1", "lesson_plan:sec2", "lesson_plan:sec3", "lesson_plan:sec4",
             "script:sec1", "script:sec2", "script:sec3", "script:sec4",
             "slide_plan", "pptx_deck", "assessment:sec1", "case:sec1:1",
         ):
-            content = store.accepted_content(artifact_id)
+            content = store.accepted_content(artifact_id) if store is not None else None
             if content is None:
                 continue
             lines.append(f"## {artifact_id}")
@@ -250,8 +260,34 @@ def export_kit(runs: list[dict[str, Any]] | None = None, *, directory: Any = Non
         (base / "run.json").write_text(json.dumps(run, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         worksheets = report_mod.write_worksheets([run], directory=base)
         exported.append({"case_id": case_id, "variant": variant, "dir": str(base), "worksheet": str(worksheets[0]) if worksheets else ""})
-        store.close()
+        if store is not None:
+            store.close()
     return exported
+
+
+def _has_store_artifacts(store: Any) -> bool:
+    if store is None:
+        return False
+    try:
+        return bool(store.list_artifacts())
+    except Exception:  # noqa: BLE001
+        return False
+
+
+def _direct_output_text(run: dict[str, Any]) -> str:
+    """读取 Direct baseline 的产物（run_dir/direct_output.md），最多 20000 字符。"""
+    from pathlib import Path
+
+    run_dir = str(run.get("run_dir") or "")
+    if not run_dir:
+        return ""
+    path = Path(run_dir) / "direct_output.md"
+    if not path.exists():
+        return ""
+    try:
+        return path.read_text(encoding="utf-8")[:20000]
+    except OSError:
+        return ""
 
 
 def latest(engine: Any) -> dict[str, Any] | None:

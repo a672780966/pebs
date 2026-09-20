@@ -439,6 +439,30 @@ def test_trace_records_per_skill_inputs_outputs_and_model_calls(engine, registry
     assert record["average_latency"] >= 0
 
 
+def test_evaluation_kit_includes_the_direct_baseline_output(tmp_path):
+    """§28：Direct 基线没有项目 Store，但它的产物必须进入教师材料包（否则对比缺一条腿）。"""
+    from pebs.benchmark import evaluation as eval_mod
+
+    run_dir = tmp_path / "20260101-A-direct_codex"
+    run_dir.mkdir(parents=True)
+    (run_dir / "direct_output.md").write_text("# 直接生成的教学内容\n\n这是 baseline 输出。", encoding="utf-8")
+    run = {
+        "case_id": "A",
+        "mode": "direct_codex",
+        "_variant": "direct_codex",
+        "run_id": "",
+        "run_status": "succeeded",
+        "project_id": "bench-a-direct_codex-does-not-exist",
+        "run_dir": str(run_dir),
+        "metrics": {"model_calls": 1},
+    }
+    exported = eval_mod.export_kit([run], directory=tmp_path / "kit")
+    assert exported and exported[0]["variant"] == "direct_codex"
+    course = (tmp_path / "kit" / "A-direct_codex" / "course.md").read_text(encoding="utf-8")
+    assert "direct_output.md" in course
+    assert "这是 baseline 输出" in course
+
+
 def test_evaluation_kit_shows_gates_and_automatic_issues(engine, registry_env, tmp_path, monkeypatch):
     """§30–§32：教师材料包必须包含门禁结论与自动命中问题（教师据此确认/推翻系统判断）。"""
     from pebs import config
