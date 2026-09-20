@@ -170,6 +170,41 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — Builtin（静态 Pipeline）被凭空判 5 条 PLAN 错误（CHECKS §28）
+
+- **date**: 2026-09-20
+- **task**: M6.4 Acceptance 4（Direct/Builtin/Dynamic 三模式对比），真实 run `C/builtin`
+- **symptom**: `C/builtin` 的自动问题里出现
+  `缺少必需步骤：learning_design / claims / evidence / scripts` 与
+  `terminal_outputs 缺少：script`——但静态 Pipeline 明明执行了这些步骤
+- **root_cause**: 静态模式**不产出 `build_plan_dynamic`**（DAG 产物是动态专属），
+  `runner` 取 `plan = {}` 后 `plan_checks` 拿空计划逐条比对，
+  于是每条期望都报"缺少"。Builtin 基线因此被系统性判差，
+  直接污染 §28 的三模式对比（也是最不该出现的偏差——它让 Dynamic 显得更好）
+- **skill**: `benchmark-checks` / `benchmark-runner`
+- **artifact**: `pebs/benchmark/runner.py`、`pebs/benchmark/checks.py`
+- **fix**: 新增 `_static_plan()`：用**真实执行过的 step** + 注册表产出合成 plan 形状；
+  `plan_checks(static_plan=True)` 跳过 DAG 专属期望（terminal_outputs / 复用率 /
+  复用产物类型），但能力类期望（必须包含/排除的步骤与 Skill）照常生效
+- **实测影响**: C-builtin 的 plan 问题 5 → **0**
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
+  `::test_static_plan_builder_uses_registry_produces`
+
+## 2026-09-20 — 模型返回被截断的 JSON 会让整条运行硬失败（RUNTIME A14）
+
+- **date**: 2026-09-20
+- **task**: M6.4 真实 run `C/builtin`（storyboard 步骤）
+- **symptom**: `storyboard FAILED：provider JSON parse error: Unterminated string starting at
+  line 1 column 6336`——一次长输出被截断就让 71 次模型调用的运行整体 failed，
+  后续 gates/preview 全部 BLOCKED
+- **root_cause**: `pipeline._llm_json` 把 provider 的 JSON 解析错误一律转成 `StepFailed`，
+  没有任何重试；对比之下外部 Skill 路径有 schema 修复重试
+- **skill**: `default-llm`
+- **artifact**: `pebs/pipeline.py`
+- **fix**: 对**畸形 JSON** 做有界重试（`MAX_JSON_RETRIES = 1`），重试时提示"只输出完整合法 JSON"；
+  配额/可用性错误不重试；两次调用都记账（§35 成本口径）
+- **regression_test**: `tests/test_pipeline.py::test_malformed_json_response_is_retried_once_then_fails`
+
 ## 2026-09-20 — 报告只显示 Auto Issues，隐藏门禁 FAIL，出现"0 问题但 G6 FAIL"（REPORT §35/§71-8）
 
 - **date**: 2026-09-20

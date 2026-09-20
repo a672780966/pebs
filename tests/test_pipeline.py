@@ -55,6 +55,40 @@ def test_failed_provider_call_is_still_counted_as_consumption(engine):
     assert int(engine.store.get_run(run_id)["calls_used"]) >= 1
 
 
+def test_malformed_json_response_is_retried_once_then_fails(engine):
+    """A14：畸形 JSON（长输出被截断）应有界重试一次；再失败则如实失败，不伪造内容。"""
+    from pebs.providers import ProviderError
+
+    class TruncatingLLM(FakeLLM):
+        def __init__(self, fail_times: int):
+            super().__init__()
+            self.remaining = fail_times
+
+        def generate_json(self, *, task, system, prompt):
+            self._bump(task)
+            if task == "storyboard" and self.remaining > 0:
+                self.remaining -= 1
+                raise ProviderError("provider JSON parse error: Unterminated string")
+            return super().generate_json(task=task, system=system, prompt=prompt)
+
+    # 第一次畸形、第二次正常 → 运行继续，且两次调用都被记账
+    engine.llm = TruncatingLLM(fail_times=1)
+    run_id, _ = run_build(engine, REQUEST_1)
+    steps = {step["step_id"]: step for step in engine.store.get_steps(run_id)}
+    assert steps["storyboard"]["status"] == "SUCCEEDED", steps["storyboard"]["error"]
+    assert engine.store.get_run(run_id)["calls_used"] >= 2
+
+    # 连续畸形 → 有界重试后失败，且没有产出伪造成品
+    engine2 = type(engine)(engine.project_id + "-retry2", base_dir=engine.base.parent / "proj2")
+    engine2.llm = TruncatingLLM(fail_times=99)
+    engine2.research = engine.research
+    run_id2, _ = run_build(engine2, REQUEST_1)
+    steps2 = {step["step_id"]: step for step in engine2.store.get_steps(run_id2)}
+    assert steps2["storyboard"]["status"] == "FAILED"
+    assert "JSON parse error" in (steps2["storyboard"]["error"] or "")
+    engine2.close()
+
+
 def test_offline_without_provider_reports_unavailable_and_never_fabricates(engine):
     engine.llm = MissingLLM()
     run_id, changeset_id = run_build(engine, REQUEST_1)

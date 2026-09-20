@@ -410,6 +410,32 @@ def run_case(
     return record
 
 
+def _static_plan(engine: Any, run_id: str) -> dict[str, Any]:
+    """把静态 Pipeline 的实际执行步骤合成为 plan 形状，供 plan 期望检查使用。
+
+    静态模式没有 DAG，但"这一 case 必须具备哪些能力"对 Builtin 基线同样成立：
+    合成节点的 skill/steps/outputs 都来自注册表，不编造。DAG 专属期望
+    （terminal_outputs / 复用率）在 `plan_checks(static_plan=True)` 里跳过。
+    """
+    from .. import registry
+
+    nodes: list[dict[str, Any]] = []
+    for step in engine.store.get_steps(run_id):
+        skill = trace._skill_for_step(step["step_id"])
+        record = registry.get(skill) if skill else None
+        nodes.append(
+            {
+                "node_id": step["step_id"],
+                "skill": skill or step["step_id"],
+                "steps": [step["step_id"]],
+                "outputs": list((record or {}).get("produces") or []),
+                "reused": False,
+                "status": step["status"],
+            }
+        )
+    return {"plan_id": f"static:{run_id}", "nodes": nodes, "terminal_outputs": [], "reused_artifacts": []}
+
+
 def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[str, int] | None, accept: bool) -> dict[str, Any]:
     engine = Engine(project)
     seed_case_artifacts(engine, case)
@@ -445,8 +471,14 @@ def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[st
     summary = metrics.summarize_run(skill_trace)
     hashes = metrics.snapshot_hashes(engine.store)
     plan = engine.store.accepted_content("build_plan_dynamic") or {}
+    static_run = planner_mode != "dynamic"
+    # 静态 Pipeline 不产出 DAG 产物：若不合成，plan 期望会对空计划逐条报"缺少"，
+    # 让 Builtin 基线凭空多出 5+ 条 PLAN 错误，直接污染 §28 的 Builtin vs Dynamic 对比。
+    plan_for_checks = _static_plan(engine, run_id) if static_run and not plan else plan
     route = engine.store.accepted_content("router_result") or {}
-    automatic = checks.evaluate(engine.store, case.get("expect") or {}, plan=plan, route=route)
+    automatic = checks.evaluate(
+        engine.store, case.get("expect") or {}, plan=plan_for_checks, route=route, static_plan=static_run
+    )
     from . import safety as safety_mod
 
     # §19/§39/§40：每次 benchmark run 都记入 performance registry（只 observe/record）

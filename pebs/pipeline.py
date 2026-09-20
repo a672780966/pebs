@@ -169,18 +169,31 @@ def _llm_json(ctx: PipelineContext, *, task: str, prompt: str, system: str = SYS
     if not status["available"]:
         raise StepBlocked("LLM Provider 不可用：" + "；".join(status["reasons"]))
     ctx.store.check_budget(ctx.run_id, model_calls=1)
-    try:
-        data = ctx.llm.generate_json(task=task, system=system, prompt=prompt)
-    except ProviderUnavailable as exc:
-        raise StepBlocked(str(exc)) from exc
-    except ProviderError as exc:
-        # §35 Cost / Quota Consumption：请求已经发出（例如 Codex 账号配额被打满），
-        # 即使失败也消耗了配额，必须记账；外部 Skill 路径一直是先记账后调用。
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            data = ctx.llm.generate_json(task=task, system=system, prompt=prompt)
+        except ProviderUnavailable as exc:
+            raise StepBlocked(str(exc)) from exc
+        except ProviderError as exc:
+            # §35 Cost / Quota Consumption：请求已经发出（例如 Codex 账号配额被打满），
+            # 即使失败也消耗了配额，必须记账；外部 Skill 路径一直是先记账后调用。
+            ctx.store.bump_calls(ctx.run_id, 1, step_id=_current_step())
+            # A14：畸形响应（常因长输出被截断）允许**有界**重试一次；
+            # 配额/可用性问题不重试，直接按原语义失败。
+            if attempt <= MAX_JSON_RETRIES and _is_json_parse_error(exc):
+                prompt = (
+                    prompt
+                    + "\n\n上一次输出不是合法 JSON（很可能被截断）。请只输出一个完整、合法的 JSON 对象，"
+                    "不要省略字段、不要输出解释文字。"
+                )
+                ctx.store.check_budget(ctx.run_id, model_calls=1)
+                continue
+            raise StepFailed(f"{task}: {exc}") from exc
         ctx.store.bump_calls(ctx.run_id, 1, step_id=_current_step())
-        raise StepFailed(f"{task}: {exc}") from exc
-    ctx.store.bump_calls(ctx.run_id, 1, step_id=_current_step())
-    data.pop("_usage", None)
-    return data
+        data.pop("_usage", None)
+        return data
 
 
 def _skill(ctx: PipelineContext, name: str, schema_name: str | None = None, output: Any = None) -> None:
@@ -1330,6 +1343,14 @@ def step_scripts(ctx: PipelineContext) -> dict[str, Any]:
 
 
 AUTO_FIX_GATES = ("G1", "G4", "G7")
+
+# A14：畸形 JSON 响应（长输出被截断最常见）允许有界重试的次数
+MAX_JSON_RETRIES = 1
+
+
+def _is_json_parse_error(exc: Exception) -> bool:
+    message = str(exc)
+    return "JSON parse error" in message or "is not JSON" in message
 
 
 def _fix_prompt(section: dict[str, Any], script: dict[str, Any], failed: list[dict[str, Any]], requirements: dict[str, Any]) -> str:

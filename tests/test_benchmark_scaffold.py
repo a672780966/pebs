@@ -5,6 +5,8 @@ pytestmark = __import__('pytest').mark.benchmark_smoke
 import json
 from pathlib import Path
 
+from conftest import REQUEST_1, FakeLLM
+
 from pebs.benchmark import checks, cases, metrics, performance, report, trace
 
 
@@ -346,6 +348,57 @@ def test_schema_repair_rate_is_recorded_from_step_notes():
     assert summary["schema_repair_rate"] == 0.5
     assert trace._schema_repairs("外部 Skill 执行：x；产出 1 个产物；Schema 修复 2 次") == 2
     assert trace._schema_repairs("外部 Skill 执行：x；产出 1 个产物") == 0
+
+
+def test_static_plans_are_not_charged_with_dag_expectations():
+    """§28：Builtin（静态 Pipeline）没有 DAG，不能因此凭空多出 PLAN 错误。
+
+    真实 run `20260920-170221-C-builtin` 曾因此被判 5 条"缺少必需步骤/terminal"，
+    直接让 Builtin 基线看起来比实际差。
+    """
+    plan = {
+        "nodes": [
+            {"node_id": "learning_design", "skill": "learning-designer", "steps": ["learning_design"], "outputs": ["learning_design"]},
+            {"node_id": "scripts", "skill": "script-writer", "steps": ["scripts"], "outputs": ["script"]},
+        ],
+        "terminal_outputs": [],
+        "reused_artifacts": [],
+    }
+    expect = {
+        "plan": {
+            "must_include_steps": ["learning_design", "scripts"],
+            "terminal_outputs": ["script"],
+            "min_reuse_rate": 0.5,
+            "must_reuse_artifact_types": ["teaching_plan"],
+        }
+    }
+    assert checks.plan_checks(plan, expect, static_plan=True) == []
+
+    # 能力缺失仍然要报（不是把静态模式的检查整体关掉）
+    missing = {"nodes": [{"node_id": "scripts", "skill": "script-writer", "steps": ["scripts"], "outputs": ["script"]}],
+               "terminal_outputs": []}
+    issues = checks.plan_checks(missing, expect, static_plan=True)
+    assert any("缺少必需步骤：learning_design" in issue["detail"] for issue in issues)
+
+    # 动态模式下同样的期望照常生效
+    dynamic_issues = checks.plan_checks(plan, expect, static_plan=False)
+    assert any("terminal_outputs 缺少" in issue["detail"] for issue in dynamic_issues)
+    assert any("复用率" in issue["detail"] for issue in dynamic_issues)
+
+
+def test_static_plan_builder_uses_registry_produces(engine, registry_env):
+    """静态模式的合成计划必须来自真实执行步骤 + 注册表产出（不编造）。"""
+    from conftest import run_build
+    from pebs.benchmark import runner as runner_mod
+
+    engine.llm = FakeLLM()
+    run_id, _ = run_build(engine, REQUEST_1)
+    plan = runner_mod._static_plan(engine, run_id)
+    skills = {node["skill"] for node in plan["nodes"]}
+    assert "script-writer" in skills
+    writer = next(node for node in plan["nodes"] if node["skill"] == "script-writer")
+    assert writer["outputs"] == ["script"]
+    assert all(node["steps"] for node in plan["nodes"])
 
 
 def test_report_shows_gate_failures_alongside_automatic_issues():

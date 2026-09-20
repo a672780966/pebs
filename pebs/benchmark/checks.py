@@ -40,7 +40,9 @@ def _step_artifact_types() -> dict[str, set[str]]:
     return mapping
 
 
-def plan_checks(plan: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
+def plan_checks(
+    plan: dict[str, Any], expect: dict[str, Any], *, static_plan: bool = False
+) -> list[dict[str, Any]]:
     plan_expect = expect.get("plan") or {}
     executed = [node for node in plan.get("nodes", []) if not node.get("reused")]
     reused = [node for node in plan.get("nodes", []) if node.get("reused")]
@@ -82,6 +84,10 @@ def plan_checks(plan: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, 
     for forbidden in plan_expect.get("must_exclude_steps", []):
         if _capability_produced(str(forbidden), executed_types):
             issues.append({"kind": "PLANNING", "detail": f"出现被禁止的步骤：{forbidden}"})
+    if static_plan:
+        # 静态 Pipeline 没有 DAG：terminal_outputs / 复用率 / 复用产物类型
+        # 都是计划层概念，对固定流水线不适用，跳过而不是伪报缺失。
+        return issues
     for terminal in plan_expect.get("terminal_outputs", []):
         if terminal not in (plan.get("terminal_outputs") or []):
             issues.append({"kind": "PLANNING", "detail": f"terminal_outputs 缺少：{terminal}"})
@@ -429,9 +435,16 @@ def case_checks(store: Any) -> list[dict[str, Any]]:
     return issues
 
 
-def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None = None, route: dict[str, Any] | None = None) -> dict[str, Any]:
+def evaluate(
+    store: Any,
+    expect: dict[str, Any],
+    *,
+    plan: dict[str, Any] | None = None,
+    route: dict[str, Any] | None = None,
+    static_plan: bool = False,
+) -> dict[str, Any]:
     issues = (
-        plan_checks(plan or {}, expect)
+        plan_checks(plan or {}, expect, static_plan=static_plan)
         + routing_checks(route or {}, expect)
         + content_checks(store, expect)
         + safety_fixture_checks(store, expect)

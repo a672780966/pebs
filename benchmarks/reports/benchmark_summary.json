@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T16:14:00",
+  "generated_at": "2026-09-20T18:24:00",
   "cases": [
     {
       "case_id": "A",
@@ -280,6 +280,29 @@
     },
     {
       "case_id": "C",
+      "builtin": {
+        "status": "failed",
+        "attempts": 1,
+        "succeeded": 0,
+        "evidence_policy": null,
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 71.0,
+        "runtime_seconds": 3030.89,
+        "skill_failure_rate": 0.045,
+        "schema_repair_rate": 0.0,
+        "locality_preservation_rate": null,
+        "automatic_issues": 11.0,
+        "gate_fail": 0.0,
+        "gate_review": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
+      },
       "direct_codex": {
         "status": "succeeded",
         "attempts": 1,
@@ -613,7 +636,7 @@
       }
     }
   ],
-  "runs": 24,
+  "runs": 25,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -949,6 +972,35 @@
       "schema_repair_rate": null,
       "locality_preservation_rate": null,
       "automatic_issues": 3,
+      "gate_fail": 0,
+      "gate_review": 0
+    },
+    {
+      "run_id": "run_5f3aac59475c",
+      "case_id": "C",
+      "mode": "builtin",
+      "variant": "builtin",
+      "experiment": "",
+      "status": "failed",
+      "attempts": 1,
+      "succeeded": 0,
+      "evidence_policy": null,
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 71,
+      "research_calls": 14,
+      "runtime_seconds": 3030.89,
+      "skill_failure_rate": 0.0455,
+      "schema_repair_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 11,
       "gate_fail": 0,
       "gate_review": 0
     },
@@ -1360,18 +1412,18 @@
       "attempts": 3.0
     },
     "builtin": {
-      "variants": 2,
+      "variants": 3,
       "human_score": null,
       "edit_ratio": null,
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
       "schema_repair_rate": 0.0,
-      "skill_failure_rate": 0.022,
-      "model_calls": 14.0,
-      "runtime_seconds": 462.79,
+      "skill_failure_rate": 0.03,
+      "model_calls": 85.0,
+      "runtime_seconds": 3493.68,
       "succeeded": 0.0,
-      "attempts": 6.0
+      "attempts": 7.0
     },
     "dynamic": {
       "variants": 17,
