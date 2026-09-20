@@ -23,12 +23,55 @@ DIRECT_BASELINE_SYSTEM = (
 )
 
 
+DIRECT_BASELINE_MATERIAL_BUDGET = 12000
+
+
+def _baseline_inputs(case: dict[str, Any]) -> str:
+    """§29：Direct baseline 必须拿到与 PEBS 相同的用户材料（模板 + 素材）。
+
+    之前只给 request，PEBS 侧却同时拿到模板与素材文件，这对 baseline 不公平。
+    素材按固定上限截断（§60 输入预算），避免把 benchmark 变成上下文长度竞赛。
+    """
+    from .. import template_parse
+
+    blocks: list[str] = []
+    template_path = cases.fixture_path(case, "template_fixture")
+    if template_path is not None:
+        try:
+            spec = template_parse.parse_template(template_path)
+            blocks.append(
+                "模板结构（用户提供了一个 DOCX 模板，必须按它的栏目组织内容）：\n"
+                + json.dumps(spec, ensure_ascii=False)[:2000]
+            )
+        except Exception:  # noqa: BLE001 - 解析失败时退化为只声明模板存在
+            blocks.append(f"用户提供了一个 DOCX 模板：{template_path.name}")
+    used = 0
+    for name in case.get("material_fixtures") or []:
+        path = cases.benchmark_dir() / name
+        if not path.exists():
+            continue
+        try:
+            text = str((template_parse.extract_text(path) or {}).get("text") or "")
+        except Exception:  # noqa: BLE001
+            continue
+        remaining = max(DIRECT_BASELINE_MATERIAL_BUDGET - used, 0)
+        if not remaining:
+            break
+        chunk = text[:remaining]
+        used += len(chunk)
+        blocks.append(f"用户提供的材料（{name}）：\n{chunk}")
+    if not blocks:
+        return ""
+    return "用户材料：\n" + "\n\n".join(blocks) + "\n\n"
+
+
 def direct_baseline_prompt(case: dict[str, Any]) -> str:
     """§29：Direct Codex baseline prompt 固定，给足信息，不故意写差。"""
     return (
         "任务：\n"
         f"{case['request']}\n\n"
-        "要求：\n"
+        + _baseline_inputs(case)
+        + "要求：\n"
         "- 输出语言文字与用户任务一致（中文）。\n"
         "- 结构化输出：先列学习目标，再按章节（或 8.1/8.2…）给出完整教学内容。\n"
         "- 每节包含教学策略、案例、讲解要点；案例必须可核查、不编造机构或研究。\n"

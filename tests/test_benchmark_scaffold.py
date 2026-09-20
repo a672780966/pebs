@@ -422,6 +422,21 @@ def test_gate_audit_computes_false_negative_and_positive_rates(tmp_path, monkeyp
     assert "重放口径" in section
 
 
+def test_direct_baseline_prompt_receives_the_same_materials_as_pebs():
+    """§29：不做不公平对比——baseline 必须拿到同样的用户材料（模板 + 素材）。"""
+    from pebs.benchmark import runner
+
+    case = cases.get_case("C")
+    prompt = runner.direct_baseline_prompt(case)
+    assert case["request"] in prompt
+    assert "用户提供的材料" in prompt, "缺少素材内容"
+    assert "模板" in prompt, "缺少模板结构"
+    # §60：素材注入必须有上限，不能变成上下文长度竞赛
+    assert len(prompt) < 20000, len(prompt)
+    # 固定：同样的 case 必须得到完全一样的 prompt
+    assert prompt == runner.direct_baseline_prompt(case)
+
+
 def test_report_renders_gate_audit_section(tmp_path, monkeypatch):
     import json
 

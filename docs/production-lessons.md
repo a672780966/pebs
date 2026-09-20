@@ -170,6 +170,25 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — §29 要求"不故意写差"，但 Direct baseline 拿不到用户材料（BENCHMARK §29）
+
+- **date**: 2026-09-20
+- **task**: M6 §29 Direct Codex baseline 公平性核查
+- **symptom**: `direct_baseline_prompt()` 只注入 `case['request']`；
+  PEBS 侧（builtin/dynamic）却能拿到 DOCX 模板与素材文件。
+  即 baseline 在"缺模板、缺素材"的条件下作答，比较天然对它不利
+- **root_cause**: baseline prompt 只按 case 的 request 拼装，没有复用
+  `template_fixture` / `material_fixtures`（虽然 case 里已声明）
+- **skill**: `benchmark-runner`
+- **artifact**: `pebs/benchmark/runner.py`
+- **fix**: baseline prompt 追加模板结构（`parse_template` 摘要）与素材正文
+  （`extract_text`，按 `DIRECT_BASELINE_MATERIAL_BUDGET = 12000` 字符上限截断，§60）；
+  prompt 依旧对同一 case 完全确定（可复现）
+- **影响范围**: 本修复之前记录的 `direct_codex` run（A/B/C）使用的是**较弱**的 baseline
+  prompt，因此这些 run 的 Direct 侧被系统性低估；与 PEBS 各模式的差距只能算
+  **保守估计**（对 PEBS 有利的方向），不可与修复后的 Direct run 直接混用
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_direct_baseline_prompt_receives_the_same_materials_as_pebs`
+
 ## 2026-09-20 — 失败的模型调用不记账 / 静态链路 per-step 成本恒为 0（COST §35/§39）
 
 - **date**: 2026-09-20
