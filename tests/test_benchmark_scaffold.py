@@ -252,7 +252,8 @@ def test_report_builds_mode_comparison_table():
     assert case_a["dynamic"]["human_score"] == 4.5
     assert case_a["dynamic"]["evidence_errors"] == 0
     markdown = report.render_markdown(summary)
-    assert "| A | dynamic |" in markdown
+    # 变体名可能带 `*`/`?` 版本标记，且这些 run 没有 run_status：只断言稳定的部分
+    assert "| A | dynamic" in markdown
     assert "Evidence Errors" in markdown
 
 
@@ -296,7 +297,7 @@ def test_report_builds_metric_by_mode_comparison_table():
     assert comparison["dynamic"]["human_score"] == 4.5
     markdown = report.render_markdown(summary)
     assert "模式对比" in markdown
-    assert "| Metric | direct_codex | dynamic |" in markdown
+    assert "| Metric | direct_codex | dynamic |" in markdown  # 模式对比表由 summary 生成
     assert "Teacher Edit Ratio" in markdown
 
 
@@ -434,7 +435,7 @@ def test_report_shows_gate_failures_alongside_automatic_issues():
     assert entry["gate_fail"] == 1
     markdown = report.render_markdown(summary)
     assert "Gate FAIL/Review" in markdown
-    assert "| D | dynamic |" in markdown and "1.0/0 |" in markdown
+    assert "| D | dynamic" in markdown and "1.0/0 |" in markdown
 
 
 def test_plan_step_expectations_accept_external_skill_equivalents():

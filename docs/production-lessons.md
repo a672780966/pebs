@@ -190,6 +190,25 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — 报告测试依赖本地 `benchmarks/runs/`，本地绿而 CI 红（TEST §43）
+
+- **date**: 2026-09-20
+- **task**: M6.4 报告版本标记改动后的 CI
+- **symptom**: 本地 `pytest tests -q` 全绿，CI 的 ubuntu/windows 两个 job 红：
+  `test_report_builds_mode_comparison_table`、`test_report_shows_gate_failures_alongside_automatic_issues`
+  断言 `"| A | dynamic |"` 失败
+- **root_cause**: 两个叠加。(1) 新增的版本标记让变体名变成 `dynamic ?`，
+  断言里的尾随 `|` 不再匹配；(2) **更隐蔽**：本地存在 `benchmarks/runs/`，
+  `render_markdown()` 的附加小节（质量指标/性能/失败类别）会读**本地真实 run**，
+  于是本地 markdown 里额外出现 `| A | dynamic | ...` 行让旧断言"碰巧"通过；
+  CI checkout 没有 `runs/`，断言就失败
+- **skill**: `benchmark-report`
+- **artifact**: `tests/test_benchmark_scaffold.py`
+- **fix**: 断言改为不依赖尾随分隔符、也不依赖本地 run 的稳定子串；
+  并用"隐藏 `benchmarks/runs/` 后跑全量 `-m 'not integration'`"复现 CI 条件
+  （491 passed）确认修复
+- **regression_test**: 上述两个测试本身；复核方式为隐藏 runs 目录的 CI 模拟
+
 ## 2026-09-20 — case A 同代码版本对照：Dynamic 用更少模型调用达到同等门禁/问题结果（BENCHMARK §28/§73）
 
 - **date**: 2026-09-20
