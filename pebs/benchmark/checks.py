@@ -106,7 +106,17 @@ def plan_checks(
     return issues
 
 
-def routing_checks(route: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
+def routing_checks(
+    route: dict[str, Any], expect: dict[str, Any], *, static_pipeline: bool = False
+) -> list[dict[str, Any]]:
+    """§36：Router 的 task type / knowledge type / 输出集合是否符合期望。
+
+    静态 Pipeline 没有 Router 决策（`router_result` 是动态专属产物），
+    对固定流水线检查路由期望只会全报"未命中"——那是把能力差异当成错误，
+    故静态模式直接跳过（其交付物仍由 content/plan 检查把关）。
+    """
+    if static_pipeline:
+        return []
     routing = expect.get("routing") or {}
     issues: list[dict[str, Any]] = []
     knowledge = set(route.get("knowledge_types") or [])
@@ -445,7 +455,7 @@ def evaluate(
 ) -> dict[str, Any]:
     issues = (
         plan_checks(plan or {}, expect, static_plan=static_plan)
-        + routing_checks(route or {}, expect)
+        + routing_checks(route or {}, expect, static_pipeline=static_plan)
         + content_checks(store, expect)
         + safety_fixture_checks(store, expect)
         + animation_checks(store, expect)

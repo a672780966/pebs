@@ -386,6 +386,18 @@ def test_static_plans_are_not_charged_with_dag_expectations():
     assert any("复用率" in issue["detail"] for issue in dynamic_issues)
 
 
+def test_static_pipeline_is_not_charged_with_router_expectations():
+    """§28/§36：静态 Pipeline 没有 Router 决策，路由期望对它不适用。
+
+    真实 run C-builtin 曾因此被判 2 条 ROUTING 未命中（合计 11 → 修复后 0）。
+    """
+    expect = {"routing": {"knowledge_types_any_of": ["concept"], "requested_outputs": ["script"]}}
+    assert checks.routing_checks({}, expect, static_pipeline=True) == []
+    dynamic = checks.routing_checks({}, expect, static_pipeline=False)
+    assert len(dynamic) == 2
+    assert all(issue["kind"] == "ROUTING" for issue in dynamic)
+
+
 def test_static_plan_builder_uses_registry_produces(engine, registry_env):
     """静态模式的合成计划必须来自真实执行步骤 + 注册表产出（不编造）。"""
     from conftest import run_build

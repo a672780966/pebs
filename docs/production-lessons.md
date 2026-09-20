@@ -190,6 +190,28 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — 静态 Pipeline 同样被凭空判 2 条 ROUTING 错误（CHECKS §28/§36）
+
+- **date**: 2026-09-20
+- **task**: 同上（`C/builtin` 重跑，验证 plan 修复）
+- **symptom**: 修掉 plan 问题后仍有
+  `knowledge_types 未命中：['case_analysis','concept','procedure']，实际 []` 与
+  `requested_outputs 缺少：script`——但静态 Pipeline 根本不产出 `router_result`
+- **root_cause**: 与上一条同源：把**动态专属产物**（Router 决策）的期望套在固定流水线上；
+  空 route 让每条路由期望都报未命中
+- **skill**: `benchmark-checks`
+- **artifact**: `pebs/benchmark/checks.py`
+- **fix**: `routing_checks(..., static_pipeline=True)` 直接返回空（路由期望对没有
+  Router 的流水线不适用；其交付物仍由 content / plan 检查把关）；
+  动态模式行为不变
+- **实测影响**: `C/builtin` 的自动问题 11 → **2** → （再修本项后）**0**；
+  该 run 同时验证了此前两项修复（plan 合成为 0 条误报）
+- **读数注意**: `run.json` 里存的是**运行时**的自动问题数，报告沿用该值；
+  修复检查器之前记录的 run（尤其所有 `builtin` 行）其 Auto Issues 偏高，
+  需要时用 `python tools/reevaluate_checks.py <case> <project_id>` 取修正后的数字，
+  不要跨修复点直接比较 Auto Issues 列
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_static_pipeline_is_not_charged_with_router_expectations`
+
 ## 2026-09-20 — 模型返回被截断的 JSON 会让整条运行硬失败（RUNTIME A14）
 
 - **date**: 2026-09-20
