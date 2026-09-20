@@ -190,6 +190,29 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-21 — case C（4 节）：外部 Backwards Design 成本翻倍且有门禁失败，Builtin 更省（BENCHMARK §17/§18）
+
+- **date**: 2026-09-21
+- **task**: M6.4 §17 命名对照（PEBS Builtin Learning Design vs Backwards Design Skill）在**多节课程**上复现
+- **背景**: 此前 `C + /backwards-design-unit-planner` 在 90 次调用预算下 blocked；
+  提高到 170 次后完成
+- **结果**（两者都是当前代码、都 succeeded）:
+  | 变体 | 模型调用 | 研究请求 | 门禁 FAIL | 自动问题 |
+  | --- | --- | --- | --- | --- |
+  | C builtin（静态） | **47** | 0 | **0** | 2（重放后 0，见 §28 条目） |
+  | C + backwards-design-unit-planner | 96 | 11 | **2**（G2/G3） | 0 |
+- **门禁失败详情**: `G2:script:sec2`——脚本含占位内容且引用
+  `clm_549e02319d@v1`（状态 PENDING）的 Claim；`G3:script:sec2`——
+  `策略目标指向未知目标：g3、g4`（外部 Skill 生成的教学策略引用了学习设计里不存在的目标 id）
+- **可读出的结论（仅记录，§47/§18）**: 在 4 节课程上，外部 Backwards Design 变体
+  模型调用约为 Builtin 的 **2×**，并引入两处真实门禁失败（证据未核验 + 目标 id 悬空）。
+  这与 D 案例上"外部变体问题更多"的观测一致：**外部 Skill 不是默认更好**，
+  §18 的"评分必须来自实际验证"得到真实数据支持
+- **artifact**: `benchmarks/runs/20260921-001516-C-dynamic/`、`benchmarks/runs/20260920-182441-C-builtin/`
+- **附带发现（值得后续跟进）**: G3 的 `策略目标指向未知目标` 说明外部 Skill 输出的
+  策略可以引用不存在的 goal id；当前由门禁兜住（fail closed），但是否应在
+  外部 Skill 的输出校验里更早拦截（schema/交叉引用检查）属于 M6.5 compact 的候选
+
 ## 2026-09-20 — 报告测试依赖本地 `benchmarks/runs/`，本地绿而 CI 红（TEST §43）
 
 - **date**: 2026-09-20
