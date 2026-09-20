@@ -348,6 +348,30 @@ def test_schema_repair_rate_is_recorded_from_step_notes():
     assert trace._schema_repairs("外部 Skill 执行：x；产出 1 个产物") == 0
 
 
+def test_report_shows_gate_failures_alongside_automatic_issues():
+    """§35/§71-8：门禁 FAIL 与自动问题是两层，报告不能只显示 Auto Issues。
+
+    否则会出现"Auto Issues = 0 但 G6 FAIL"这种自相矛盾的行（真实 run 出现过）。
+    """
+    runs = [
+        {
+            "case_id": "D",
+            "mode": "dynamic",
+            "run_id": "r1",
+            "metrics": {"model_calls": 5},
+            "automatic_issues": {"issues": [], "counts": {}},
+            "trace": {"gates": [{"gate": "G6", "status": "FAIL"}, {"gate": "G1", "status": "PASS"}]},
+        }
+    ]
+    summary = report.summarize(runs)
+    entry = summary["cases"][0]["dynamic"]
+    assert entry["automatic_issues"] == 0
+    assert entry["gate_fail"] == 1
+    markdown = report.render_markdown(summary)
+    assert "Gate FAIL/Review" in markdown
+    assert "| D | dynamic |" in markdown and "1.0/0 |" in markdown
+
+
 def test_plan_step_expectations_accept_external_skill_equivalents():
     """§46：外部 Skill 替换内置步骤时，能力在即可，不应报"缺少必需步骤"。
 

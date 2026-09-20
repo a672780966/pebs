@@ -113,6 +113,12 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
         "schema_repair_rate": metrics.get("schema_repair_rate"),
         "locality_preservation_rate": metrics.get("locality_preservation_rate"),
         "automatic_issues": len((run.get("automatic_issues") or {}).get("issues", [])),
+        # §35/§71-8：门禁 FAIL 与"自动问题"是两层，报告必须能同时看到，
+        # 否则会出现"Auto Issues = 0 但 G6 FAIL"这种互相矛盾的行。
+        "gate_fail": len([g for g in (run.get("trace") or {}).get("gates", []) if g.get("status") == "FAIL"]),
+        "gate_review": len(
+            [g for g in (run.get("trace") or {}).get("gates", []) if g.get("status") == "NEEDS_REVIEW"]
+        ),
     }
 
 
@@ -200,6 +206,8 @@ def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
                 "schema_repair_rate": _mean(row["schema_repair_rate"] for row in matching),
                 "locality_preservation_rate": _mean(row["locality_preservation_rate"] for row in matching),
                 "automatic_issues": _sum(row["automatic_issues"] for row in matching),
+                "gate_fail": _sum(row["gate_fail"] for row in matching),
+                "gate_review": _sum(row["gate_review"] for row in matching),
                 "reviewers": sorted({str(row["reviewer"]) for row in matching if row.get("reviewer")}),
                 "human_eval_stale": any(row.get("human_eval_stale") for row in matching),
                 "runs": len(matching),
@@ -357,8 +365,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
         "",
         f"生成时间：{summary.get('generated_at')}；run 数（每 case×mode 取最新）：{summary.get('runs', 0)}",
         "",
-        "| Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues |",
-        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues | Gate FAIL/Review |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for case in summary.get("cases", []):
         for variant, entry in sorted(case.items()):
@@ -369,7 +377,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 note = " ⚠评分针对另一版产物"
             reviewers = entry.get("reviewers") or []
             lines.append(
-                "| {case} | {mode} | {status} | {attempts} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} |".format(
+                "| {case} | {mode} | {status} | {attempts} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} | {gates} |".format(
                     case=case["case_id"],
                     mode=variant,
                     status=entry.get("status"),
@@ -382,10 +390,11 @@ def render_markdown(summary: dict[str, Any]) -> str:
                     calls=entry.get("model_calls"),
                     runtime=entry.get("runtime_seconds"),
                     issues=entry.get("automatic_issues"),
+                    gates=f"{entry.get('gate_fail') or 0}/{entry.get('gate_review') or 0}",
                 )
             )
             if reviewers or note:
-                lines.append(f"| | 教师：{('、'.join(reviewers)) or '—'}{note} | | | | | | | | | | |")
+                lines.append(f"| | 教师：{('、'.join(reviewers)) or '—'}{note} | | | | | | | | | | | |")
     lines.extend(render_mode_comparison(summary))
     lines.extend(failure_category_section())
     lines.extend(_gate_audit_section())

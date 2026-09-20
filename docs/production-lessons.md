@@ -170,6 +170,25 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 报告只显示 Auto Issues，隐藏门禁 FAIL，出现"0 问题但 G6 FAIL"（REPORT §35/§71-8）
+
+- **date**: 2026-09-20
+- **task**: M6.4 §17 第三对 A/B（D + `/dual-coding-designer`）
+- **symptom**: 该 run 的报告行是 `Auto Issues = 0`，但 `gate:G6` 实际 **FAIL**
+  （媒体计划推荐了 4 张图示，却没有产出对应 SVG 资产）。
+  两层结论互不相容，读报告的人会以为这条 run 完全干净
+- **root_cause**: 自动检查（case 期望）与门禁（G1–G8）是两条独立链路，
+  报告表格只渲染前者；案例期望不一定覆盖门禁关心的点
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/report.py`
+- **fix**: per-case 表增加 `Gate FAIL/Review` 列（`FAIL/NEEDS_REVIEW` 计数），
+  模式对比表同步；报告中因此能一眼看到"自动 0 问题但有门禁失败"
+- **留待观察（不是本次修复）**: 外部媒体 Skill 可以产出"推荐图示"的 media_plan，
+  而计划里没有 diagram 节点 → G6 正确地报 FAIL。是否应由 Planner 在
+  media_plan 推荐图示时自动纳入 diagram 步骤，属于路由/计划策略问题，
+  与 §3（不因单个课程重写固定 Pipeline）一并留到 M6.5/M7 评估
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_report_shows_gate_failures_alongside_automatic_issues`
+
 ## 2026-09-20 — 外部 Skill 替换内置步骤会被判"缺少必需步骤"，A/B 平白多一条错（CHECKS §46）
 
 - **date**: 2026-09-20
