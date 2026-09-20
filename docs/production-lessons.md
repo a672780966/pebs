@@ -170,6 +170,22 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — §69 降级只有判定函数，没有基于已记录数据的候选清单（SKILL §69）
+
+- **date**: 2026-09-20
+- **task**: M6 §68/§69 Skill Promotion / Demotion
+- **symptom**: `demotion_decision()` 存在且被测试覆盖，但 `benchmark --promotions`
+  只输出晋升候选与"已禁用"历史，从未用 `registry/performance.json` 里已有的
+  schema 失败数据去找出**该降级的 Skill**——§69 的"schema 不稳定 → DISABLED"没有落点
+- **root_cause**: 策略函数与数据源（performance registry）之间没有聚合层
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/performance.py`
+- **fix**: 新增 `review_demotions()`：对 runs ≥ 3 且
+  `schema_failure_rate > 0.3` 的 Skill 给出降级候选（触发原因、建议动作），
+  并入 `--promotions` 输出的 `demotion_candidates`；仍然只报告，
+  不改注册表（§47：M6 不允许历史表现影响路由/装配）
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_review_demotions_flags_schema_instability`
+
 ## 2026-09-20 — Direct 基线产物进不了教师材料包，三模式对比少一条腿（EVALUATION §28）
 
 - **date**: 2026-09-20

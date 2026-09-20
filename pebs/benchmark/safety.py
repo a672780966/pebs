@@ -42,6 +42,12 @@ def load_safety_cases(benchmark_dir: Any) -> dict[str, Any]:
 
 
 def safety_checks(text: str, case: dict[str, Any]) -> list[dict[str, Any]]:
+    """§49–§52 的**简化版**断言（纯函数，供测试与快速对照使用）。
+
+    生产路径用的是 `checks.safety_fixture_checks()`：它逐产物定位、并带
+    反例/选项/练习语境豁免。改规则时请改那一份，这里只是"同一规则的朴素表达"，
+    不要只修一处（历史教训见 docs/production-lessons.md 的 §64/§65 条目）。
+    """
     issues: list[dict[str, Any]] = []
     for pattern in case.get("forbidden_regex", []):
         if re.search(pattern, text):

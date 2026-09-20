@@ -170,6 +170,36 @@ def record_trace(
     return recorded
 
 
+def review_demotions(*, max_schema_failure_rate: float = 0.3) -> list[dict[str, Any]]:
+    """§69：用已记录数据找出该降级的 Skill（只报告，不改注册表，§47）。
+
+    M6 阶段的可判定信号目前只有 schema 不稳定（`schema_failure_rate`）；
+    evidence error / safety regression 需要人工或案件数据，由调用方通过
+    `demotion_decision(evidence_error=..., safety_regression=...)` 显式传入。
+    """
+    data = load_performance()
+    candidates: list[dict[str, Any]] = []
+    for name, record in sorted(data.get("skills", {}).items()):
+        rate = float(record.get("schema_failure_rate", 0.0) or 0.0)
+        if int(record.get("runs", 0)) < 3:
+            continue
+        decision = demotion_decision(schema_instability=rate > max_schema_failure_rate)
+        if not decision["demote"]:
+            continue
+        candidates.append(
+            {
+                "skill": name,
+                "version": record.get("version"),
+                "runs": record.get("runs"),
+                "schema_failure_rate": rate,
+                "triggers": decision["triggers"],
+                "action": decision["action"],
+                "note": "§69：观察结论；实际禁用/回退需人工执行注册表变更",
+            }
+        )
+    return candidates
+
+
 def review_promotions(*, unresolved_safety: dict[str, bool] | None = None) -> dict[str, Any]:
     """§68/§69：只做观察与判定，不改变路由（§47：M6 不允许历史表现影响 Resolver）。"""
     unresolved_safety = unresolved_safety or {}
@@ -198,6 +228,7 @@ def review_promotions(*, unresolved_safety: dict[str, bool] | None = None) -> di
         "promote_candidates": promote,
         "experimental": stay,
         "disabled": demote,
+        "demotion_candidates": review_demotions(),
         "thresholds": PROMOTION_THRESHOLD,
         "note": "§47：M6 仅记录与判定；promotion 的实际生效由 M7 的 performance-aware routing 决定",
     }

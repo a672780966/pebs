@@ -348,6 +348,31 @@ def test_schema_repair_rate_is_recorded_from_step_notes():
     assert trace._schema_repairs("外部 Skill 执行：x；产出 1 个产物") == 0
 
 
+def test_review_demotions_flags_schema_instability(tmp_path, monkeypatch):
+    """§69：schema 不稳定要能被识别成降级候选（只报告，不改注册表）。"""
+    from pebs import config
+
+    monkeypatch.setattr(config, "REGISTRY_DIR", tmp_path)
+    stable = performance.record_run(skill="stable-skill", success=True)
+    assert stable["schema_repair_rate"] == 0.0
+    for _ in range(3):
+        performance.record_run(skill="flaky-skill", success=False, schema_failure=True)
+    candidates = performance.review_demotions()
+    names = {item["skill"] for item in candidates}
+    assert "flaky-skill" in names
+    assert "stable-skill" not in names
+    entry = next(item for item in candidates if item["skill"] == "flaky-skill")
+    assert "schema_instability" in entry["triggers"]
+    assert entry["action"] == "DISABLED"
+    # 数据不足（runs<3）不触发
+    performance.record_run(skill="new-skill", success=False, schema_failure=True)
+    assert "new-skill" not in {item["skill"] for item in performance.review_demotions()}
+
+
+def test_failure_category_section_handles_empty_runs():
+    assert report.failure_category_section([]) == []
+
+
 def test_failure_taxonomy_categories_match_emitted_issue_kinds():
     """§65：自动检查产出的每个 kind 都必须能落进 failure_taxonomy 的类别。"""
     known = checks.taxonomy_categories()
