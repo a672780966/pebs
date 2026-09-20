@@ -170,6 +170,22 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 教师材料包里看不到门禁结论与自动问题（EVALUATION §30–§32/§73）
+
+- **date**: 2026-09-20
+- **task**: M6 Acceptance 5 的准备（真实教师评分）
+- **symptom**: `export_kit` 生成的 `course.md` 只有 run 头信息 + 产物 JSON；
+  教师在评分时看不到系统自己认为哪里不合格（门禁结论），也看不到自动检查命中了什么，
+  而这些正是 §73 最高优先级指标（Evidence Error Rate）要教师确认/推翻的对象
+- **root_cause**: 材料包只拼接产物，没有把 `gate_result`（按门禁逐条列出）与
+  `automatic_issues` 一并带上；门禁结果还不在 changeset 里，
+  用 `accepted_content` 读会得到空（必须取该产物的最新 revision）
+- **skill**: `human-evaluation`
+- **artifact**: `pebs/benchmark/evaluation.py`、`benchmarks/reports/evaluation_kit/`
+- **fix**: course.md 增加"自动检查命中的问题"表（要求教师在 comment/must_fix 中说明
+  真问题还是误报）与"门禁结论"列表（`G1@script:sec1: FAIL — 原因…`）
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_evaluation_kit_shows_gates_and_automatic_issues`
+
 ## 2026-09-20 — §55 案例红旗检查只有定义、没有调用点（CHECKS §55）
 
 - **date**: 2026-09-20

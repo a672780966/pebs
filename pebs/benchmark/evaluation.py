@@ -143,11 +143,59 @@ def record(engine: Any, payload: dict[str, Any], *, run_id: str = "", mode: str 
     return content
 
 
+def _gate_lines(store: Any) -> list[str]:
+    """把该 run 的门禁结论放进材料包：教师能看到系统自己认为哪里不合格。"""
+    rows: list[tuple[str, str, list[str]]] = []
+    for item in store.list_artifacts():
+        if item["artifact_type"] != "gate_result":
+            continue
+        # 门禁结果不一定随 changeset 被 accept，取该产物的最新 revision
+        revisions = store.revisions_of(item["artifact_id"])
+        if not revisions:
+            continue
+        content = store.get_revision(revisions[-1])["content"]
+        if not isinstance(content, dict):
+            continue
+        rows.append(
+            (
+                f"{content.get('gate_id')}@{str((content.get('target') or {}).get('artifact_id') or '')}",
+                str(content.get("status") or ""),
+                [str(issue.get("reason") or "") for issue in content.get("issues") or []],
+            )
+        )
+    if not rows:
+        return []
+    lines = ["## 门禁结论（供教师核对，不是评分）", ""]
+    for gate_id, status, reasons in sorted(rows):
+        lines.append(f"- **{gate_id}: {status}**" + (f" — {'；'.join(reasons[:3])}" if reasons else ""))
+    lines.append("")
+    return lines
+
+
+def _auto_issue_lines(run: dict[str, Any]) -> list[str]:
+    """自动检查命中的问题：教师需要逐条确认"真的有问题"还是"误报"。"""
+    issues = (run.get("automatic_issues") or {}).get("issues") or []
+    if not issues:
+        return []
+    lines = [
+        "## 自动检查命中的问题（请在 comment / must_fix 中说明是真问题还是误报）",
+        "",
+        "| 类别 | 说明 |",
+        "| --- | --- |",
+    ]
+    for issue in issues[:20]:
+        detail = str(issue.get("detail") or "").replace("|", "/")
+        lines.append(f"| {issue.get('kind')} | {detail[:200]} |")
+    lines.append("")
+    return lines
+
+
 def export_kit(runs: list[dict[str, Any]] | None = None, *, directory: Any = None) -> list[dict[str, Any]]:
     """§30/§31：把待评课程导出成教师可直接阅读的材料包 + 评分表。
 
     教师不需要运行 PEBS：每个 run 一个目录，含 course.md（关键产物）、run.json 摘要与
-    human_eval.yaml（待填）。
+    human_eval.yaml（待填）。course.md 同时给出**门禁结论**与**自动检查命中的问题**，
+    这样教师既能读到课程本身，也能确认/推翻系统自己的判断。
     """
     from pathlib import Path
 
@@ -182,6 +230,8 @@ def export_kit(runs: list[dict[str, Any]] | None = None, *, directory: Any = Non
             "> 评分说明见同目录 human_eval.yaml 与 benchmarks/reports/evaluation_kit/README.md",
             "",
         ]
+        lines.extend(_auto_issue_lines(run))
+        lines.extend(_gate_lines(store))
         for artifact_id in (
             "lesson_plan:sec1", "lesson_plan:sec2", "lesson_plan:sec3", "lesson_plan:sec4",
             "script:sec1", "script:sec2", "script:sec3", "script:sec4",

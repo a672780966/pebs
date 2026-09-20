@@ -439,6 +439,44 @@ def test_trace_records_per_skill_inputs_outputs_and_model_calls(engine, registry
     assert record["average_latency"] >= 0
 
 
+def test_evaluation_kit_shows_gates_and_automatic_issues(engine, registry_env, tmp_path, monkeypatch):
+    """§30–§32：教师材料包必须包含门禁结论与自动命中问题（教师据此确认/推翻系统判断）。"""
+    from pebs import config
+    from pebs.benchmark import evaluation as eval_mod
+
+    # export_kit 按 config.project_dir(project_id) 打开 Store：让它指向本测试引擎的实际目录，
+    # 且 project_id 必须与 Store 构造时的一致（list_artifacts 按 project_id 过滤）
+    monkeypatch.setattr(config, "project_dir", lambda pid: engine.base)
+    engine.llm = FakeLLM()
+    start, status = run_dynamic_build(engine, REQUEST_1)
+    assert status["run"]["status"] == "succeeded"
+    engine.accept(start["changeset_id"])
+
+    run = {
+        "case_id": "C",
+        "mode": "dynamic",
+        "variant": "dynamic",
+        "_variant": "dynamic",
+        "run_id": start["run_id"],
+        "run_status": "succeeded",
+        "project_id": engine.project_id,
+        "artifact_hashes": {"script:sec1": "h"},
+        "metrics": {"model_calls": 7, "research_calls": 0},
+        "automatic_issues": {
+            "issues": [{"kind": "SAFETY", "detail": "脚本命中禁用表达：x"}],
+            "counts": {"SAFETY": 1},
+        },
+    }
+    exported = eval_mod.export_kit([run], directory=tmp_path)
+    assert exported, "材料包必须导出"
+    assert eval_mod._gate_lines(engine.store), "该 run 必须有门禁结论可展示"
+    course = (tmp_path / "C-dynamic" / "course.md").read_text(encoding="utf-8")
+    assert "自动检查命中的问题" in course
+    assert "SAFETY" in course
+    assert "门禁结论" in course
+    assert "script:sec1" in course
+
+
 def test_evaluation_endpoints_expose_trace_and_accept_scores(client):
     client.post("/api/projects", json={"project_id": "evaltest"})
     evaluation_payload = _valid_payload()
