@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T20:15:13",
+  "generated_at": "2026-09-20T21:06:12",
   "cases": [
     {
       "case_id": "A",
@@ -378,9 +378,9 @@
     {
       "case_id": "D",
       "builtin": {
-        "status": "failed",
-        "attempts": 1,
-        "succeeded": 0,
+        "status": "succeeded",
+        "attempts": 2,
+        "succeeded": 1,
         "evidence_policy": null,
         "human_score": null,
         "edit_ratio": null,
@@ -388,14 +388,14 @@
         "evidence_errors": null,
         "routing_errors": null,
         "plan_errors": null,
-        "model_calls": 15.0,
-        "runtime_seconds": 775.31,
-        "skill_failure_rate": 0.045,
+        "model_calls": 17.0,
+        "runtime_seconds": 854.97,
+        "skill_failure_rate": 0.0,
         "schema_repair_rate": 0.0,
         "locality_preservation_rate": null,
-        "automatic_issues": 0.0,
-        "gate_fail": 0.0,
-        "gate_review": 0.0,
+        "automatic_issues": 1.0,
+        "gate_fail": 1.0,
+        "gate_review": 1.0,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -1117,14 +1117,14 @@
       "gate_review": 0
     },
     {
-      "run_id": "run_954a86277c5a",
+      "run_id": "run_43e41c5b9119",
       "case_id": "D",
       "mode": "builtin",
       "variant": "builtin",
       "experiment": "",
-      "status": "failed",
-      "attempts": 1,
-      "succeeded": 0,
+      "status": "succeeded",
+      "attempts": 2,
+      "succeeded": 1,
       "evidence_policy": null,
       "human_score": null,
       "edit_ratio": null,
@@ -1135,15 +1135,15 @@
       "reviewer": null,
       "human_eval_run_id": null,
       "human_eval_stale": false,
-      "model_calls": 15,
+      "model_calls": 17,
       "research_calls": 0,
-      "runtime_seconds": 775.31,
-      "skill_failure_rate": 0.0455,
+      "runtime_seconds": 854.97,
+      "skill_failure_rate": 0.0,
       "schema_repair_rate": 0.0,
       "locality_preservation_rate": null,
-      "automatic_issues": 0,
-      "gate_fail": 0,
-      "gate_review": 0
+      "automatic_issues": 1,
+      "gate_fail": 1,
+      "gate_review": 1
     },
     {
       "run_id": "run_e065d4c09320",
@@ -1471,11 +1471,11 @@
       "routing_errors": null,
       "plan_errors": null,
       "schema_repair_rate": 0.0,
-      "skill_failure_rate": 0.022,
-      "model_calls": 76.0,
-      "runtime_seconds": 3807.22,
-      "succeeded": 1.0,
-      "attempts": 9.0
+      "skill_failure_rate": 0.011,
+      "model_calls": 78.0,
+      "runtime_seconds": 3886.88,
+      "succeeded": 2.0,
+      "attempts": 10.0
     },
     "dynamic": {
       "variants": 17,

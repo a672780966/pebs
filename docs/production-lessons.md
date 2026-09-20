@@ -190,6 +190,31 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — Builtin 基线首次完整跑通，形成 case D 的 §17 共同对照（BENCHMARK §17）
+
+- **date**: 2026-09-20
+- **task**: M6.4 §17 Builtin vs External A/B
+- **背景**: 此前 case D 只有 dynamic 与 4 个外部变体，缺少**共同对照**；
+  第一次 `D/builtin` 因 `slide_plan` 崩溃失败（见上一条），修复后重跑
+- **结果**（`benchmarks/reports/benchmark_summary.md`，D 行）:
+  | 变体 | 状态 | 尝试 | 模型调用 | 门禁 FAIL + review | 自动问题 |
+  | --- | --- | --- | --- | --- | --- |
+  | builtin（静态） | succeeded 1/2 | 17 | 1 FAIL + 1 review | 1（SAFETY） |
+  | dynamic（内置） | succeeded 2/3 | 10 | 2 FAIL + 1 review | 1 |
+  | + hinge-question-designer | succeeded 1/4 | 22 | 1 FAIL + 1 review | 0 |
+  | + backwards-design-unit-planner | succeeded 1/1 | 19 | 0 FAIL + 1 review | 3 |
+  | + dual-coding-designer | succeeded 1/1 | 26 | 1 FAIL | 0 |
+  | + cognitive-load-analyser | succeeded 1/1 | 17 | 3 FAIL + 1 review | 0 |
+- **可读出的结论（仅记录，不做路由调整，§47）**:
+  1. Builtin 与 Dynamic 都能完成同一 case，但 Dynamic 用 **10 次**调用、Builtin 用 **17 次**；
+     外部 Skill 变体在 17–26 次之间——外部能力不是免费的
+  2. `builtin` 与 `dynamic` 都命中同一条 `SAFETY`（脚本里的机制/因果表述），
+     且 `builtin` 的 G4 同步 FAIL——两层独立判定一致，属于**真实待人工确认**内容
+     （§50 因果基准的作用）
+  3. 外部变体并非普遍更好：`+backwards-design` 自动问题最多（3 条），
+     印证 §18"不默认外部 Skill 更好"
+- **artifact**: `benchmarks/runs/20260920-204124-D-builtin/`、`benchmarks/reports/benchmark_summary.md`
+
 ## 2026-09-20 — 模型把标量返回成数组 → `x not in set` 抛 unhashable，整条运行 failed（RUNTIME §67）
 
 - **date**: 2026-09-20
