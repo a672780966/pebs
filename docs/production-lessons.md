@@ -218,7 +218,12 @@
   G7 模板……）都可能被静默跳过。这些 run 的 `run_status`/产物仍然有效，
   但**门禁状态不可与修复后的 run 直接比较**；`benchmark_summary.md` 不区分修复前后，
   比较时需按本节日期切分
-- **修复后的验证状态**: 目前只有 hermetic（FakeLLM）验证（471 项测试全绿）。
+- **量化审计（零模型调用）**: `tools/reevaluate_gates.py` 用当前门禁代码重放已存项目。
+  对 23 个 succeeded 且保留项目的 run 重放，**17 个 run 的门禁结论发生变化**：
+  `G1 PASS→FAIL ×12`（静默漏检，真实缺陷被放过）、`G3 FAIL→PASS ×27` 与
+  `G5 FAIL→PASS ×31`（因读不到产物而误报失败）、`G4 NEEDS_REVIEW→FAIL ×5`、
+  `G6 NEEDS_REVIEW→FAIL ×3`。即同一根因同时造成**假阴性**与**假阳性**
+- **修复后的验证状态**: 目前只有 hermetic（FakeLLM）验证（472 项测试全绿）与上述重放审计。
   真实 provider 复跑在 2026-09-20 因配额再次耗尽而失败
   （`learning_design: codex exec rc=1 … You've hit your usage limit`，
   run `20260920-064316-D-dynamic`）——真实链路验证待配额恢复后进行
