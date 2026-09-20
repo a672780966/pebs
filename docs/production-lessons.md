@@ -170,6 +170,23 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 失败的模型调用不记账 / 静态链路 per-step 成本恒为 0（COST §35/§39）
+
+- **date**: 2026-09-20
+- **task**: M6.4 真实运行（C + `/backwards-design-unit-planner`）恰逢配额打满
+- **symptom**: 外部 Skill 的 `codex exec` 因"usage limit"失败，但
+  `run.metrics.model_calls` 把这次真实消耗记成 **0**；同时**静态链路**
+  （builtin 基线）的 per-step `model_calls` 永远是 0，因为
+  `step_scope` 只在动态执行器里设置
+- **root_cause**: 两条路径不一致——`prompt_skill._generate` 是"先记账后调用"，
+  而 `pipeline._llm_json` 只在**成功返回后**才 `bump_calls`；
+  静态执行循环（`engine.py` 的三处 handler 调用）没有设置线程局部 step 上下文
+- **skill**: `default-llm`
+- **artifact**: `pebs/pipeline.py`、`pebs/engine.py`
+- **fix**: `pipeline._llm_json` 在 `ProviderError` 分支也记账（请求已发出即消耗配额）；
+  `engine.py` 三处静态 handler 调用包进 `step_scope(step_id)`
+- **regression_test**: `tests/test_pipeline.py::test_failed_provider_call_is_still_counted_as_consumption`
+
 ## 2026-09-20 — §35 要求的 Gate FP/FN Rate 没有任何计算口径（METRICS §35）
 
 - **date**: 2026-09-20

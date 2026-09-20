@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T09:39:09",
+  "generated_at": "2026-09-20T09:46:44",
   "cases": [
     {
       "case_id": "A",
@@ -258,6 +258,27 @@
     },
     {
       "case_id": "C",
+      "direct_codex": {
+        "status": "succeeded",
+        "attempts": 1,
+        "succeeded": 1,
+        "evidence_policy": null,
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 1.0,
+        "runtime_seconds": 190.24,
+        "skill_failure_rate": null,
+        "schema_repair_rate": null,
+        "locality_preservation_rate": null,
+        "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
+      },
       "dynamic": {
         "status": "succeeded",
         "attempts": 5,
@@ -277,6 +298,27 @@
         "schema_repair_rate": null,
         "locality_preservation_rate": null,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
+      },
+      "dynamic [+external-backwards-design]": {
+        "status": "failed",
+        "attempts": 1,
+        "succeeded": 0,
+        "evidence_policy": null,
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 1.0,
+        "runtime_seconds": 49.29,
+        "skill_failure_rate": 0.091,
+        "schema_repair_rate": 0.0,
+        "locality_preservation_rate": null,
+        "automatic_issues": 5.0,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -481,7 +523,7 @@
       }
     }
   ],
-  "runs": 20,
+  "runs": 22,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -799,6 +841,33 @@
       "automatic_issues": 3
     },
     {
+      "run_id": "",
+      "case_id": "C",
+      "mode": "direct_codex",
+      "variant": "direct_codex",
+      "experiment": "",
+      "status": "succeeded",
+      "attempts": 1,
+      "succeeded": 1,
+      "evidence_policy": null,
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 1,
+      "research_calls": 0,
+      "runtime_seconds": 190.24,
+      "skill_failure_rate": null,
+      "schema_repair_rate": null,
+      "locality_preservation_rate": null,
+      "automatic_issues": 0
+    },
+    {
       "run_id": "run_ec5bff2ee0c1",
       "case_id": "C",
       "mode": "dynamic",
@@ -826,6 +895,33 @@
       "schema_repair_rate": null,
       "locality_preservation_rate": null,
       "automatic_issues": 0
+    },
+    {
+      "run_id": "run_8ca075447385",
+      "case_id": "C",
+      "mode": "dynamic",
+      "variant": "dynamic [+external-backwards-design]",
+      "experiment": "external-backwards-design",
+      "status": "failed",
+      "attempts": 1,
+      "succeeded": 0,
+      "evidence_policy": null,
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 1,
+      "research_calls": 0,
+      "runtime_seconds": 49.29,
+      "skill_failure_rate": 0.0909,
+      "schema_repair_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 5
     },
     {
       "run_id": "run_e065d4c09320",
@@ -1058,7 +1154,7 @@
   ],
   "mode_comparison": {
     "direct_codex": {
-      "variants": 2,
+      "variants": 3,
       "human_score": null,
       "edit_ratio": null,
       "evidence_errors": null,
@@ -1066,10 +1162,10 @@
       "plan_errors": null,
       "schema_repair_rate": null,
       "skill_failure_rate": null,
-      "model_calls": 2.0,
-      "runtime_seconds": 377.46,
-      "succeeded": 2.0,
-      "attempts": 2.0
+      "model_calls": 3.0,
+      "runtime_seconds": 567.7,
+      "succeeded": 3.0,
+      "attempts": 3.0
     },
     "builtin": {
       "variants": 2,
@@ -1086,18 +1182,18 @@
       "attempts": 6.0
     },
     "dynamic": {
-      "variants": 14,
+      "variants": 15,
       "human_score": null,
       "edit_ratio": null,
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
       "schema_repair_rate": 0.0,
-      "skill_failure_rate": 0.012,
-      "model_calls": 377.0,
-      "runtime_seconds": 20546.01,
+      "skill_failure_rate": 0.017,
+      "model_calls": 378.0,
+      "runtime_seconds": 20595.3,
       "succeeded": 20.0,
-      "attempts": 41.0
+      "attempts": 42.0
     },
     "scenario": {
       "variants": 2,

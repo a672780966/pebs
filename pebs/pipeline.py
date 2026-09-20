@@ -174,6 +174,9 @@ def _llm_json(ctx: PipelineContext, *, task: str, prompt: str, system: str = SYS
     except ProviderUnavailable as exc:
         raise StepBlocked(str(exc)) from exc
     except ProviderError as exc:
+        # §35 Cost / Quota Consumption：请求已经发出（例如 Codex 账号配额被打满），
+        # 即使失败也消耗了配额，必须记账；外部 Skill 路径一直是先记账后调用。
+        ctx.store.bump_calls(ctx.run_id, 1, step_id=_current_step())
         raise StepFailed(f"{task}: {exc}") from exc
     ctx.store.bump_calls(ctx.run_id, 1, step_id=_current_step())
     data.pop("_usage", None)

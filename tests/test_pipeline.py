@@ -33,6 +33,28 @@ def test_full_build_produces_formal_ready_artifacts(engine):
     assert readiness["ready"] is True, readiness["blocking"]
 
 
+def test_failed_provider_call_is_still_counted_as_consumption(engine):
+    """§35 Cost / Quota Consumption：请求已发出但 provider 报错（如配额打满）也要记账。
+
+    否则一次真实的配额耗尽会被记成 0 次调用，成本口径失真。
+    """
+    from pebs.providers import ProviderError
+
+    class FlakyLLM(FakeLLM):
+        def generate_json(self, *, task, system, prompt):
+            self._bump(task)
+            if task == "learning_design":
+                raise ProviderError("codex exec 失败：usage limit")
+            return super().generate_json(task=task, system=system, prompt=prompt)
+
+    engine.llm = FlakyLLM()
+    run_id, _ = run_build(engine, REQUEST_1)
+    step = next(s for s in engine.store.get_steps(run_id) if s["step_id"] == "learning_design")
+    assert step["status"] == "FAILED"
+    assert int(step["model_calls"]) == 1, "失败的调用也要记到该步骤"
+    assert int(engine.store.get_run(run_id)["calls_used"]) >= 1
+
+
 def test_offline_without_provider_reports_unavailable_and_never_fabricates(engine):
     engine.llm = MissingLLM()
     run_id, changeset_id = run_build(engine, REQUEST_1)

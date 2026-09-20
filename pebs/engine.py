@@ -11,6 +11,7 @@ from .evidence import EvidenceStore
 from .hooks import Hooks
 from .permissions import PermissionDenied, PermissionManager
 from .providers import get_llm, get_research
+from .runtime.step_context import step_scope
 from .store import BudgetExceeded, ConflictError, Store, StoreError, canonical_json, now_iso
 
 
@@ -377,7 +378,9 @@ class Engine:
             try:
                 if handler is None:
                     raise pipeline.StepFailed(f"未实现步骤：{step_id}")
-                result = handler(ctx)
+                # §39：静态链路也要把模型调用记到步骤上（否则 builtin 基线 per-skill 成本恒为 0）
+                with step_scope(step_id):
+                    result = handler(ctx)
                 notes = result.get("notes", []) if isinstance(result, dict) else []
                 self.store.set_step(
                     run_id,
@@ -732,7 +735,8 @@ class Engine:
                 ]:
                     handler = pipeline.STEPS[step_id]
                     self.store.set_step(run_id, step_id, status="RUNNING", bump_attempt=True)
-                    result = handler(ctx)
+                    with step_scope(step_id):
+                        result = handler(ctx)
                     self.store.set_step(
                         run_id, step_id, status="SUCCEEDED", note="；".join(str(n) for n in result.get("notes", [])[:8])
                     )
@@ -784,7 +788,8 @@ class Engine:
             handler = pipeline.STEPS[step_id]
             self.store.set_step(run_id, step_id, status="RUNNING", bump_attempt=True)
             try:
-                result = handler(ctx)
+                with step_scope(step_id):
+                    result = handler(ctx)
             except pipeline.StepBlocked as exc:
                 self.store.set_step(run_id, step_id, status="BLOCKED", error=str(exc))
                 self.store.set_run_status(run_id, "blocked")
