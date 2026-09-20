@@ -428,6 +428,16 @@ def test_trace_records_per_skill_inputs_outputs_and_model_calls(engine, registry
         "per-skill model_calls 之和必须等于 run 的 calls_used"
     )
 
+    # §19：per-skill 调用量/耗时必须真的写进 performance registry（否则该字段恒为 0）
+    performance.record_trace(
+        skill_trace,
+        latency_by_skill={item["skill"]: float(item.get("duration") or 0.0) for item in skill_trace["skills"]},
+        model_calls_by_skill={item["skill"]: int(item.get("model_calls") or 0) for item in skill_trace["skills"]},
+    )
+    record = performance.load_performance()["skills"]["script-writer"]
+    assert record["average_model_calls"] > 0
+    assert record["average_latency"] >= 0
+
 
 def test_evaluation_endpoints_expose_trace_and_accept_scores(client):
     client.post("/api/projects", json={"project_id": "evaltest"})

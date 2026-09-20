@@ -268,10 +268,16 @@
   `G1 PASS→FAIL ×12`（静默漏检，真实缺陷被放过）、`G3 FAIL→PASS ×27` 与
   `G5 FAIL→PASS ×31`（因读不到产物而误报失败）、`G4 NEEDS_REVIEW→FAIL ×5`、
   `G6 NEEDS_REVIEW→FAIL ×3`。即同一根因同时造成**假阴性**与**假阳性**
-- **修复后的验证状态**: 目前只有 hermetic（FakeLLM）验证（472 项测试全绿）与上述重放审计。
-  真实 provider 复跑在 2026-09-20 因配额再次耗尽而失败
-  （`learning_design: codex exec rc=1 … You've hit your usage limit`，
-  run `20260920-064316-D-dynamic`）——真实链路验证待配额恢复后进行
+- **修复后的验证状态**: hermetic（FakeLLM）验证 + 重放审计 + **真实链路验证**
+  （2026-09-20 09:16，配额短暂恢复）：`D / dynamic [+external-assessment]`
+  （外部 patched skill `hinge-question-designer@hinge-question-designer-pebs-1`，
+  provider SHA `6bbbce41…`）一次跑通，run `20260920-091629-D-dynamic`：
+  - 外部 Skill 产出声明产物（`assessment:sec1`、`case:sec1:1`）；trace 里 per-skill
+    `input_artifacts`/`model_calls` 均为真实值（此前恒为空）
+  - **门禁真正生效**：G1/G3/G4/G5 PASS，**G2 = FAIL**（脚本含占位内容且引用了
+    `clm_2c6750773f@v1` 状态 UNSUPPORTED 的 Claim），G6 NEEDS_REVIEW
+  - 该 run 此前失败过两次（先是契约违规、后是配额）；G2 FAIL 正是 §71-8 期望的结果——
+    动态 Skill 不能绕过 Evidence Gate
 
 ## 2026-09-20 — provider 的 `_usage` 元数据被 emit 进外部 Skill 产物（RUNTIME §11/§39）
 
