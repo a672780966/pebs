@@ -369,6 +369,25 @@ def categorize(issues: list[dict[str, Any]]) -> dict[str, int]:
     return dict(sorted(counts.items()))
 
 
+def case_checks(store: Any) -> list[dict[str, Any]]:
+    """§55：案例红旗与结构要求。
+
+    `safety.case_quality_checks` 早就写好了，但一直**没有任何调用点**——
+    即"假机构/假研究/隐性诊断/未关联学习目标"这些规则从未在运行中生效。
+    """
+    from . import safety as safety_mod
+
+    issues: list[dict[str, Any]] = []
+    for item in store.list_artifacts():
+        if item["artifact_type"] != "case" or not item.get("accepted_rev"):
+            continue
+        content = store.accepted_content(item["artifact_id"]) or {}
+        if not isinstance(content, dict):
+            continue
+        issues.extend(safety_mod.case_quality_checks(content))
+    return issues
+
+
 def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None = None, route: dict[str, Any] | None = None) -> dict[str, Any]:
     issues = (
         plan_checks(plan or {}, expect)
@@ -378,6 +397,7 @@ def evaluate(store: Any, expect: dict[str, Any], *, plan: dict[str, Any] | None 
         + animation_checks(store, expect)
         + ppt_checks(store, expect)
         + media_consistency_checks(store, expect)
+        + case_checks(store)
     )
     counts = categorize(issues)
     known = taxonomy_categories()

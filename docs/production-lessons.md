@@ -170,6 +170,21 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — §55 案例红旗检查只有定义、没有调用点（CHECKS §55）
+
+- **date**: 2026-09-20
+- **task**: M6 §55 Case Benchmark
+- **symptom**: `safety.case_quality_checks()`（编造研究、把结论写成必然、标签化个体、
+  虚构机构、缺少 linked_goal、信息量不足）写好了，但**全仓库没有任何调用点**；
+  `checks.evaluate()` 只调 plan/routing/content/safety-fixture/animation/ppt/media 七类检查
+- **root_cause**: 检查函数与其调用聚合器分离，新增检查时漏接线（与 §64/§65 同类问题）
+- **skill**: `benchmark-checks`
+- **artifact**: `pebs/benchmark/checks.py`
+- **fix**: 新增 `case_checks(store)` 并接入 `evaluate()`；对每个已接受的 `case` 产物运行红旗检查
+- **实测影响**: 对 24 个已存 succeeded 项目回放，**0 条命中**——说明现有真实产物
+  没有踩这些红旗，但规则此前从未生效、此后开始生效
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_case_quality_checks_are_wired_into_evaluate`
+
 ## 2026-09-20 — §29 要求"不故意写差"，但 Direct baseline 拿不到用户材料（BENCHMARK §29）
 
 - **date**: 2026-09-20

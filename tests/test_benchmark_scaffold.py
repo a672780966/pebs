@@ -422,6 +422,41 @@ def test_gate_audit_computes_false_negative_and_positive_rates(tmp_path, monkeyp
     assert "重放口径" in section
 
 
+def test_case_quality_checks_are_wired_into_evaluate():
+    """§55：case 红旗检查必须真的被 evaluate() 调用（此前只有定义、没有调用点）。"""
+    from pebs.benchmark import checks
+
+    class _Store:
+        def __init__(self, content):
+            self._content = content
+
+        def list_artifacts(self):
+            return [{"artifact_id": "case:sec1:1", "artifact_type": "case", "accepted_rev": "case:sec1:1@r1"}]
+
+        def accepted_content(self, artifact_id):
+            return self._content
+
+    bad = _Store(
+        {
+            "case_id": "c1",
+            "linked_goal": "",
+            "text": "某某幼儿园的乐乐被教师称为问题儿童，某某大学研究发现他一定有问题。",
+        }
+    )
+    issues = checks.case_checks(bad)
+    reasons = " ".join(issue["detail"] for issue in issues)
+    assert any(issue["kind"] == "PEDAGOGY" for issue in issues), "缺少 linked_goal 必须报出"
+    assert "标签化" in reasons and "虚构机构" in reasons
+
+    result = checks.evaluate(bad, {})
+    assert any(issue["detail"] in reasons for issue in result["issues"]), (
+        "evaluate() 必须把 case 检查算进去"
+    )
+
+    good = _Store({"case_id": "c1", "linked_goal": "g1", "text": "小班晨间接待时两名幼儿争抢玩具，教师先观察再介入。" * 4})
+    assert checks.case_checks(good) == []
+
+
 def test_direct_baseline_prompt_receives_the_same_materials_as_pebs():
     """§29：不做不公平对比——baseline 必须拿到同样的用户材料（模板 + 素材）。"""
     from pebs.benchmark import runner
