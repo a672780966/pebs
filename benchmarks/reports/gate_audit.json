@@ -1,44 +1,44 @@
 {
-  "checked": 175,
-  "runs": 20,
+  "checked": 182,
+  "runs": 22,
   "runs_with_changes": 9,
-  "gate_false_negative_rate": 0.1618,
-  "gate_false_positive_rate": 0.5122,
+  "gate_false_negative_rate": 0.1528,
+  "gate_false_positive_rate": 0.5,
   "false_negative": 11,
   "false_positive": 42,
   "per_gate": {
     "G1": {
-      "checked": 25,
+      "checked": 26,
       "false_negative": 11,
       "false_positive": 0
     },
     "G2": {
-      "checked": 25,
+      "checked": 26,
       "false_negative": 0,
       "false_positive": 0
     },
     "G3": {
-      "checked": 25,
+      "checked": 26,
       "false_negative": 0,
       "false_positive": 19
     },
     "G4": {
-      "checked": 25,
+      "checked": 26,
       "false_negative": 0,
       "false_positive": 0
     },
     "G5": {
-      "checked": 25,
+      "checked": 26,
       "false_negative": 0,
       "false_positive": 23
     },
     "G6": {
-      "checked": 25,
+      "checked": 26,
       "false_negative": 0,
       "false_positive": 0
     },
     "G7": {
-      "checked": 25,
+      "checked": 26,
       "false_negative": 0,
       "false_positive": 0
     }
@@ -677,6 +677,11 @@
       "rows": []
     },
     {
+      "project": "bench-c-direct_codex-094023",
+      "skipped": "no artifacts",
+      "rows": []
+    },
+    {
       "project": "bench-c-dynamic-170741",
       "skipped": "",
       "rows": [
@@ -933,6 +938,11 @@
       ]
     },
     {
+      "project": "bench-c-dynamic-094554",
+      "skipped": "",
+      "rows": []
+    },
+    {
       "project": "bench-d-dynamic-080449",
       "skipped": "",
       "rows": [
@@ -997,9 +1007,75 @@
       ]
     },
     {
-      "project": "bench-d-dynamic-064316",
+      "project": "bench-d-dynamic-091629",
       "skipped": "",
-      "rows": []
+      "rows": [
+        {
+          "artifact": "script:sec1",
+          "gate": "G1",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G2",
+          "stored": "FAIL",
+          "now": "FAIL",
+          "changed": false,
+          "issues": [
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_2c6750773f@v1（状态 UNSUPPORTED）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_2c6750773f@v1（状态 UNSUPPORTED）",
+            "存在待核验占位内容，事实性陈述尚未通过 Evidence Gate",
+            "引用了未获支持的 Claim：clm_57de3c2e98@v1（状态 PENDING）"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G3",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G4",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G5",
+          "stored": "PASS",
+          "now": "PASS",
+          "changed": false,
+          "issues": []
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G6",
+          "stored": "NEEDS_REVIEW",
+          "now": "NEEDS_REVIEW",
+          "changed": false,
+          "issues": [
+            "媒体选型未运行，无法确认视觉与动画决策"
+          ]
+        },
+        {
+          "artifact": "script:sec1",
+          "gate": "G7",
+          "stored": "NOT_APPLICABLE",
+          "now": "NOT_APPLICABLE",
+          "changed": false,
+          "issues": []
+        }
+      ]
     },
     {
       "project": "bench-d-dynamic-044426",
