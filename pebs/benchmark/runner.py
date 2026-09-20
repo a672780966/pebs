@@ -409,7 +409,19 @@ def _run_pebs(case: dict[str, Any], *, mode: str, project: str, budgets: dict[st
     # §19/§39/§40：每次 benchmark run 都记入 performance registry（只 observe/record）
     from . import performance as performance_mod
 
-    performance_mod.record_trace(skill_trace)
+    performance_mod.record_trace(
+        skill_trace,
+        latency_by_skill={
+            str(item.get("skill")): float(item.get("duration") or 0.0)
+            for item in skill_trace.get("skills", [])
+            if item.get("skill")
+        },
+        model_calls_by_skill={
+            str(item.get("skill")): int(item.get("model_calls") or 0)
+            for item in skill_trace.get("skills", [])
+            if item.get("skill")
+        },
+    )
 
     return {
         "run_id": run_id,

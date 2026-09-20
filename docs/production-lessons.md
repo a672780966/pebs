@@ -170,6 +170,30 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — Skill Trace 的 per-skill 产物与调用量全是空的（TRACE §19/§35/§39）
+
+- **date**: 2026-09-20
+- **task**: M6 §39 Skill Trace 结构完整性
+- **symptom**: trace 里每个 skill 的 `input_artifacts` 恒为 `[]`、
+  `output_artifacts` 会把同一产物按 revision 重复列出（`['claims','claims','claims']`）、
+  `model_calls` **字段根本不存在**；`registry/performance.json` 的
+  `average_model_calls` / `average_latency` 因此永远是 0
+- **root_cause**: `build_trace()` 里写了一个空列表 `inputs: list[str] = []` 从未填充；
+  outputs 用 `produced_by` 去匹配 `step["step_id"]`，且未去重；
+  `steps` 表虽然有 `input_revs/output_revs` 列，但**执行器从不写入**；
+  per-skill 调用量没有任何记录点（只有 run 级 `calls_used`）
+- **skill**: `external-skill-runtime` / `benchmark-trace`
+- **artifact**: `pebs/store.py`、`pebs/runtime/executor.py`、`pebs/runtime/step_context.py`、
+  `pebs/runtime/prompt_skill.py`、`pebs/pipeline.py`、`pebs/benchmark/trace.py`、
+  `pebs/benchmark/runner.py`
+- **fix**: `steps` 增加 `model_calls` 列（`_migrate` 自动补）；
+  执行器在节点前后对 `ctx.outputs` 取快照，写入该节点的 input/output revisions
+  （三条 runtime 路径通用，失败节点也记）；per-skill 调用量改为
+  **线程局部 step 上下文 + `store.bump_calls(step_id=...)` 在调用点精确记账**
+  —— 最初用"run 级计数器差分"实现，在并行批次下会把同批节点的调用算进来（测试发现 15 vs 12）
+- **regression_test**: `tests/test_benchmark_evaluation.py::test_trace_records_per_skill_inputs_outputs_and_model_calls`
+  （断言 input/output 正确、去重、且 per-skill 调用量之和 == run `calls_used`）
+
 ## 2026-09-20 — Skill Trace 不带 selection_trace，§63 高级模式永远空白（UI §63/§64）
 
 - **date**: 2026-09-20

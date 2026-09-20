@@ -104,6 +104,24 @@ def _skill_identity(name: str) -> dict[str, Any]:
     }
 
 
+def _parse_rev_list(raw: Any) -> list[str]:
+    """steps.input_revs / output_revs 存的是 JSON 数组字符串。"""
+    if isinstance(raw, list):
+        return [str(item) for item in raw]
+    if not raw:
+        return []
+    try:
+        value = json.loads(str(raw))
+    except json.JSONDecodeError:
+        return []
+    return [str(item) for item in value] if isinstance(value, list) else []
+
+
+def _artifact_of(revision_id: str) -> str:
+    """`script:sec1@r2` → `script:sec1`。"""
+    return revision_id.split("@", 1)[0]
+
+
 def _schema_repairs(note: str) -> int:
     """§35：从 step note 里读出 Schema 修复次数（外部 Skill 第二次生成）。"""
     import re
@@ -197,9 +215,19 @@ def build_trace(
             "patch": "",
             "pinned": False,
         }
-        inputs: list[str] = []
+        # §39：优先用执行器记录的 input_revs/output_revs（精确到 revision，含失败节点）；
+        # 旧数据没有这些列，回退到按 produced_by 反查（只到 artifact_id，且需去重）。
         node = node_by_skill.get(step["step_id"]) or {}
-        outputs = [rev["artifact_id"] for rev in produced.get(step["step_id"], [])]
+        stored_inputs = _parse_rev_list(step.get("input_revs"))
+        stored_outputs = _parse_rev_list(step.get("output_revs"))
+        if stored_inputs or stored_outputs:
+            inputs = sorted({_artifact_of(rev) for rev in stored_inputs if _artifact_of(rev)})
+            outputs = list(dict.fromkeys(_artifact_of(rev) for rev in stored_outputs if _artifact_of(rev)))
+        else:
+            inputs = []
+            outputs = list(
+                dict.fromkeys(rev["artifact_id"] for rev in produced.get(step["step_id"], []))
+            )
         skills.append(
             {
                 **identity,
@@ -207,6 +235,7 @@ def build_trace(
                 "status": step["status"],
                 "attempts": step.get("attempts", 0),
                 "duration": _step_duration(step),
+                "model_calls": int(step.get("model_calls") or 0),
                 "schema_repairs": _schema_repairs(str(step.get("note") or "")),
                 "started_at": step.get("started_at"),
                 "ended_at": step.get("ended_at"),
@@ -214,6 +243,7 @@ def build_trace(
                 "error": step.get("error") or "",
                 "input_artifacts": inputs,
                 "output_artifacts": outputs,
+                "output_revisions": stored_outputs,
                 "parallel_group": node.get("parallel_group"),
                 "reused": bool(node.get("reused")),
                 "gates_before": node.get("gate_before", []),

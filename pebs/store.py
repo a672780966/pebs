@@ -260,6 +260,10 @@ class Store:
         columns = {row["name"] for row in self.conn.execute("PRAGMA table_info(runs)")}
         if "inputs" not in columns:
             self.conn.execute("ALTER TABLE runs ADD COLUMN inputs TEXT NOT NULL DEFAULT '{}'")
+        # §39/§35：Skill Trace 需要 per-skill model_calls（成本核算与 schema 修复率都依赖它）
+        step_columns = {row["name"] for row in self.conn.execute("PRAGMA table_info(steps)")}
+        if "model_calls" not in step_columns:
+            self.conn.execute("ALTER TABLE steps ADD COLUMN model_calls INTEGER NOT NULL DEFAULT 0")
 
     def close(self) -> None:
         with self._lock:
@@ -612,6 +616,7 @@ class Store:
         note: str | None = None,
         input_revs: list[str] | None = None,
         output_revs: list[str] | None = None,
+        model_calls: int | None = None,
         bump_attempt: bool = False,
     ) -> None:
         rows = self._query("SELECT * FROM steps WHERE run_id = ? AND step_id = ?", (run_id, step_id))
@@ -621,6 +626,7 @@ class Store:
         row = rows[0]
         self._exec(
             "UPDATE steps SET status = ?, error = ?, note = ?, input_revs = ?, output_revs = ?, "
+            "model_calls = ?, "
             "started_at = COALESCE(started_at, CASE WHEN ? = 'RUNNING' THEN ? ELSE started_at END), "
             "ended_at = CASE WHEN ? IN ('SUCCEEDED','FAILED','BLOCKED','CANCELLED','STALE') THEN ? ELSE ended_at END, "
             "attempts = attempts + ? WHERE run_id = ? AND step_id = ?",
@@ -630,6 +636,7 @@ class Store:
                 note if note is not None else row["note"],
                 canonical_json(input_revs) if input_revs is not None else row["input_revs"],
                 canonical_json(output_revs) if output_revs is not None else row["output_revs"],
+                int(model_calls) if model_calls is not None else row["model_calls"],
                 status,
                 now_iso(),
                 status,
@@ -644,8 +651,19 @@ class Store:
         rows = self._query("SELECT * FROM steps WHERE run_id = ? ORDER BY rowid", (run_id,))
         return [dict(r) for r in rows]
 
-    def bump_calls(self, run_id: str, n: int = 1) -> None:
+    def bump_calls(self, run_id: str, n: int = 1, *, step_id: str = "") -> None:
         self._exec("UPDATE runs SET calls_used = calls_used + ? WHERE run_id = ?", (n, run_id))
+        # §39：同时记到发起调用的节点上（并行调度下这是唯一准确的口径）
+        if step_id:
+            rows = self._query(
+                "SELECT 1 FROM steps WHERE run_id = ? AND step_id = ?", (run_id, step_id)
+            )
+            if not rows:
+                self.add_step(run_id, step_id, step_id)
+            self._exec(
+                "UPDATE steps SET model_calls = model_calls + ? WHERE run_id = ? AND step_id = ?",
+                (n, run_id, step_id),
+            )
 
     def bump_research(self, run_id: str, n: int = 1) -> None:
         self._exec("UPDATE runs SET research_used = research_used + ? WHERE run_id = ?", (n, run_id))

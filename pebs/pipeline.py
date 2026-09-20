@@ -13,6 +13,7 @@ from .hooks import Hooks, HookFailure
 from .permissions import PermissionManager, PermissionDenied
 from .providers import ProviderError, ProviderUnavailable, merge_research_items as _merge_research_items
 from .store import BudgetExceeded, ConflictError, Store, content_hash, file_hash, now_iso
+from .runtime.step_context import current_step as _current_step
 from .template_parse import ParseError, check_import_limits, extract_text, parse_template
 
 SYSTEM = (
@@ -174,7 +175,7 @@ def _llm_json(ctx: PipelineContext, *, task: str, prompt: str, system: str = SYS
         raise StepBlocked(str(exc)) from exc
     except ProviderError as exc:
         raise StepFailed(f"{task}: {exc}") from exc
-    ctx.store.bump_calls(ctx.run_id, 1)
+    ctx.store.bump_calls(ctx.run_id, 1, step_id=_current_step())
     data.pop("_usage", None)
     return data
 

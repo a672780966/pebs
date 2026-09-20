@@ -8,6 +8,7 @@ from . import context as context_mod
 from . import skill_loader
 from .result import validate_result
 from .skill_loader import SkillRuntimeBlocked
+from .step_context import current_step as _current_step
 
 
 def _validate_with_policies(data: Any, *, skill_record: dict[str, Any], artifact_type: str | None, inline_schema: dict[str, Any] | None) -> list[str]:
@@ -212,7 +213,7 @@ class PromptSkillExecutor:
                 from .. import pipeline
 
                 raise pipeline.StepBlocked(f"预算耗尽：{exc}") from exc
-            store.bump_calls(run_id, 1)
+            store.bump_calls(run_id, 1, step_id=_current_step())
         data = self.llm.generate_json(task=task, system=SYSTEM, prompt=prompt)
         # provider 会把用量元数据塞进返回体；内置路径在 pipeline 里已剔除，
         # 外部 Skill 路径若不剔除，`_usage` 就会被 emit 成教学产物的一部分。

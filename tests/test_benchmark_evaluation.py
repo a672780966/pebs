@@ -399,6 +399,36 @@ def test_trace_carries_selection_trace_for_the_ui(engine, registry_env):
     assert contested[0]["rejected_candidates"][0]["rejected_because"]
 
 
+def test_trace_records_per_skill_inputs_outputs_and_model_calls(engine, registry_env):
+    """§39：Skill Trace 的每项必须带 input_artifacts / output_artifacts / model_calls。
+
+    这些值由执行器在节点前后取快照写入 steps 表（内置/外部/沙箱三条路径通用），
+    旧数据的回退路径只能给出 artifact_id 且会重复。
+    """
+    from pebs.benchmark import trace as trace_mod
+
+    engine.llm = FakeLLM()
+    start, status = run_dynamic_build(engine, REQUEST_1)
+    assert status["run"]["status"] == "succeeded"
+    skill_trace = trace_mod.build_trace(engine, start["run_id"])
+    by_skill = {item["skill"]: item for item in skill_trace["skills"]}
+
+    designer = by_skill["learning-designer"]
+    assert "requirements" in designer["input_artifacts"], designer["input_artifacts"]
+    assert any(item.startswith("learning_design") for item in designer["output_artifacts"])
+    # 去重：同一产物多个 revision 只算一次
+    assert len(designer["output_artifacts"]) == len(set(designer["output_artifacts"]))
+
+    writer = by_skill["script-writer"]
+    assert "teaching_plan" in {item.split(":", 1)[0] for item in writer["input_artifacts"]}
+    assert writer["model_calls"] > 0, "script-writer 至少调用一次模型"
+
+    total = sum(int(item.get("model_calls") or 0) for item in skill_trace["skills"])
+    assert total == int(engine.store.get_run(start["run_id"])["calls_used"]), (
+        "per-skill model_calls 之和必须等于 run 的 calls_used"
+    )
+
+
 def test_evaluation_endpoints_expose_trace_and_accept_scores(client):
     client.post("/api/projects", json={"project_id": "evaltest"})
     evaluation_payload = _valid_payload()

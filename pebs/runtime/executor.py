@@ -11,9 +11,34 @@ from .builtin import BuiltinStepExecutor
 from .prompt_skill import PromptSkillExecutor, SkillExecutionFailed
 from .sandbox_skill import SandboxSkillExecutor
 from .skill_loader import SkillRuntimeBlocked
+from .step_context import step_scope
 
 # step note 里标记 Schema 修复的稳定前缀（trace 以此计算 §35 Schema Repair Rate）
 SCHEMA_REPAIR_NOTE = "Schema 修复 "
+
+
+def _step_input_revs(node: dict[str, Any], before_outputs: dict[str, str]) -> list[str]:
+    """§39：把节点声明的输入类型解析成本轮真实存在的产物 id（可追溯"读了什么"）。"""
+    declared = set(node.get("inputs") or []) | set(node.get("optional_requires") or [])
+    if not declared:
+        return []
+    resolved: list[str] = []
+    for artifact_id in before_outputs:
+        if artifact_id.split(":", 1)[0] in declared and artifact_id not in resolved:
+            resolved.append(artifact_id)
+    return sorted(resolved)
+
+
+def _step_output_revs(
+    before_outputs: dict[str, str], after_outputs: dict[str, str]
+) -> list[str]:
+    """§39：本节点新产出的 revision（去重，保持 artifact 出现顺序）。"""
+    seen: list[str] = []
+    for artifact_id in after_outputs:
+        revision_id = after_outputs[artifact_id]
+        if before_outputs.get(artifact_id) != revision_id and revision_id not in seen:
+            seen.append(revision_id)
+    return seen
 
 
 def _node_kind(record: dict[str, Any]) -> str:
@@ -178,11 +203,34 @@ class _Runner:
         kind = _node_kind(record)
         semaphore = self.semaphores.get(kind)
         agent = for_skill(record, self.engine.llm)
+        # §39：per-skill input_artifacts / output_artifacts / model_calls。
+        # 用节点执行前后的快照求差，内置/外部/沙箱三条路径都能覆盖，不必逐个 handler 改。
+        before_outputs = dict(self.ctx.outputs)
+
+        def _finalize(status: str, **fields: Any) -> None:
+            """所有终态都带上 §39 的 per-skill 产物（失败节点也要可追溯）。
+
+            model_calls 不在这里记：并行调度下共享计数器差分会被同批节点污染，
+            改由 `store.bump_calls(..., step_id=current_step())` 在调用点精确记账。
+            """
+            store.set_step(
+                run_id,
+                node_id,
+                status=status,
+                input_revs=_step_input_revs(node, before_outputs),
+                output_revs=_step_output_revs(before_outputs, self.ctx.outputs),
+                **fields,
+            )
+
         store.set_step(run_id, node_id, status="RUNNING", bump_attempt=True)
         try:
             if semaphore is not None:
                 semaphore.acquire()
+            _scope = None
             try:
+                # §39：让本次节点内的所有模型调用都记到这个 step 上（线程局部，支持并行）
+                _scope = step_scope(node_id)
+                _scope.__enter__()
                 if runtime_kind == "builtin":
                     outcome = agent.run_node(
                         self.ctx, node=node, record=record, handler=self._builtin_handler
@@ -214,26 +262,26 @@ class _Runner:
                     store.set_step(run_id, node_id, status="BLOCKED", error=f"未知 runtime 类型：{runtime_kind}")
                     return
             finally:
+                if _scope is not None:
+                    _scope.__exit__(None, None, None)
                 if semaphore is not None:
                     semaphore.release()
-            store.set_step(
-                run_id, node_id, status="SUCCEEDED", note="；".join(part for part in [gate_note, note] if part)
-            )
+            _finalize("SUCCEEDED", note="；".join(part for part in [gate_note, note] if part))
         except (pipeline.StepBlocked, SkillRuntimeBlocked) as exc:
-            store.set_step(run_id, node_id, status="BLOCKED", error=str(exc))
+            _finalize("BLOCKED", error=str(exc))
         except ConflictError as exc:
-            store.set_step(run_id, node_id, status="BLOCKED", error=f"preserve 契约阻止写入：{exc}")
+            _finalize("BLOCKED", error=f"preserve 契约阻止写入：{exc}")
         except (pipeline.StepFailed, SkillExecutionFailed) as exc:
-            store.set_step(run_id, node_id, status="FAILED", error=str(exc))
+            _finalize("FAILED", error=str(exc))
         except (IsolationViolation, AgentContractError) as exc:
-            store.set_step(run_id, node_id, status="FAILED", error=f"Subagent 契约违规：{exc}")
+            _finalize("FAILED", error=f"Subagent 契约违规：{exc}")
         except BudgetExceeded as exc:
             self.abort_run(str(exc))
-            store.set_step(run_id, node_id, status="BLOCKED", error=f"预算耗尽：{exc}")
+            _finalize("BLOCKED", error=f"预算耗尽：{exc}")
         except pipeline.CancelledRun:
-            store.set_step(run_id, node_id, status="CANCELLED", error="运行已取消")
+            _finalize("CANCELLED", error="运行已取消")
         except Exception as exc:  # noqa: BLE001 - unexpected failures must be recorded
-            store.set_step(run_id, node_id, status="FAILED", error=f"未预期错误：{exc}")
+            _finalize("FAILED", error=f"未预期错误：{exc}")
 
 
 def execute_plan(*, engine: Any, run_id: str, ctx: pipeline.PipelineContext, plan: dict[str, Any]) -> None:
