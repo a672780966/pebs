@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-20T22:05:37；run 数（每 case×mode 取最新）：26
+生成时间：2026-09-20T22:41:22；run 数（每 case×mode 取最新）：26
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues | Gate FAIL/Review |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -10,7 +10,7 @@
 | A | dynamic [+external-media-A2] ? | succeeded | 1/1 | None | None | None | None | None | 22.0 | 1012.21 | 3.0 | 6.0/3.0 |
 | A | dynamic [+external-media-A] ? | failed | 0/1 | None | None | None | None | None | 25.0 | 1466.48 | 3.0 | 0/0 |
 | A | dynamic [+external-media] ? | succeeded | 1/1 | None | None | None | None | None | 28.0 | 1020.85 | 3.0 | 6.0/3.0 |
-| B | builtin * | failed | 0/1 | None | None | None | None | None | 2.0 | 114.26 | 12.0 | 0/0 |
+| B | builtin | blocked | 0/2 | None | None | None | None | None | 23.0 | 599.1 | 4.0 | 0/0 |
 | B | direct_codex ? | succeeded | 1/1 | None | None | None | None | None | 1.0 | 210.04 | 0.0 | 0/0 |
 | B | dynamic ? | succeeded | 1/5 | None | None | None | None | None | 45.0 | 1235.35 | 1.0 | 0/1.0 |
 | B | dynamic [+empty-claims-policy] ? | blocked | 0/1 | None | None | None | None | None | 33.0 | 925.75 | 3.0 | 0/0 |
@@ -40,11 +40,11 @@
 | Evidence Errors（合计） | — | — | — | — |
 | Routing Errors（合计） | — | — | — | — |
 | Plan Errors（合计） | — | — | — | — |
-| Skill Failure Rate（均值） | — | 0.011 | 0.01 | — |
+| Skill Failure Rate（均值） | — | 0.0 | 0.01 | — |
 | Schema Repair Rate（均值） | — | 0.0 | 0.0 | — |
-| Model Calls（合计） | 3.0 | 103.0 | 512.0 | 14.0 |
-| Runtime(s)（合计） | 567.7 | 5289.46 | 24196.97 | 4318.9 |
-| Succeeded / Attempts | 3.0 / 3.0 | 3.0 / 11.0 | 22.0 / 45.0 | 3.0 / 3.0 |
+| Model Calls（合计） | 3.0 | 124.0 | 512.0 | 14.0 |
+| Runtime(s)（合计） | 567.7 | 5774.3 | 24196.97 | 4318.9 |
+| Succeeded / Attempts | 3.0 / 3.0 | 3.0 / 12.0 | 22.0 / 45.0 | 3.0 / 3.0 |
 
 
 ## 失败类别分布（§65 failure taxonomy；仅统计代表 run 的自动问题）
@@ -53,8 +53,8 @@
 | --- | ---: |
 | CONTENT | 13 |
 | SAFETY | 12 |
-| ROUTING | 10 |
-| PLANNING | 8 |
+| ROUTING | 6 |
+| PLANNING | 4 |
 | EVIDENCE | 3 |
 
 
@@ -97,29 +97,29 @@
 
 | Skill | Version | Runs | Success | Schema Fail | Human | Edit Ratio | Status |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| animation-gate | 0.1.0 | 6 | 0.6667 | 0.0 | None | None | EXPERIMENTAL |
-| assessment-designer | 0.1.0 | 27 | 0.8148 | 0.0 | None | None | EXPERIMENTAL |
+| animation-gate | 0.1.0 | 7 | 0.5714 | 0.0 | None | None | EXPERIMENTAL |
+| assessment-designer | 0.1.0 | 28 | 0.7857 | 0.0 | None | None | EXPERIMENTAL |
 | backwards-design-unit-planner | 6bbbce418f82 | 3 | 0.6667 | 0.0 | None | None | EXPERIMENTAL |
-| case-designer | 0.1.0 | 26 | 0.7308 | 0.0 | None | None | EXPERIMENTAL |
-| claim-extractor | 0.1.0 | 41 | 0.8537 | 0.0 | None | None | EXPERIMENTAL |
+| case-designer | 0.1.0 | 27 | 0.7037 | 0.0 | None | None | EXPERIMENTAL |
+| claim-extractor | 0.1.0 | 42 | 0.8571 | 0.0 | None | None | EXPERIMENTAL |
 | cognitive-load-analyser | 6bbbce418f82 | 1 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
-| diagram-designer | 0.1.0 | 13 | 0.5385 | 0.0 | None | None | EXPERIMENTAL |
-| docx-exporter | 0.1.0 | 22 | 0.6364 | 0.0 | None | None | EXPERIMENTAL |
+| diagram-designer | 0.1.0 | 14 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
+| docx-exporter | 0.1.0 | 23 | 0.6087 | 0.0 | None | None | EXPERIMENTAL |
 | dual-coding-designer | 6bbbce418f82 | 4 | 0.75 | 0.25 | None | None | EXPERIMENTAL |
-| evidence-indexer | 0.1.0 | 13 | 0.5385 | 0.0 | None | None | EXPERIMENTAL |
-| evidence-reviewer | 0.1.0 | 47 | 0.8298 | 0.0 | None | None | EXPERIMENTAL |
-| gate-runner | 0.1.0 | 34 | 0.6471 | 0.0 | None | None | EXPERIMENTAL |
+| evidence-indexer | 0.1.0 | 14 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
+| evidence-reviewer | 0.1.0 | 49 | 0.8163 | 0.0 | None | None | EXPERIMENTAL |
+| gate-runner | 0.1.0 | 35 | 0.6286 | 0.0 | None | None | EXPERIMENTAL |
 | hinge-question-designer | 6bbbce418f82 | 4 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
-| learning-designer | 0.1.0 | 38 | 0.9737 | 0.0 | None | None | EXPERIMENTAL |
-| lesson-designer | 0.1.0 | 37 | 0.7027 | 0.0 | None | None | EXPERIMENTAL |
-| load-reviewer | 0.1.0 | 6 | 0.8333 | 0.0 | None | None | EXPERIMENTAL |
-| media-router | 0.1.0 | 12 | 0.5833 | 0.0 | None | None | EXPERIMENTAL |
-| pck-developer | 0.1.0 | 38 | 0.7632 | 0.0 | None | None | EXPERIMENTAL |
-| presentation-composer | 0.1.0 | 13 | 0.4615 | 0.0 | None | None | EXPERIMENTAL |
-| presentation-planner | 0.1.0 | 13 | 0.4615 | 0.0 | None | None | EXPERIMENTAL |
-| preview-builder | 0.1.0 | 22 | 0.8636 | 0.0 | None | None | EXPERIMENTAL |
-| requirements-builder | 0.1.0 | 41 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
-| script-writer | 0.1.0 | 35 | 0.7429 | 0.0 | None | None | EXPERIMENTAL |
-| template-parser | 0.1.0 | 41 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
-| worksheet-designer | 0.1.0 | 6 | 0.8333 | 0.0 | None | None | EXPERIMENTAL |
+| learning-designer | 0.1.0 | 39 | 0.9744 | 0.0 | None | None | EXPERIMENTAL |
+| lesson-designer | 0.1.0 | 38 | 0.6842 | 0.0 | None | None | EXPERIMENTAL |
+| load-reviewer | 0.1.0 | 7 | 0.7143 | 0.0 | None | None | EXPERIMENTAL |
+| media-router | 0.1.0 | 13 | 0.5385 | 0.0 | None | None | EXPERIMENTAL |
+| pck-developer | 0.1.0 | 39 | 0.7436 | 0.0 | None | None | EXPERIMENTAL |
+| presentation-composer | 0.1.0 | 14 | 0.4286 | 0.0 | None | None | EXPERIMENTAL |
+| presentation-planner | 0.1.0 | 14 | 0.4286 | 0.0 | None | None | EXPERIMENTAL |
+| preview-builder | 0.1.0 | 23 | 0.8261 | 0.0 | None | None | EXPERIMENTAL |
+| requirements-builder | 0.1.0 | 42 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| script-writer | 0.1.0 | 36 | 0.7222 | 0.0 | None | None | EXPERIMENTAL |
+| template-parser | 0.1.0 | 42 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| worksheet-designer | 0.1.0 | 7 | 0.7143 | 0.0 | None | None | EXPERIMENTAL |
 

@@ -190,6 +190,31 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — case B：Builtin 两次都卡在证据前置，Dynamic 以更多研究请求通过（BENCHMARK §22/§28）
+
+- **date**: 2026-09-20
+- **task**: M6.4 为 case B（大学生心理健康第一课）补齐 Builtin 基线
+- **symptom**: `B/builtin` 两次尝试都没完成：
+  - `20260920-041319`：`claims` 步骤 fail-fast（"Claim 提取结果为空"），2 次调用
+  - `20260920-222030`：23 次调用 / **12 次研究请求**后在 `teaching_plan` 被前置条件拦下
+    ——"证据索引为空，没有可用的 SUPPORTED Claim"
+  同期 `B/dynamic`（`20260919-084324`）以 45 次调用 / **33 次研究请求**完成，
+  Router 判定 `research_need=VERIFY`
+- **root_cause**: 不是代码缺陷，而是**研究投入差异 + 冻结的证据契约**：
+  B 是概念型第一课，本身不含实证 Claim；Builtin 默认研究预算下没能拿到 SUPPORTED 证据，
+  而 PCK 的冻结前置条件（`PCK_REQUIRED_STATUS = "SUPPORTED"`）不允许放行。
+  Dynamic 侧 Router 给出 `VERIFY` 并实际发出 33 次研究请求（含 `HTTP 403` 全文抓取失败、
+  公开语料里"未找到支持证据"等真实限制），才凑出可用证据
+- **skill**: `claim-extractor` / `evidence-reviewer` / `pck-developer`
+- **artifact**: `benchmarks/runs/20260920-222030-B-builtin/`、`benchmarks/runs/20260919-084324-B-dynamic/`
+- **fix**: **不改代码**。这是 M6 要测的东西：同一课程，Dynamic 付出约 2.75× 研究请求后能完成，
+  Builtin 在默认预算下不能。**明确不恢复**被上游冻结移除的 `allow_empty_claims` /
+  `allow_unverified_pck`——空证据必须 fail closed
+- **留给上游决策的开放问题（不由本 worker 单方面修改，§3/§47）**:
+  §22 的 B 是"概念型第一课"，冻结契约要求它提供 empirical SUPPORTED Claim 是否过严？
+  若认为过严，应由规则所有者调整契约并在 §85 验收中重新定义，而不是在 benchmark 里放宽
+- **regression_test**: 无（基准观测）；数字见 `benchmark_summary.md` 的 B 行
+
 ## 2026-09-20 — 报告不区分 run 的代码版本，读者会跨版本比较门禁/检查器结论（REPORT §41）
 
 - **date**: 2026-09-20
