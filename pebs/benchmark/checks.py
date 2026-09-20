@@ -22,13 +22,54 @@ def _artifact_texts(store: Any, artifact_types: tuple[str, ...]) -> dict[str, st
     return texts
 
 
+def _step_artifact_types() -> dict[str, set[str]]:
+    """step 名 → 该 step 产出的 artifact 类型（来自 registry 的 handler.steps/produces）。
+
+    用于把"能力"与"内置实现"解耦：`must_include_steps: [learning_design]` 说的是
+    "这一步的能力必须在"，而不是"必须由名为 learning_design 的内置步骤完成"。
+    否则每个外部 Skill 替换内置步骤的实验都会平白多出一条 PLAN 错误（§46 的 A/B 失真）。
+    """
+    from .. import registry
+
+    mapping: dict[str, set[str]] = {}
+    for record in registry.load_skills().values():
+        steps = (record.get("handler") or {}).get("steps") or []
+        produces = {str(item) for item in (record.get("produces") or [])}
+        for step in steps:
+            mapping.setdefault(str(step), set()).update(produces)
+    return mapping
+
+
 def plan_checks(plan: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
     plan_expect = expect.get("plan") or {}
     executed = [node for node in plan.get("nodes", []) if not node.get("reused")]
     reused = [node for node in plan.get("nodes", []) if node.get("reused")]
     skills = [str(node.get("skill")) for node in executed]
     steps = [step for node in executed for step in (node.get("steps") or [])]
+    produced_types = {
+        str(output).split(":", 1)[0]
+        for node in plan.get("nodes", [])
+        for output in (node.get("outputs") or [])
+    }
+    # 排除类期望说的是"这一步不能被执行"：只看本轮真正执行的节点，
+    # 复用的既有产物（E 审阅已有讲稿、G 只做 PPT）不算重新执行该步骤
+    executed_types = {
+        str(output).split(":", 1)[0]
+        for node in executed
+        for output in (node.get("outputs") or [])
+    }
+    signatures = _step_artifact_types()
     issues: list[dict[str, Any]] = []
+
+    def _capability_produced(name: str, within: set[str]) -> bool:
+        if name in steps or name in skills:
+            return True
+        wanted = signatures.get(name) or {name}
+        return bool(wanted & within)
+
+    def _capability_present(name: str) -> bool:
+        return _capability_produced(name, produced_types)
+
     for required in plan_expect.get("must_include_skills", []):
         if required not in [str(node.get("skill")) for node in plan.get("nodes", [])]:
             issues.append({"kind": "PLANNING", "detail": f"缺少必需 Skill：{required}"})
@@ -36,10 +77,10 @@ def plan_checks(plan: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, 
         if forbidden in skills:
             issues.append({"kind": "PLANNING", "detail": f"出现被禁止的 Skill：{forbidden}"})
     for required in plan_expect.get("must_include_steps", []):
-        if required not in steps and required not in skills:
+        if not _capability_present(str(required)):
             issues.append({"kind": "PLANNING", "detail": f"缺少必需步骤：{required}"})
     for forbidden in plan_expect.get("must_exclude_steps", []):
-        if forbidden in steps or forbidden in skills:
+        if _capability_produced(str(forbidden), executed_types):
             issues.append({"kind": "PLANNING", "detail": f"出现被禁止的步骤：{forbidden}"})
     for terminal in plan_expect.get("terminal_outputs", []):
         if terminal not in (plan.get("terminal_outputs") or []):

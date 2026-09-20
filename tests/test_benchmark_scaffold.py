@@ -348,6 +348,43 @@ def test_schema_repair_rate_is_recorded_from_step_notes():
     assert trace._schema_repairs("外部 Skill 执行：x；产出 1 个产物") == 0
 
 
+def test_plan_step_expectations_accept_external_skill_equivalents():
+    """§46：外部 Skill 替换内置步骤时，能力在即可，不应报"缺少必需步骤"。
+
+    否则每个 Builtin vs External A/B 实验都会平白多一条 PLAN 错误。
+    但排除类期望只看**本轮执行**的节点：复用既有产物不算重新执行该步骤。
+    """
+    plan = {
+        "nodes": [
+            {"skill": "backwards-design-unit-planner", "steps": [], "outputs": ["learning_design"]},
+            {"skill": "claim-extractor", "steps": ["claims"], "outputs": ["claims_set"], "reused": False},
+        ],
+        "terminal_outputs": ["learning_design"],
+    }
+    expect = {"plan": {"must_include_steps": ["learning_design"]}}
+    assert checks.plan_checks(plan, expect) == []
+
+    # 复用的既有 script 不算"执行了 scripts 步骤"
+    reused_plan = {
+        "nodes": [
+            {"skill": "docx-exporter", "steps": [], "outputs": ["export_manifest"], "reused": False},
+            {"skill": "script-writer", "steps": ["scripts"], "outputs": ["script"], "reused": True},
+        ],
+        "terminal_outputs": ["export_manifest"],
+    }
+    assert checks.plan_checks(reused_plan, {"plan": {"must_exclude_steps": ["scripts"]}}) == []
+
+    # 真正执行了被禁步骤仍要报出
+    executed_plan = {
+        "nodes": [
+            {"skill": "script-writer", "steps": ["scripts"], "outputs": ["script"], "reused": False},
+        ],
+        "terminal_outputs": ["script"],
+    }
+    issues = checks.plan_checks(executed_plan, {"plan": {"must_exclude_steps": ["scripts"]}})
+    assert any("出现被禁止的步骤" in issue["detail"] for issue in issues)
+
+
 def test_review_demotions_flags_schema_instability(tmp_path, monkeypatch):
     """§69：schema 不稳定要能被识别成降级候选（只报告，不改注册表）。"""
     from pebs import config

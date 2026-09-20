@@ -170,6 +170,27 @@
 - **fix**: 解析显式 Skill 的 `produces/emits` 并加入 `terminals`，同时把原因写入 `plan.route_notes.explicit_skills`
 - **regression_test**: `tests/test_explicit_skill_planning.py`
 
+## 2026-09-20 — 外部 Skill 替换内置步骤会被判"缺少必需步骤"，A/B 平白多一条错（CHECKS §46）
+
+- **date**: 2026-09-20
+- **task**: M6.4 §17 A/B（D + `/backwards-design-unit-planner`）
+- **symptom**: 真实 run `20260920-151226-D-dynamic` 里外部 Skill 成功产出了
+  `learning_design:sec1`，但自动检查仍报
+  `PLANNING 缺少必需步骤：learning_design`——因为期望里的 `must_include_steps`
+  写的是**内置步骤名**，而这一步已被外部 Skill 取代
+- **root_cause**: `plan_checks()` 把"能力"与"内置实现"绑死：
+  `must_include_steps` 只比对 `node.steps` / `node.skill` 字面值，
+  没有考虑"某个 Skill 产出了该步骤对应的 artifact 类型"
+- **skill**: `benchmark-checks`
+- **artifact**: `pebs/benchmark/checks.py`
+- **fix**: 用 registry 建立 `step → produces` 映射（`_step_artifact_types()`），
+  包含类期望按"能力是否在"判定；**排除类期望只看本轮执行节点**，
+  以免把"复用既有讲稿"（E 审阅、G 只做 PPT）误判成重新执行了 steps
+- **实测影响**: 用 `tools/reevaluate_checks.py` 重放该 run，问题数 3 → 2，
+  仅剩 `ROUTING research_need=DEEP，期望 LITERATURE`（路由判断，待人工）
+  与一条真实 `SAFETY` 命中
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_plan_step_expectations_accept_external_skill_equivalents`
+
 ## 2026-09-20 — §69 降级只有判定函数，没有基于已记录数据的候选清单（SKILL §69）
 
 - **date**: 2026-09-20

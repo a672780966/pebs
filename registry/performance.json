@@ -10,15 +10,15 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 33,
+      "runs": 35,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
-      "average_latency": 1.06,
+      "average_latency": 1.97,
       "known_failure_modes": [],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "requirements-builder": {
@@ -29,7 +29,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 33,
+      "runs": 35,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -37,7 +37,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.0,
       "known_failure_modes": [],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "learning-designer": {
@@ -69,19 +69,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 33,
-      "success_rate": 0.8182,
+      "runs": 35,
+      "success_rate": 0.8286,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.03,
-      "average_latency": 0.79,
+      "average_model_calls": 0.09,
+      "average_latency": 2.38,
       "known_failure_modes": [
         "Claim 提取结果为空：模型未返回可核验的实证性 Claim。请检查请求是否包含可核验的心理学事实，或补充材料后重试（系统不会用空证据继续生产）。",
         "依赖未成功：learning-designer",
         "依赖未成功：backwards-design-unit-planner"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "evidence-reviewer": {
@@ -92,20 +92,20 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 34,
-      "success_rate": 0.7647,
+      "runs": 36,
+      "success_rate": 0.7778,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.44,
-      "average_latency": 11.91,
+      "average_model_calls": 3.0,
+      "average_latency": 66.28,
       "known_failure_modes": [
         "依赖未成功：claim-extractor",
         "预算耗尽：research request budget exhausted",
         "依赖步骤未成功：claims",
         "依赖步骤未成功：worksheets"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "pck-developer": {
@@ -116,13 +116,13 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 30,
-      "success_rate": 0.7,
+      "runs": 32,
+      "success_rate": 0.7188,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.03,
-      "average_latency": 2.07,
+      "average_model_calls": 0.19,
+      "average_latency": 13.31,
       "known_failure_modes": [
         "执行前置条件未满足：clm_7b12769477@v2 状态为 UNSUPPORTED；PCK 只允许消费 ['SUPPORTED'] 证据（见 rules.evidence.pck_claim_statuses）",
         "执行前置条件未满足：证据索引为空：没有可消费的 SUPPORTED Claim",
@@ -133,7 +133,7 @@
         "依赖未成功：evidence-reviewer、learning-designer",
         "依赖未成功：backwards-design-unit-planner、evidence-reviewer"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "media-router": {
@@ -300,20 +300,21 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 29,
-      "success_rate": 0.6552,
+      "runs": 31,
+      "success_rate": 0.6452,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.04,
-      "average_latency": 2.31,
+      "average_model_calls": 0.07,
+      "average_latency": 4.0,
       "known_failure_modes": [
         "依赖未成功：pck-developer",
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "lesson_plan: codex exec 失败（lesson_plan）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com",
-        "依赖步骤未成功：teaching_plan"
+        "依赖步骤未成功：teaching_plan",
+        "预算耗尽：model call budget exhausted"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "assessment-designer": {
@@ -324,19 +325,20 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 19,
-      "success_rate": 0.7895,
+      "runs": 21,
+      "success_rate": 0.7619,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.0,
-      "average_latency": 0.0,
+      "average_model_calls": 0.05,
+      "average_latency": 1.67,
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "依赖未成功：lesson-designer",
-        "依赖步骤未成功：cases"
+        "依赖步骤未成功：cases",
+        "预算耗尽：本次运行已中止后续步骤（model call budget exhausted）"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "case-designer": {
@@ -347,20 +349,21 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 18,
-      "success_rate": 0.6667,
+      "runs": 20,
+      "success_rate": 0.65,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.06,
-      "average_latency": 2.22,
+      "average_model_calls": 0.11,
+      "average_latency": 3.09,
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "依赖未成功：pck-developer",
         "case: codex exec 失败（case）rc=1: st.\nERROR: You've hit your usage limit. Upgrade to Pro (https://chatgpt.com/explore/pro),",
-        "依赖步骤未成功：lesson_plans"
+        "依赖步骤未成功：lesson_plans",
+        "预算耗尽：model call budget exhausted"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "script-writer": {
@@ -371,22 +374,23 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 27,
-      "success_rate": 0.7037,
+      "runs": 29,
+      "success_rate": 0.6897,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.04,
-      "average_latency": 2.41,
+      "average_model_calls": 0.07,
+      "average_latency": 3.76,
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "script: codex exec 超时（script）",
         "依赖未成功：assessment-designer、case-designer、evidence-reviewer、lesson-designer、pck-developer",
         "依赖未成功：case-designer、hinge-question-designer、lesson-designer",
         "依赖步骤未成功：evidence_topup",
-        "依赖未成功：case-designer、evidence-reviewer、hinge-question-designer、lesson-designer、pck-developer"
+        "依赖未成功：case-designer、evidence-reviewer、hinge-question-designer、lesson-designer、pck-developer",
+        "预算耗尽：本次运行已中止后续步骤（model call budget exhausted）"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "gate-runner": {
@@ -397,13 +401,13 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 26,
-      "success_rate": 0.6154,
+      "runs": 28,
+      "success_rate": 0.6071,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
-      "average_latency": 0.04,
+      "average_latency": 0.07,
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "依赖未成功：dual-coding-designer、script-writer",
@@ -413,9 +417,10 @@
         "依赖步骤未成功：storyboard",
         "Subagent 契约违规：qa-agent 不允许产出 artifact 类型：script（契约产出：['gate_result']）",
         "依赖未成功：case-designer、claim-extractor、evidence-reviewer、hinge-question-designer、learning-designer、lesson-designer、pck-deve",
-        "依赖未成功：assessment-designer、backwards-design-unit-planner、case-designer、claim-extractor、evidence-reviewer、lesson-designer、"
+        "依赖未成功：assessment-designer、backwards-design-unit-planner、case-designer、claim-extractor、evidence-reviewer、lesson-designer、",
+        "预算耗尽：本次运行已中止后续步骤（model call budget exhausted）"
       ],
-      "last_verified": "2026-09-20T09:46:44",
+      "last_verified": "2026-09-20T15:22:29",
       "schema_repair_rate": 0.0
     },
     "dual-coding-designer": {
@@ -550,18 +555,18 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 1,
-      "success_rate": 0.0,
+      "runs": 3,
+      "success_rate": 0.6667,
       "schema_failure_rate": 0.0,
       "schema_repair_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 1.0,
-      "average_latency": 16.0,
+      "average_model_calls": 2.0,
+      "average_latency": 87.33,
       "known_failure_modes": [
         "未预期错误：codex exec 失败（external_skill:backwards-design-unit-planner）rc=1:  to leave more room for the rest.\nERROR: You've h"
       ],
-      "last_verified": "2026-09-20T09:46:44"
+      "last_verified": "2026-09-20T15:22:29"
     }
   }
 }

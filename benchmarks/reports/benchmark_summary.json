@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20T11:43:10",
+  "generated_at": "2026-09-20T15:36:21",
   "cases": [
     {
       "case_id": "A",
@@ -303,8 +303,8 @@
         "runs": 1
       },
       "dynamic [+external-backwards-design]": {
-        "status": "failed",
-        "attempts": 1,
+        "status": "blocked",
+        "attempts": 2,
         "succeeded": 0,
         "evidence_policy": null,
         "human_score": null,
@@ -313,9 +313,9 @@
         "evidence_errors": null,
         "routing_errors": null,
         "plan_errors": null,
-        "model_calls": 1.0,
-        "runtime_seconds": 49.29,
-        "skill_failure_rate": 0.091,
+        "model_calls": 90.0,
+        "runtime_seconds": 2276.17,
+        "skill_failure_rate": 0.0,
         "schema_repair_rate": 0.0,
         "locality_preservation_rate": null,
         "automatic_issues": 5.0,
@@ -366,6 +366,27 @@
         "schema_repair_rate": 0.0,
         "locality_preservation_rate": null,
         "automatic_issues": 0.0,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
+      },
+      "dynamic [+external-backwards-design]": {
+        "status": "succeeded",
+        "attempts": 1,
+        "succeeded": 1,
+        "evidence_policy": null,
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 19.0,
+        "runtime_seconds": 602.48,
+        "skill_failure_rate": 0.0,
+        "schema_repair_rate": 0.0,
+        "locality_preservation_rate": null,
+        "automatic_issues": 3.0,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -523,7 +544,7 @@
       }
     }
   ],
-  "runs": 22,
+  "runs": 23,
   "rows": [
     {
       "run_id": "run_41f857a82fe8",
@@ -897,13 +918,13 @@
       "automatic_issues": 0
     },
     {
-      "run_id": "run_8ca075447385",
+      "run_id": "run_9100e42d1b58",
       "case_id": "C",
       "mode": "dynamic",
       "variant": "dynamic [+external-backwards-design]",
       "experiment": "external-backwards-design",
-      "status": "failed",
-      "attempts": 1,
+      "status": "blocked",
+      "attempts": 2,
       "succeeded": 0,
       "evidence_policy": null,
       "human_score": null,
@@ -915,10 +936,10 @@
       "reviewer": null,
       "human_eval_run_id": null,
       "human_eval_stale": false,
-      "model_calls": 1,
-      "research_calls": 0,
-      "runtime_seconds": 49.29,
-      "skill_failure_rate": 0.0909,
+      "model_calls": 90,
+      "research_calls": 13,
+      "runtime_seconds": 2276.17,
+      "skill_failure_rate": 0.0,
       "schema_repair_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 5
@@ -978,6 +999,33 @@
       "schema_repair_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 0
+    },
+    {
+      "run_id": "run_c97abb6c9ee6",
+      "case_id": "D",
+      "mode": "dynamic",
+      "variant": "dynamic [+external-backwards-design]",
+      "experiment": "external-backwards-design",
+      "status": "succeeded",
+      "attempts": 1,
+      "succeeded": 1,
+      "evidence_policy": null,
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 19,
+      "research_calls": 10,
+      "runtime_seconds": 602.48,
+      "skill_failure_rate": 0.0,
+      "schema_repair_rate": 0.0,
+      "locality_preservation_rate": null,
+      "automatic_issues": 3
     },
     {
       "run_id": "run_4fa43397a016",
@@ -1182,18 +1230,18 @@
       "attempts": 6.0
     },
     "dynamic": {
-      "variants": 15,
+      "variants": 16,
       "human_score": null,
       "edit_ratio": null,
       "evidence_errors": null,
       "routing_errors": null,
       "plan_errors": null,
       "schema_repair_rate": 0.0,
-      "skill_failure_rate": 0.017,
-      "model_calls": 378.0,
-      "runtime_seconds": 20595.3,
-      "succeeded": 20.0,
-      "attempts": 42.0
+      "skill_failure_rate": 0.01,
+      "model_calls": 486.0,
+      "runtime_seconds": 23424.66,
+      "succeeded": 21.0,
+      "attempts": 44.0
     },
     "scenario": {
       "variants": 2,
