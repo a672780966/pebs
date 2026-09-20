@@ -4,8 +4,7 @@ Spec: `psychology-education-skills-grok-build-requirements-v1.1.md` (V1.1). Curr
 
 ## Commands
 
-- Install: `pip install -r requirements.txt`
-- Test: `python -m pytest tests -q`
+- Install: `pip install -r requirements.txt`- Test: `python -m pytest tests -q`
 - Compile check: `python -m compileall -q pebs`
 - Run server: `python -m pebs.cli serve --port 8710` (or `uvicorn pebs.server:app --port 8710`)
 - Run one build from CLI: `python -m pebs.cli build --request "..." --project demo` (`--planner dynamic` switches to Semantic Router + Dynamic DAG; default `static`)
@@ -23,6 +22,8 @@ Spec: `psychology-education-skills-grok-build-requirements-v1.1.md` (V1.1). Curr
 - Golden benchmark: `python -m pebs.cli benchmark --cases A,B,C --modes direct_codex,builtin,dynamic[,dynamic] --skills <ext-skill>`（`--experiment NAME` 给 §46 A/B 打标签；`--plan-only` 零模型调用；`--report` 只重算报告）
 - Evaluation kit: `python -m pebs.cli benchmark --export-eval-kit` → 教师填 `benchmarks/reports/evaluation_kit/<case>-<variant>/<case>-<mode>-human_eval.yaml` → `python -m pebs.cli benchmark --submit-eval <yaml> --project <run 的 project_id>`
 - Skill promotion review (observe only): `python -m pebs.cli benchmark --promotions`
+- Gate replay audit (§35 Gate FP/FN，零模型调用): `python -m pebs.cli benchmark --gate-audit`
+- M6 acceptance map (§71 验收 → 测试/产物): `python -m pytest tests/test_m6_acceptance.py -q`
 ## Hard rules (do not violate)
 
 - Audit, review and research agents are READ-ONLY on this repository: they report findings with evidence and never write, create, delete or revert implementation files. Implementation is a separate, explicitly authorized step — an agent asked to audit must not "helpfully" implement what it found.
