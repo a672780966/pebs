@@ -190,6 +190,24 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — case A 同代码版本对照：Dynamic 用更少模型调用达到同等门禁/问题结果（BENCHMARK §28/§73）
+
+- **date**: 2026-09-20
+- **task**: M6.4 Acceptance 4（同任务 Direct/Builtin/Dynamic 对比）
+- **背景**: A 的 dynamic 代表 run 是 2026-09-18 的旧代码产物（门禁修复前，报告里带 `?`），
+  与新的 A/builtin 不可比；因此用**当前代码**重跑 A/dynamic
+- **结果**（两者都是当前代码、都 succeeded、都 0 条自动问题、都 0 条门禁 FAIL）:
+  | 模式 | 模型调用 | 研究请求 | 时间(s) | 门禁 FAIL | 自动问题 |
+  | --- | --- | --- | --- | --- | --- |
+  | builtin（静态） | 37 | 0 | 1751 | 0 | 0 |
+  | dynamic | **28** | 6 | 949 | 0 | 0 |
+- **可读出的结论（仅记录，§47）**: 同一门 3 节课程，Dynamic 少用约 24% 模型调用完成，
+  代价是 6 次研究请求；两者在门禁与自动检查上打平。按 §73 的成本项，这一 case 上 Dynamic 更优；
+  但样本量=1，不构成"Dynamic 普遍更好"的结论
+- **artifact**: `benchmarks/runs/20260920-224226-A-dynamic/`、`benchmarks/runs/20260920-210708-A-builtin/`
+- **附带验证**: 该 run 的 `evidence_policy = ["SUPPORTED"]`——`run_case` 写入证据政策的新逻辑
+  在真实运行中生效（此前恒为 None）
+
 ## 2026-09-20 — case B：Builtin 两次都卡在证据前置，Dynamic 以更多研究请求通过（BENCHMARK §22/§28）
 
 - **date**: 2026-09-20
