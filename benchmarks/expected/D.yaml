@@ -1,0 +1,30 @@
+case_id: D
+expect:
+  content:
+    artifact_types:
+    - evidence_index
+    - claims
+    - script
+    - lesson_plan
+    banned_regex:
+    - 手机使用导致焦虑
+    - 一定会导致
+    - 所有大学生都会
+  plan:
+    must_include_steps:
+    - claims
+    - evidence
+    - learning_design
+  routing:
+    knowledge_types_any_of:
+    - concept
+    - research_literacy
+    - critical_thinking
+    research_need: LITERATURE
+mode_targets:
+- direct_codex
+- builtin
+- dynamic
+- mixed
+source: D_research_psychology_course.yaml
+title: Research-driven Psychology Course（手机使用与焦虑）

@@ -1,0 +1,41 @@
+case_id: B
+expect:
+  content:
+    artifact_types:
+    - lesson_plan
+    - pptx_deck
+    banned_regex:
+    - 录课脚本
+    - 分镜
+    must_exist:
+    - lesson_plan:sec1
+    - pptx_deck
+  plan:
+    must_exclude_steps:
+    - scripts
+    - storyboard
+    must_include_steps:
+    - learning_design
+    - lesson_plans
+    - slide_plan
+    - pptx
+    terminal_outputs:
+    - lesson_plan
+    - pptx_deck
+  routing:
+    knowledge_types_any_of:
+    - concept
+    - critical_thinking
+    - reflection
+    - transfer
+    requested_outputs:
+    - lesson_plan
+    - pptx
+    research_need: VERIFY
+mode_targets:
+- direct_codex
+- builtin
+- dynamic
+- mixed
+source: B_first_psychology_class.yaml
+title: 大学生心理健康第一课（90 分钟现场课）

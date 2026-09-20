@@ -1,0 +1,17 @@
+case_id: F
+expect:
+  content:
+    artifact_types:
+    - script
+    - case
+    banned_regex: []
+  routing:
+    requested_outputs:
+    - script
+mode_targets:
+- direct_codex
+- builtin
+- dynamic
+- mixed
+source: F_local_edit.yaml
+title: Local Edit（8.2 案例替换）

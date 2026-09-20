@@ -1,0 +1,38 @@
+case_id: C
+expect:
+  animation:
+    max_approved: 3
+  content:
+    artifact_types:
+    - script
+    - case
+    banned_regex:
+    - 婴幼儿宝宝
+    - 小孩子嘛
+    must_exist:
+    - script:sec1
+    - script:sec2
+    - script:sec3
+    - script:sec4
+  plan:
+    must_include_steps:
+    - learning_design
+    - claims
+    - evidence
+    - scripts
+    terminal_outputs:
+    - script
+  routing:
+    knowledge_types_any_of:
+    - concept
+    - procedure
+    - case_analysis
+    requested_outputs:
+    - script
+mode_targets:
+- direct_codex
+- builtin
+- dynamic
+- mixed
+source: C_childcare_management.yaml
+title: 托育机构管理实务 第八章（8.1–8.4）

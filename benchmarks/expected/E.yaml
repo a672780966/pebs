@@ -1,0 +1,26 @@
+case_id: E
+expect:
+  content:
+    artifact_types:
+    - gate_result
+    - evidence_index
+    banned_regex: []
+  plan:
+    must_exclude_steps:
+    - scripts
+    - pptx
+    - storyboard
+    must_include_steps:
+    - claims
+    - evidence
+    - gates
+  routing:
+    requested_outputs:
+    - script
+mode_targets:
+- direct_codex
+- builtin
+- dynamic
+- mixed
+source: E_existing_course_review.yaml
+title: Existing Course Review（已有讲稿审阅）

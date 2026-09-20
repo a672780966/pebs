@@ -1,0 +1,43 @@
+case_id: A
+expect:
+  animation:
+    max_approved: 2
+  content:
+    artifact_types:
+    - script
+    - case
+    - animation_decisions
+    banned_regex:
+    - 这个孩子就是
+    - 他就是个
+    - 天生就是
+    must_exist:
+    - script:sec1
+    - script:sec2
+    - script:sec3
+  plan:
+    must_exclude_steps: []
+    must_include_steps:
+    - learning_design
+    - claims
+    - evidence
+    - scripts
+    terminal_outputs:
+    - script
+  routing:
+    knowledge_types_any_of:
+    - observation
+    - distinction
+    - attitude
+    - transfer
+    - critical_thinking
+    media_need: ANIMATION_CANDIDATE
+    requested_outputs:
+    - script
+mode_targets:
+- direct_codex
+- builtin
+- dynamic
+- mixed
+source: A_online_recording_scripts.yaml
+title: 在线录播课程脚本（融合教育 项目三）

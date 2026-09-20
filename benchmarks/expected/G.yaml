@@ -1,0 +1,30 @@
+case_id: G
+expect:
+  content:
+    artifact_types:
+    - pptx_deck
+    - slide_plan
+    banned_regex: []
+    must_exist:
+    - pptx_deck
+  plan:
+    min_reuse_rate: 0.3
+    must_exclude_steps:
+    - scripts
+    - learning_design
+    must_include_steps:
+    - slide_plan
+    - pptx
+    must_reuse_artifact_types:
+    - script
+    - teaching_plan
+  routing:
+    requested_outputs:
+    - pptx
+mode_targets:
+- direct_codex
+- builtin
+- dynamic
+- mixed
+source: G_ppt_only.yaml
+title: PPT-only（复用已有教案与脚本）
