@@ -190,6 +190,23 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-20 — 报告不区分 run 的代码版本，读者会跨版本比较门禁/检查器结论（REPORT §41）
+
+- **date**: 2026-09-20
+- **task**: M6.4 报告可读性（A 行出现 builtin 0 门禁失败 vs dynamic 6 条失败）
+- **symptom**: `A | builtin`（本次，修复后）显示 0 条门禁失败，而 `A | dynamic`
+  （2026-09-18 的旧 run）显示 6 条——两者代码版本不同、门禁实现也不同，
+  放在同一张表里直接比较会得出"builtin 比 dynamic 更干净"的错误结论
+- **root_cause**: 报告只按 `(case, mode, experiment)` 分行，没有任何"该 run 由哪个代码版本产生"的标记；
+  门禁契约修复（5f99507）与若干检查器修复之后，历史行的口径已经不可比
+- **skill**: `benchmark-report`
+- **artifact**: `pebs/benchmark/report.py`
+- **fix**: 变体名带版本标记：`*` = 已知由不同 commit 产生，
+  `?` = 记录中没有 PEBS commit（早于 §41）；表尾附说明并指向
+  `tools/reevaluate_gates.py` / `tools/reevaluate_checks.py` 的重放口径
+- **regression_test**: 既有报告测试（`test_benchmark_report_renders_status_and_issues`）改为
+  兼容版本标记；标记逻辑本身由 `_same_code_version()` 直接可测
+
 ## 2026-09-20 — `evidence_policy` 只被读、从未被写（REPORT §35/§41）
 
 - **date**: 2026-09-20

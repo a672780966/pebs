@@ -218,7 +218,8 @@ def test_benchmark_report_renders_status_and_issues():
     }
     summary = report_mod.summarize([record])
     markdown = report_mod.render_markdown(summary)
-    assert "| A | dynamic | succeeded |" in markdown
+    # 记录里没有 PEBS commit（早于 §41）时变体名会带 `?` 版本标记
+    assert "| A | dynamic" in markdown and "| succeeded |" in markdown
     assert "22" in markdown and "770.7" in markdown
 
 

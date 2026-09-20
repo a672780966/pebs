@@ -84,6 +84,19 @@ def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
     return representatives
 
 
+def _same_code_version(run: dict[str, Any]) -> bool | None:
+    """run 的 PEBS commit 是否等于当前代码版本；未知（旧记录无 commit）返回 None。"""
+    from . import trace as trace_mod
+
+    recorded = str((run.get("reproducibility") or {}).get("pebs_commit") or "")
+    if not recorded:
+        return None
+    current = trace_mod.pebs_commit()
+    if not current:
+        return None
+    return recorded == current
+
+
 def _row_for(run: dict[str, Any]) -> dict[str, Any]:
     metrics = run.get("metrics") or {}
     human = run.get("human_eval") or {}
@@ -119,6 +132,9 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
         "gate_review": len(
             [g for g in (run.get("trace") or {}).get("gates", []) if g.get("status") == "NEEDS_REVIEW"]
         ),
+        # §41：该 run 是否由当前代码版本产生。不同版本的检查器/门禁口径会有差异
+        # （见 docs/production-lessons.md），报告必须能一眼区分，不能让读者跨版本比较。
+        "code_version_current": _same_code_version(run),
     }
 
 
@@ -208,6 +224,7 @@ def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
                 "automatic_issues": _sum(row["automatic_issues"] for row in matching),
                 "gate_fail": _sum(row["gate_fail"] for row in matching),
                 "gate_review": _sum(row["gate_review"] for row in matching),
+                "code_version_current": matching[-1].get("code_version_current"),
                 "reviewers": sorted({str(row["reviewer"]) for row in matching if row.get("reviewer")}),
                 "human_eval_stale": any(row.get("human_eval_stale") for row in matching),
                 "runs": len(matching),
@@ -376,10 +393,15 @@ def render_markdown(summary: dict[str, Any]) -> str:
             if entry.get("human_eval_stale"):
                 note = " ⚠评分针对另一版产物"
             reviewers = entry.get("reviewers") or []
+            # §41：`*` = 已知由不同代码版本产生；`?` = 记录里没有 PEBS commit（早于 §41），
+            # 两种情况的门禁/检查器口径都无法与当前代码对齐，不能跨行直接比较。
+            version_state = entry.get("code_version_current")
+            marker = " *" if version_state is False else (" ?" if version_state is None else "")
             lines.append(
-                "| {case} | {mode} | {status} | {attempts} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} | {gates} |".format(
+                "| {case} | {mode}{marker} | {status} | {attempts} | {human} | {edit} | {evidence} | {routing} | {plan} | {calls} | {runtime} | {issues} | {gates} |".format(
                     case=case["case_id"],
                     mode=variant,
+                    marker=marker,
                     status=entry.get("status"),
                     attempts=f"{entry.get('succeeded', 0)}/{entry.get('attempts', 1)}",
                     human=entry.get("human_score"),
@@ -398,6 +420,21 @@ def render_markdown(summary: dict[str, Any]) -> str:
     lines.extend(render_mode_comparison(summary))
     lines.extend(failure_category_section())
     lines.extend(_gate_audit_section())
+    if any(
+        case.get(variant, {}).get("code_version_current") is not True
+        for case in summary.get("cases", [])
+        for variant in case
+        if isinstance(case.get(variant), dict)
+    ):
+        lines.extend(
+            [
+                "",
+                "> `*` = 该 run 由**不同代码版本**产生；`?` = 记录中没有 PEBS commit（早于 §41 provenance）。",
+                "> 检查器与门禁的实现会随版本变化（例如门禁契约修复），",
+                "> 因此带标记的行不应与其它行直接比较；必要时用 `tools/reevaluate_gates.py`、",
+                "> `tools/reevaluate_checks.py` 在当前代码上重放已存项目。",
+            ]
+        )
     lines.extend(quality_section())
     lines.extend(performance_section())
     lines.append("")
