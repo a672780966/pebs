@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T20:59:46",
+  "generated_at": "2026-09-21T21:44:03",
   "cases": [
     {
       "case_id": "A",
@@ -418,6 +418,32 @@
         "human_eval_stale": false,
         "runs": 1
       },
+      "direct_codex": {
+        "status": "succeeded",
+        "attempts": 1,
+        "succeeded": 1,
+        "evidence_policy": [
+          "SUPPORTED"
+        ],
+        "human_score": null,
+        "edit_ratio": null,
+        "major_edit_rate": null,
+        "evidence_errors": null,
+        "routing_errors": null,
+        "plan_errors": null,
+        "model_calls": 1.0,
+        "runtime_seconds": 148.9,
+        "skill_failure_rate": null,
+        "schema_repair_rate": null,
+        "locality_preservation_rate": null,
+        "automatic_issues": 0.0,
+        "gate_fail": 0.0,
+        "gate_review": 0.0,
+        "code_version_current": true,
+        "reviewers": [],
+        "human_eval_stale": false,
+        "runs": 1
+      },
       "dynamic": {
         "status": "succeeded",
         "attempts": 3,
@@ -545,8 +571,8 @@
       "case_id": "E",
       "dynamic": {
         "status": "succeeded",
-        "attempts": 3,
-        "succeeded": 2,
+        "attempts": 4,
+        "succeeded": 3,
         "evidence_policy": [
           "SUPPORTED"
         ],
@@ -556,15 +582,15 @@
         "evidence_errors": null,
         "routing_errors": null,
         "plan_errors": null,
-        "model_calls": 26.0,
-        "runtime_seconds": 678.8,
+        "model_calls": 20.0,
+        "runtime_seconds": 689.03,
         "skill_failure_rate": 0.0,
-        "schema_repair_rate": null,
+        "schema_repair_rate": 0.0,
         "locality_preservation_rate": null,
         "automatic_issues": 0.0,
         "gate_fail": 2.0,
         "gate_review": 1.0,
-        "code_version_current": null,
+        "code_version_current": true,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -685,7 +711,7 @@
       }
     }
   ],
-  "runs": 26,
+  "runs": 27,
   "rows": [
     {
       "run_id": "run_b4b178dda794",
@@ -1190,6 +1216,38 @@
       "code_version_current": false
     },
     {
+      "run_id": "",
+      "case_id": "D",
+      "mode": "direct_codex",
+      "variant": "direct_codex",
+      "experiment": "",
+      "status": "succeeded",
+      "attempts": 1,
+      "succeeded": 1,
+      "evidence_policy": [
+        "SUPPORTED"
+      ],
+      "human_score": null,
+      "edit_ratio": null,
+      "major_edit_rate": null,
+      "evidence_errors": null,
+      "routing_errors": null,
+      "plan_errors": null,
+      "reviewer": null,
+      "human_eval_run_id": null,
+      "human_eval_stale": false,
+      "model_calls": 1,
+      "research_calls": 0,
+      "runtime_seconds": 148.9,
+      "skill_failure_rate": null,
+      "schema_repair_rate": null,
+      "locality_preservation_rate": null,
+      "automatic_issues": 0,
+      "gate_fail": 0,
+      "gate_review": 0,
+      "code_version_current": true
+    },
+    {
       "run_id": "run_e065d4c09320",
       "case_id": "D",
       "mode": "dynamic",
@@ -1342,14 +1400,14 @@
       "code_version_current": false
     },
     {
-      "run_id": "run_48670d5de26c",
+      "run_id": "run_bc5ab60ceb68",
       "case_id": "E",
       "mode": "dynamic",
       "variant": "dynamic",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 3,
-      "succeeded": 2,
+      "attempts": 4,
+      "succeeded": 3,
       "evidence_policy": [
         "SUPPORTED"
       ],
@@ -1362,16 +1420,16 @@
       "reviewer": null,
       "human_eval_run_id": null,
       "human_eval_stale": false,
-      "model_calls": 26,
-      "research_calls": 34,
-      "runtime_seconds": 678.8,
+      "model_calls": 20,
+      "research_calls": 18,
+      "runtime_seconds": 689.03,
       "skill_failure_rate": 0.0,
-      "schema_repair_rate": null,
+      "schema_repair_rate": 0.0,
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 2,
       "gate_review": 1,
-      "code_version_current": null
+      "code_version_current": true
     },
     {
       "run_id": "run_c3c600f6b004",
@@ -1502,7 +1560,7 @@
   ],
   "mode_comparison": {
     "direct_codex": {
-      "variants": 3,
+      "variants": 4,
       "human_score": null,
       "edit_ratio": null,
       "evidence_errors": null,
@@ -1510,10 +1568,10 @@
       "plan_errors": null,
       "schema_repair_rate": null,
       "skill_failure_rate": null,
-      "model_calls": 3.0,
-      "runtime_seconds": 567.7,
-      "succeeded": 3.0,
-      "attempts": 3.0
+      "model_calls": 4.0,
+      "runtime_seconds": 716.6,
+      "succeeded": 4.0,
+      "attempts": 4.0
     },
     "builtin": {
       "variants": 4,
@@ -1538,10 +1596,10 @@
       "plan_errors": null,
       "schema_repair_rate": 0.0,
       "skill_failure_rate": 0.01,
-      "model_calls": 524.0,
-      "runtime_seconds": 25068.99,
-      "succeeded": 24.0,
-      "attempts": 47.0
+      "model_calls": 518.0,
+      "runtime_seconds": 25079.22,
+      "succeeded": 25.0,
+      "attempts": 48.0
     },
     "scenario": {
       "variants": 2,

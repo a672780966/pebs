@@ -10,15 +10,15 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 44,
+      "runs": 45,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
-      "average_latency": 5.45,
+      "average_latency": 5.93,
       "known_failure_modes": [],
-      "last_verified": "2026-09-21T01:04:03",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "requirements-builder": {
@@ -29,7 +29,7 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 44,
+      "runs": 45,
       "success_rate": 1.0,
       "schema_failure_rate": 0.0,
       "human_score": null,
@@ -37,7 +37,7 @@
       "average_model_calls": 0.0,
       "average_latency": 0.02,
       "known_failure_modes": [],
-      "last_verified": "2026-09-21T01:04:03",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "learning-designer": {
@@ -48,17 +48,17 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 40,
-      "success_rate": 0.975,
+      "runs": 41,
+      "success_rate": 0.9756,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.48,
-      "average_latency": 17.37,
+      "average_model_calls": 0.49,
+      "average_latency": 17.97,
       "known_failure_modes": [
         "learning_design: codex exec 失败（learning_design）rc=1:  to leave more room for the rest.\nERROR: You've hit your usage limi"
       ],
-      "last_verified": "2026-09-20T22:58:59",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "claim-extractor": {
@@ -69,19 +69,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 44,
-      "success_rate": 0.8636,
+      "runs": 45,
+      "success_rate": 0.8667,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.28,
-      "average_latency": 6.84,
+      "average_model_calls": 0.3,
+      "average_latency": 7.27,
       "known_failure_modes": [
         "Claim 提取结果为空：模型未返回可核验的实证性 Claim。请检查请求是否包含可核验的心理学事实，或补充材料后重试（系统不会用空证据继续生产）。",
         "依赖未成功：learning-designer",
         "依赖未成功：backwards-design-unit-planner"
       ],
-      "last_verified": "2026-09-21T01:04:03",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "evidence-reviewer": {
@@ -92,20 +92,20 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 51,
-      "success_rate": 0.8235,
+      "runs": 52,
+      "success_rate": 0.8269,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 4.29,
-      "average_latency": 94.9,
+      "average_model_calls": 4.55,
+      "average_latency": 104.08,
       "known_failure_modes": [
         "依赖未成功：claim-extractor",
         "预算耗尽：research request budget exhausted",
         "依赖步骤未成功：claims",
         "依赖步骤未成功：worksheets"
       ],
-      "last_verified": "2026-09-21T01:04:03",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "pck-developer": {
@@ -256,8 +256,8 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 23,
-      "success_rate": 0.8261,
+      "runs": 24,
+      "success_rate": 0.8333,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
@@ -267,7 +267,7 @@
         "依赖未成功：gate-runner",
         "依赖步骤未成功：gates"
       ],
-      "last_verified": "2026-09-20T22:30:30",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "docx-exporter": {
@@ -278,19 +278,19 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 23,
-      "success_rate": 0.6087,
+      "runs": 24,
+      "success_rate": 0.625,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
       "average_model_calls": 0.0,
-      "average_latency": 0.1,
+      "average_latency": 0.14,
       "known_failure_modes": [
         "依赖未成功：presentation-composer",
         "依赖未成功：preview-builder",
         "依赖步骤未成功：preview"
       ],
-      "last_verified": "2026-09-20T22:30:30",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "lesson-designer": {
@@ -375,13 +375,13 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 38,
-      "success_rate": 0.7368,
+      "runs": 39,
+      "success_rate": 0.7436,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.61,
-      "average_latency": 37.42,
+      "average_model_calls": 0.59,
+      "average_latency": 36.46,
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "script: codex exec 超时（script）",
@@ -391,7 +391,7 @@
         "依赖未成功：case-designer、evidence-reviewer、hinge-question-designer、lesson-designer、pck-developer",
         "预算耗尽：本次运行已中止后续步骤（model call budget exhausted）"
       ],
-      "last_verified": "2026-09-21T01:04:03",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "gate-runner": {
@@ -402,13 +402,13 @@
       "patch": "",
       "domain": "",
       "status": "EXPERIMENTAL",
-      "runs": 37,
-      "success_rate": 0.6486,
+      "runs": 38,
+      "success_rate": 0.6579,
       "schema_failure_rate": 0.0,
       "human_score": null,
       "teacher_edit_ratio": null,
-      "average_model_calls": 0.25,
-      "average_latency": 15.16,
+      "average_model_calls": 0.24,
+      "average_latency": 14.76,
       "known_failure_modes": [
         "预算耗尽：本次运行已中止后续步骤（research request budget exhausted）",
         "依赖未成功：dual-coding-designer、script-writer",
@@ -421,7 +421,7 @@
         "依赖未成功：assessment-designer、backwards-design-unit-planner、case-designer、claim-extractor、evidence-reviewer、lesson-designer、",
         "预算耗尽：本次运行已中止后续步骤（model call budget exhausted）"
       ],
-      "last_verified": "2026-09-21T01:04:03",
+      "last_verified": "2026-09-21T21:44:01",
       "schema_repair_rate": 0.0
     },
     "dual-coding-designer": {

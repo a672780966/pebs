@@ -216,6 +216,36 @@
   `20260921-202853` 是 `pck-developer` 前置条件"证据索引为空，没有可用的 SUPPORTED Claim"
   （60 次调用）——与 case B 同源（冻结契约 + 证据波动），不是 F 场景本身的问题
 
+## 2026-09-21 — case D 补齐 Direct 基线：四个 case 已具备三模式对照（BENCHMARK §28/§71-4）
+
+- **date**: 2026-09-21
+- **task**: M6.4 Acceptance 4（同一任务可比较 Direct / Builtin / Dynamic）
+- **结果**: `D/direct_codex` 一次调用即完成（148.9s）。至此 **A / B / C / D** 四个 case
+  都同时具备 Direct、Builtin、Dynamic 三种模式（D 另有 4 个外部变体）：
+  | D 变体 | 模型调用 | 研究 | 门禁 FAIL | 自动问题 |
+  | --- | --- | --- | --- | --- |
+  | direct_codex | 1 | 0 | —（无门禁存储） | 0 |
+  | builtin（静态） | 17 | 0 | 1 | 1（SAFETY） |
+  | dynamic（内置） | 10 | 3 | 2 | 1 |
+  | dynamic + 4 个外部变体 | 17–26 | 6–11 | 0–3 | 0–3 |
+- **意义**: Direct 只用 1 次调用（无门禁、无证据链、无局部修改能力），
+  Builtin/Dynamic 把成本花在证据、门禁与可追溯上；这张表把"多花的调用买到了什么"
+  变成可检验的数据，而不是主张
+- **artifact**: `benchmarks/runs/20260921-212802-D-direct_codex/`、`benchmark_summary.md` 的 D 行
+
+## 2026-09-21 — case E（已有讲稿审阅）当前代码确认：脚本被复用而非重写（BENCHMARK §25）
+
+- **date**: 2026-09-21
+- **task**: M6.4 §25（Existing Course Review）当前代码复测
+- **结果**（`20260921-213232-E-dynamic`，20 次调用，证据政策 `['SUPPORTED']`）:
+  - trace 里 `script-writer` 为 **`reused: true`、`output_artifacts: []`**——
+    已有讲稿被复用，**没有被重写**（这正是 §25 的核心要求）
+  - 规划只走 审阅链：requirements → learning_design → claims → evidence → gates → preview → export，
+    terminal 为 `gate_result` / `export_manifest`，没有 script/lesson_plan/pptx/storyboard 的再生成
+  - 审阅确实发现问题：`G3 FAIL`（教学法）、`G5 FAIL`（UDL），`G6 NEEDS_REVIEW`
+- **意义**: 用真实 run 证明"只检查、不重写"在路由与复用两头都成立
+- **artifact**: `benchmarks/runs/20260921-213232-E-dynamic/`
+
 ## 2026-09-21 — Acceptance 7 在当前代码上直接复测：locality 1.0，只重建被点名的那一节（BENCHMARK §26/§71-7）
 
 - **date**: 2026-09-21
