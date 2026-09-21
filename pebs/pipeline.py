@@ -1157,7 +1157,7 @@ def step_cases(ctx: PipelineContext) -> dict[str, Any]:
             record = ctx.evidence.add_claim(str(text), "descriptive", usage="案例")
             new_claims.append(f"{record['revision_id']}")
         if new_claims:
-            data["claim_refs"] = sorted(set(list(data.get("claim_refs", [])) + new_claims))
+            data["claim_refs"] = sorted(set(_claim_refs(data) + [str(item) for item in new_claims]))
             data["new_factual_claims"] = []
             registered.extend(new_claims)
             notes.append(f"{section['section_id']}: 案例新增 {len(new_claims)} 条事实已登记为 Claim，交由补充核验")
@@ -1263,6 +1263,22 @@ def _script_prompt(ctx: PipelineContext, section: dict[str, Any]) -> str:
 ]}}"""
 
 
+def _claim_refs(holder: dict[str, Any]) -> list[str]:
+    """把模型返回的 claim_refs 归一化成字符串列表。
+
+    真实 run 里模型会把引用返回成对象/数组（`claim_refs: [{"id": ...}]`），
+    而下游会做 `set(...)`、`sorted(...)`、`ref.partition("@v")`——字典做集合成员
+    直接抛 `unhashable type: 'dict'`，整条运行 failed（`script-writer` 就这么崩过）。
+    非字符串引用无法构成合法 `id@vN`，归一到字符串后会按"未获支持"处理（保守方向）。
+    """
+    raw = holder.get("claim_refs")
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        raw = [raw]
+    return [str(item) for item in raw if item]
+
+
 def _finalize_script(ctx: PipelineContext, section: dict[str, Any], units: list[dict[str, Any]]) -> dict[str, Any]:
     spec = _template_spec(ctx)
     case = ctx.content(f"case:{section['section_id']}:1") or {}
@@ -1273,14 +1289,15 @@ def _finalize_script(ctx: PipelineContext, section: dict[str, Any], units: list[
                 "kind": "case",
                 "text": case["text"],
                 "case_ref": case.get("case_id", "case1"),
-                "claim_refs": list(case.get("claim_refs", [])),
+                "claim_refs": _claim_refs(case),
             }
         )
     if not any(u.get("kind") == "title" for u in units):
         units.insert(0, {"unit_id": f"{section['section_id']}-title", "kind": "title", "text": section["title"]})
     for idx, unit in enumerate(units):
         unit.setdefault("unit_id", f"{section['section_id']}-u{idx}")
-        refs = [r for r in unit.get("claim_refs", []) if r]
+        unit["claim_refs"] = _claim_refs(unit)
+        refs = unit["claim_refs"]
         if any(not ctx.evidence.is_supported(r) for r in refs):
             unit["placeholder"] = True
     if any(u.get("placeholder") for u in units):
@@ -1907,7 +1924,8 @@ def _enforce_slide_plan(ctx: PipelineContext, data: dict[str, Any]) -> list[str]
                 notes.append(f"slide{index}: diagram_id 无效，降级为要点页")
         if row["section_id"] and row["section_id"] not in valid_sections:
             row["section_id"] = ""
-        for ref in list(row.get("claim_refs", [])):
+        row["claim_refs"] = _claim_refs(row)
+        for ref in list(row["claim_refs"]):
             if "@v" not in str(ref) or not ctx.evidence.is_supported(str(ref)):
                 row["claim_refs"] = [r for r in row.get("claim_refs", []) if r != ref]
                 notes.append(f"slide{index}: 移除未获支持的引用 {ref}")
@@ -1935,7 +1953,7 @@ def step_slide_plan(ctx: PipelineContext) -> dict[str, Any]:
 
 
 def _citation_label(ctx: PipelineContext, claim_ref: str) -> str:
-    claim_id, _, version_text = claim_ref.partition("@v")
+    claim_id, _, version_text = str(claim_ref).partition("@v")
     try:
         version = int(version_text)
     except ValueError:
@@ -2447,7 +2465,7 @@ def replace_case(
         record = ctx.evidence.add_claim(str(text), "descriptive", usage="案例")
         new_claims.append(record["revision_id"])
     if new_claims:
-        data["claim_refs"] = sorted(set(list(data.get("claim_refs", [])) + new_claims))
+        data["claim_refs"] = sorted(set(_claim_refs(data) + [str(item) for item in new_claims]))
     try:
         schemas.validate(data, "case")
     except schemas.SchemaError as exc:

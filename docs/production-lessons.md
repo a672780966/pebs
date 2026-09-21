@@ -190,6 +190,25 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-21 — 模型把 `claim_refs` 返回成对象 → `set(...)` 抛 unhashable dict，整条运行 failed（RUNTIME §67）
+
+- **date**: 2026-09-21
+- **task**: M6.4 Acceptance 7 复跑（F 场景先构建基线课程 C）
+- **symptom**: 基线课程在 `script-writer` 崩溃：
+  `未预期错误：unhashable type: 'dict'`（60 次调用后整条 F 场景 failed，locality 无法测量）
+- **root_cause**: 与 2026-09-20 的 slide_plan 崩溃**同源**——模型返回的 `claim_refs`
+  有时是对象/数组（`[{"id": ..., "version": ...}]`），而下游对引用做
+  `set(...)`（script 的待核验汇总）、`sorted(set(...))`（case 登记新事实）；
+  字典参与集合运算直接 `unhashable`。另有 `_citation_label` 用 `ref.partition("@v")`，
+  拿到 dict 会 AttributeError（尚未触发，但是同一雷）
+- **skill**: `script-writer` / `case-designer`
+- **artifact**: `pebs/pipeline.py`
+- **fix**: 新增 `_claim_refs()` 统一归一化成字符串列表，并在四处入口应用
+  （script units、case 的新事实登记 ×2、slide_plan rows）；`_citation_label` 用
+  `str(claim_ref)` 兜底。非字符串引用无法构成合法 `id@vN`，归一八成字符串后
+  按"未获支持"处理（保守方向：标为待核验占位）
+- **regression_test**: `tests/test_pipeline.py::test_claim_refs_returned_as_objects_do_not_crash_the_script`
+
 ## 2026-09-21 — case C（4 节）：外部 Backwards Design 成本翻倍且有门禁失败，Builtin 更省（BENCHMARK §17/§18）
 
 - **date**: 2026-09-21

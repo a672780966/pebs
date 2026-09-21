@@ -94,6 +94,41 @@ def test_slide_plan_enforcement_survives_list_typed_model_fields(engine):
     assert isinstance(notes, list)
 
 
+def test_claim_refs_returned_as_objects_do_not_crash_the_script(engine):
+    """真实 run 缺陷：模型把 claim_refs 返回成对象时，`set(...)` 抛 unhashable dict。
+
+    归一化后按"未获支持"处理（保守：标为待核验占位），而不是让整条运行 failed。
+    """
+    from pebs import pipeline
+
+    class _Ctx:
+        section = {"section_id": "sec1", "title": "标题"}
+
+        def content(self, artifact_id):
+            return None
+
+    units = [
+        {"kind": "title", "text": "标题"},
+        {
+            "kind": "narration",
+            "text": "正文",
+            "claim_refs": [{"id": "clm_deadbeef", "version": 1}],
+        },
+    ]
+    ctx = _Ctx()
+    ctx.evidence = type("E", (), {"is_supported": staticmethod(lambda ref: False)})()
+    result = pipeline._finalize_script(ctx, ctx.section, units)  # type: ignore[arg-type]
+    assert isinstance(result, dict)
+    assert all(isinstance(ref, str) for unit in units for ref in unit.get("claim_refs", []))
+    assert any(unit.get("placeholder") for unit in units)
+
+    # 数组/字符串混用同样不崩（注意 _finalize_script 会在首位插入 title 单元）
+    mixed = [{"kind": "narration", "text": "x", "claim_refs": ["clm_1@v1", ["clm_2@v1"], ""]}]
+    pipeline._finalize_script(ctx, ctx.section, mixed)  # type: ignore[arg-type]
+    narration = next(unit for unit in mixed if unit.get("kind") == "narration")
+    assert narration["claim_refs"] == ["clm_1@v1", "['clm_2@v1']"]
+
+
 def test_unexpected_step_error_records_the_offending_frame(engine, monkeypatch):
     """未预期错误的 step error 要带定位信息，否则只有 `unhashable type` 无从排查。"""
     from pebs import pipeline
