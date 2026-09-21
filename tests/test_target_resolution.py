@@ -78,6 +78,7 @@ def test_preserve_clause_is_parsed_deterministically():
 
 
 def test_llm_layer_cannot_override_deterministic_intent():
+
     from conftest import FakeLLM
 
     llm = FakeLLM(
@@ -97,3 +98,34 @@ def test_llm_layer_cannot_override_deterministic_intent():
     assert "sec3" in intent["targets"]["section_ids"]
     assert "evidence" in intent["preserve"]
     assert intent["source"] == "hybrid"
+
+
+def test_deterministic_section_label_beats_a_wrong_llm_guess():
+    """真实缺陷：LLM 猜错 section_ids 时，用户明确写的「8.2」必须仍然生效。
+
+    F 场景（2026-09-21）因此把 8.2 的局部修改打到 8.1，preserve 校验失败
+    （locality 0.875），而同一条指令在 2026-09-19 却正确落在 8.2。
+    """
+    from pebs.conversation import resolver
+
+    sections = [
+        {"section_id": "sec1", "title": "8.1 办托理念与价值体系构建"},
+        {"section_id": "sec2", "title": "8.2 文化建设的策略"},
+        {"section_id": "sec3", "title": "8.3 员工行为规范与服务礼仪建设"},
+        {"section_id": "sec4", "title": "8.4 品牌形象与口碑传播管理"},
+    ]
+    message = "只把8.2的案例换成托育机构晨间接待冲突，其他章节不要修改"
+    intent = {
+        "preserve_sections": [1, 3, 4],
+        "targets": {"section_ids": ["sec1"]},  # 模型猜错
+        "artifact_ids": ["case"],
+    }
+    resolved = resolver.resolve(message, intent, sections=sections, artifacts=[])
+    assert resolved["section_ids"] == ["sec2"], resolved
+    assert any("冲突" in note for note in resolved["unmapped"]), resolved
+
+    # 没有确定性引用时，LLM 目标仍然可用
+    resolved2 = resolver.resolve(
+        "把那段案例换掉", {"targets": {"section_ids": ["sec3"]}}, sections=sections, artifacts=[]
+    )
+    assert resolved2["section_ids"] == ["sec3"]

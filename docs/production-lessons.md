@@ -190,6 +190,26 @@
 - **regression_test**: `tests/test_benchmark_scaffold.py::test_static_plans_are_not_charged_with_dag_expectations`、
   `::test_static_plan_builder_uses_registry_produces`
 
+## 2026-09-21 — 局部修改打到错误章节：LLM 猜测优先于确定性「8.2」引用（CONVERSATION §26/§36）
+
+- **date**: 2026-09-21
+- **task**: M6.4 Acceptance 7 复跑（F：只把 8.2 的案例换掉）
+- **symptom**: 同一条指令两次结果不同——`20260919-051411` 正确落在 `sec2`（locality 1.0），
+  `20260921-175142` 却落在 `sec1`（locality **0.875**，`preserve_violations: ['script:sec1']`），
+  即把"只改 8.2"执行成了"改了 8.1"
+- **root_cause**: `conversation/resolver.resolve()` 的定位优先级把
+  **LLM 返回的 `targets.section_ids` 排在确定性编号匹配之前**：
+  模型这次猜了 `sec1`，`section_ids` 非空，`8.2 → 标题以 "8.2" 开头` 的确定性匹配
+  根本没有机会执行。这违反项目硬规则"确定性用户约束优先于 LLM"
+- **skill**: `conversation-edit`
+- **artifact**: `pebs/conversation/resolver.py`
+- **fix**: 定位顺序改为 确定性序数（第N节）→ 确定性编号引用（8.2）→ 确定性标题匹配 →
+  **LLM 目标（仅在前述都没有时）** → 文本匹配 → 单章节默认；
+  当 LLM 目标与确定性引用冲突时，采用确定性结果并把冲突写入 `unmapped`（不静默丢弃）
+- **regression_test**: `tests/test_target_resolution.py::test_deterministic_section_label_beats_a_wrong_llm_guess`
+  （并保留 `test_llm_layer_cannot_override_deterministic_intent` 覆盖序数场景）
+- **复跑验证**: 修复后再跑 F（见下一条）
+
 ## 2026-09-21 — 模型把 `claim_refs` 返回成对象 → `set(...)` 抛 unhashable dict，整条运行 failed（RUNTIME §67）
 
 - **date**: 2026-09-21

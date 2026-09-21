@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-21T17:21:11；run 数（每 case×mode 取最新）：26
+生成时间：2026-09-21T19:00:31；run 数（每 case×mode 取最新）：26
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues | Gate FAIL/Review |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -26,7 +26,7 @@
 | D | dynamic [+external-dual-coding] * | succeeded | 1/1 | None | None | None | None | None | 26.0 | 772.31 | 0.0 | 1.0/0 |
 | D | dynamic [+external-load] * | succeeded | 1/1 | None | None | None | None | None | 17.0 | 720.33 | 0.0 | 3.0/1.0 |
 | E | dynamic ? | succeeded | 2/3 | None | None | None | None | None | 26.0 | 678.8 | 0.0 | 2.0/1.0 |
-| F | scenario ? | succeeded | 2/3 | None | None | None | None | None | 5.0 | 1964.68 | 0.0 | 0/0 |
+| F | scenario | succeeded | 3/4 | None | None | None | None | None | 101.0 | 4126.63 | 0.0 | 0/0 |
 | G | scenario ? | succeeded | 1/1 | None | None | None | None | None | 9.0 | 2354.22 | 0.0 | 0/0 |
 | H | dynamic ? | succeeded | 6/6 | None | None | None | None | None | 32.0 | 1570.97 | 3.0 | 3.0/2.0 |
 | I | dynamic ? | succeeded | 1/1 | None | None | None | None | None | 7.0 | 361.02 | 0.0 | 0/1.0 |
@@ -42,9 +42,9 @@
 | Plan Errors（合计） | — | — | — | — |
 | Skill Failure Rate（均值） | — | 0.0 | 0.01 | — |
 | Schema Repair Rate（均值） | — | 0.0 | 0.0 | — |
-| Model Calls（合计） | 3.0 | 124.0 | 524.0 | 14.0 |
-| Runtime(s)（合计） | 567.7 | 5774.3 | 25068.99 | 4318.9 |
-| Succeeded / Attempts | 3.0 / 3.0 | 3.0 / 12.0 | 24.0 / 47.0 | 3.0 / 4.0 |
+| Model Calls（合计） | 3.0 | 124.0 | 524.0 | 110.0 |
+| Runtime(s)（合计） | 567.7 | 5774.3 | 25068.99 | 6480.85 |
+| Succeeded / Attempts | 3.0 / 3.0 | 3.0 / 12.0 | 24.0 / 47.0 | 4.0 / 5.0 |
 
 
 ## 失败类别分布（§65 failure taxonomy；仅统计代表 run 的自动问题）

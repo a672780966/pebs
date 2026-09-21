@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T17:21:11",
+  "generated_at": "2026-09-21T19:00:31",
   "cases": [
     {
       "case_id": "A",
@@ -574,26 +574,24 @@
       "case_id": "F",
       "scenario": {
         "status": "succeeded",
-        "attempts": 3,
-        "succeeded": 2,
-        "evidence_policy": [
-          "SUPPORTED"
-        ],
+        "attempts": 4,
+        "succeeded": 3,
+        "evidence_policy": null,
         "human_score": null,
         "edit_ratio": null,
         "major_edit_rate": null,
         "evidence_errors": null,
         "routing_errors": null,
         "plan_errors": null,
-        "model_calls": 5.0,
-        "runtime_seconds": 1964.68,
+        "model_calls": 101.0,
+        "runtime_seconds": 4126.63,
         "skill_failure_rate": null,
         "schema_repair_rate": null,
-        "locality_preservation_rate": 1.0,
+        "locality_preservation_rate": 0.875,
         "automatic_issues": 0.0,
         "gate_fail": 0.0,
         "gate_review": 0.0,
-        "code_version_current": null,
+        "code_version_current": true,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -1376,17 +1374,15 @@
       "code_version_current": null
     },
     {
-      "run_id": "run_dfcecd407801",
+      "run_id": "run_c3c600f6b004",
       "case_id": "F",
       "mode": "scenario",
       "variant": "scenario",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 3,
-      "succeeded": 2,
-      "evidence_policy": [
-        "SUPPORTED"
-      ],
+      "attempts": 4,
+      "succeeded": 3,
+      "evidence_policy": null,
       "human_score": null,
       "edit_ratio": null,
       "major_edit_rate": null,
@@ -1396,16 +1392,16 @@
       "reviewer": null,
       "human_eval_run_id": null,
       "human_eval_stale": false,
-      "model_calls": 5,
+      "model_calls": 101,
       "research_calls": null,
-      "runtime_seconds": 1964.68,
+      "runtime_seconds": 4126.63,
       "skill_failure_rate": null,
       "schema_repair_rate": null,
-      "locality_preservation_rate": 1.0,
+      "locality_preservation_rate": 0.875,
       "automatic_issues": 0,
       "gate_fail": 0,
       "gate_review": 0,
-      "code_version_current": null
+      "code_version_current": true
     },
     {
       "run_id": "run_ee22bc3e2062",
@@ -1556,10 +1552,10 @@
       "plan_errors": null,
       "schema_repair_rate": null,
       "skill_failure_rate": null,
-      "model_calls": 14.0,
-      "runtime_seconds": 4318.9,
-      "succeeded": 3.0,
-      "attempts": 4.0
+      "model_calls": 110.0,
+      "runtime_seconds": 6480.85,
+      "succeeded": 4.0,
+      "attempts": 5.0
     }
   }
 }

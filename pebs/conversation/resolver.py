@@ -116,10 +116,11 @@ def resolve(
             resolved["match_reasons"].append(f"第{index}节 → {sections[index - 1]['section_id']}")
         else:
             resolved["unmapped"].append(f"第{index}节")
-    for candidate in intent.get("targets", {}).get("section_ids", []):
-        if candidate in {section["section_id"] for section in sections}:
-            section_ids.append(candidate)
-
+    # 确定性锚点优先于 LLM 猜测（硬规则："确定性用户约束优先于 LLM"）。
+    # 用户明确写了「8.2」，就必须落在标题为 8.2 的那一节；之前 LLM 的
+    # targets.section_ids 排在编号匹配之前，模型偶尔猜错就会改到别的章节——
+    # 真实 F 场景（2026-09-21）因此把 8.2 的局部修改打到了 8.1，
+    # preserve 校验随即失败（locality 0.875），而同一指令在 2026-09-19 却是对的。
     if not section_ids:
         labelled = _match_section_by_label(message, sections)
         if labelled:
@@ -130,6 +131,23 @@ def resolve(
         if titled:
             section_ids.append(titled)
             resolved["match_reasons"].append(f"章节标题匹配 → {titled}")
+
+    llm_sections = [
+        candidate
+        for candidate in intent.get("targets", {}).get("section_ids", [])
+        if candidate in {section["section_id"] for section in sections}
+    ]
+    if not section_ids:
+        section_ids.extend(llm_sections)
+        for candidate in llm_sections:
+            resolved["match_reasons"].append(f"LLM 目标定位 → {candidate}")
+    elif llm_sections and set(llm_sections) - set(section_ids):
+        # 不静默丢弃冲突：确定性引用与 LLM 判断不一致时留痕，便于排查
+        resolved["unmapped"].append(
+            f"LLM 目标与确定性小节引用冲突，已采用确定性结果：{sorted(set(llm_sections) - set(section_ids))}"
+        )
+        resolved["match_reasons"].append("LLM 目标与确定性小节引用冲突，确定性优先")
+
     if not section_ids and script_units:
         matched_section = _match_section_by_text(message, script_units)
         if matched_section:
