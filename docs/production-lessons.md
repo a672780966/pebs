@@ -211,9 +211,27 @@
 - **复跑验证（零模型调用，真实产物）**: 在 `20260921-175142` 那个**已建好 C 课程的项目**上重放同一条指令
   （`engine.conversation_edit(..., execute=False)`）：patch plan 目标为
   `case:sec2:1` / `script:sec2` / `gate:G1..G7:script:sec2`，**没有任何 sec1 目标**，锁定 51 个产物
-- **未能完成的部分（如实记录）**: 完整 F 场景的端到端复跑（`20260921-193240`）因 provider
-  在构建前置课程时 `learning_design: codex exec 超时` 而失败（2 次调用），scenario 未执行；
-  真实端到端确认待下一次配额窗口
+- **未能完成的部分（如实记录）**: 完整 F 场景的端到端复跑两次都卡在**前置课程构建**上：
+  `20260921-193240` 是 provider `learning_design: codex exec 超时`（2 次调用）；
+  `20260921-202853` 是 `pck-developer` 前置条件"证据索引为空，没有可用的 SUPPORTED Claim"
+  （60 次调用）——与 case B 同源（冻结契约 + 证据波动），不是 F 场景本身的问题
+
+## 2026-09-21 — Acceptance 7 在当前代码上直接复测：locality 1.0，只重建被点名的那一节（BENCHMARK §26/§71-7）
+
+- **date**: 2026-09-21
+- **task**: Acceptance 7（局部修改 Unrelated Artifact Hash 保持不变）的当前代码确认
+- **做法**: 新增 `tools/verify_locality.py`——**复制**一份已建成课程的项目到临时目录，
+  在副本上跑真实的 `conversation_edit`（原项目保持不变），再用
+  `metrics.locality_report` 度量（与 benchmark 同一套口径）
+- **结果（2 次运行，各 4–5 次模型调用）**:
+  - 受影响集合只有 `case:sec2:1` / `script:sec2` / `gate:G1..G7:script:sec2` / `claims`
+  - `locality_preservation_rate = 1.0`、`preserve_violations = []`、
+    `unnecessary_regeneration = []`，锁定 51 个产物
+  - 被点名那一节自己的门禁照常生效：`gate:G2:script:sec2` FAIL（新案例引用 PENDING Claim、
+    含占位内容）、`gate:G6:script:sec2` NEEDS_REVIEW——失败**限制在改动的那一节**
+- **意义**: 同时闭合 Acceptance 7 的当前代码证据、§26 preserve 契约，
+  以及上一轮"确定性小节引用优先"修复在真实产物上的效果
+- **artifact**: `tools/verify_locality.py`、`benchmarks/runs/20260921-175142-F-scenario/`
 
 ## 2026-09-21 — 模型把 `claim_refs` 返回成对象 → `set(...)` 抛 unhashable dict，整条运行 failed（RUNTIME §67）
 
