@@ -366,6 +366,16 @@
   §22 的 B 是"概念型第一课"，冻结契约要求它提供 empirical SUPPORTED Claim 是否过严？
   若认为过严，应由规则所有者调整契约并在 §85 验收中重新定义，而不是在 benchmark 里放宽
 - **regression_test**: 无（基准观测）；数字见 `benchmark_summary.md` 的 B 行
+- **重要修正（2026-09-21 复跑）**: 上面的"Builtin 卡住 / Dynamic 通过"是**单次运行**的印象，
+  复跑推翻了它：`B/dynamic`（`20260921-215555`，27 次调用 / 12 次研究请求）在**同一条**
+  `pck-developer` 前置条件上 blocked（"证据索引为空，没有可用的 SUPPORTED Claim"）。
+  准确结论应当是：**两种模式都可能因空证据前置条件而中止**，差别只在研究投入
+  （那次成功用了 33 次研究请求，这次只有 12 次），成功并不保证——
+  这正是"不追求用叙事代替数据"的提醒
+- **顺带确认（路由侧）**: 同一次运行 Router 给出的 knowledge_types 为
+  `['concept','distinction','reflection','attitude','critical_thinking','transfer']`，
+  即 §21/§36 关心的 attitude / transfer / critical_thinking 都被识别到了，
+  这一条**不是** Routing Error
 
 ## 2026-09-20 — 报告不区分 run 的代码版本，读者会跨版本比较门禁/检查器结论（REPORT §41）
 

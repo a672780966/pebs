@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-21T21:44:03；run 数（每 case×mode 取最新）：27
+生成时间：2026-09-21T22:09:49；run 数（每 case×mode 取最新）：27
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues | Gate FAIL/Review |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -12,7 +12,7 @@
 | A | dynamic [+external-media] ? | succeeded | 1/1 | None | None | None | None | None | 28.0 | 1020.85 | 3.0 | 6.0/3.0 |
 | B | builtin * | blocked | 0/2 | None | None | None | None | None | 23.0 | 599.1 | 4.0 | 0/0 |
 | B | direct_codex ? | succeeded | 1/1 | None | None | None | None | None | 1.0 | 210.04 | 0.0 | 0/0 |
-| B | dynamic ? | succeeded | 1/5 | None | None | None | None | None | 45.0 | 1235.35 | 1.0 | 0/1.0 |
+| B | dynamic ? | succeeded | 1/6 | None | None | None | None | None | 45.0 | 1235.35 | 1.0 | 0/1.0 |
 | B | dynamic [+empty-claims-policy] ? | blocked | 0/1 | None | None | None | None | None | 33.0 | 925.75 | 3.0 | 0/0 |
 | B | dynamic [+external-media-B] ? | interrupted | 0/1 | None | None | None | None | None | 40.0 | 7826.67 | 3.0 | 0/0 |
 | C | builtin * | succeeded | 1/2 | None | None | None | None | None | 47.0 | 2569.12 | 2.0 | 0/4.0 |
@@ -20,13 +20,13 @@
 | C | dynamic ? | succeeded | 3/5 | None | None | None | None | None | 48.0 | 1868.79 | 0.0 | 10.0/4.0 |
 | C | dynamic [+external-backwards-design] * | succeeded | 1/3 | None | None | None | None | None | 96.0 | 2926.5 | 0.0 | 2.0/4.0 |
 | D | builtin * | succeeded | 1/2 | None | None | None | None | None | 17.0 | 854.97 | 1.0 | 1.0/1.0 |
-| D | direct_codex | succeeded | 1/1 | None | None | None | None | None | 1.0 | 148.9 | 0.0 | 0/0 |
+| D | direct_codex * | succeeded | 1/1 | None | None | None | None | None | 1.0 | 148.9 | 0.0 | 0/0 |
 | D | dynamic ? | succeeded | 2/3 | None | None | None | None | None | 10.0 | 371.08 | 1.0 | 2.0/1.0 |
 | D | dynamic [+external-assessment] * | succeeded | 1/4 | None | None | None | None | None | 22.0 | 717.01 | 0.0 | 1.0/1.0 |
 | D | dynamic [+external-backwards-design] * | succeeded | 1/1 | None | None | None | None | None | 19.0 | 602.48 | 3.0 | 0/1.0 |
 | D | dynamic [+external-dual-coding] * | succeeded | 1/1 | None | None | None | None | None | 26.0 | 772.31 | 0.0 | 1.0/0 |
 | D | dynamic [+external-load] * | succeeded | 1/1 | None | None | None | None | None | 17.0 | 720.33 | 0.0 | 3.0/1.0 |
-| E | dynamic | succeeded | 3/4 | None | None | None | None | None | 20.0 | 689.03 | 0.0 | 2.0/1.0 |
+| E | dynamic * | succeeded | 3/4 | None | None | None | None | None | 20.0 | 689.03 | 0.0 | 2.0/1.0 |
 | F | scenario * | succeeded | 3/6 | None | None | None | None | None | 101.0 | 4126.63 | 0.0 | 0/0 |
 | G | scenario ? | succeeded | 1/1 | None | None | None | None | None | 9.0 | 2354.22 | 0.0 | 0/0 |
 | H | dynamic ? | succeeded | 6/6 | None | None | None | None | None | 32.0 | 1570.97 | 3.0 | 3.0/2.0 |
@@ -45,7 +45,7 @@
 | Schema Repair Rate（均值） | — | 0.0 | 0.0 | — |
 | Model Calls（合计） | 4.0 | 124.0 | 518.0 | 110.0 |
 | Runtime(s)（合计） | 716.6 | 5774.3 | 25079.22 | 6480.85 |
-| Succeeded / Attempts | 4.0 / 4.0 | 3.0 / 12.0 | 25.0 / 48.0 | 4.0 / 7.0 |
+| Succeeded / Attempts | 4.0 / 4.0 | 3.0 / 12.0 | 25.0 / 49.0 | 4.0 / 7.0 |
 
 
 ## 失败类别分布（§65 failure taxonomy；仅统计代表 run 的自动问题）
@@ -103,25 +103,25 @@
 | assessment-designer | 0.1.0 | 30 | 0.8 | 0.0 | None | None | EXPERIMENTAL |
 | backwards-design-unit-planner | 6bbbce418f82 | 4 | 0.75 | 0.0 | None | None | EXPERIMENTAL |
 | case-designer | 0.1.0 | 29 | 0.7241 | 0.0 | None | None | EXPERIMENTAL |
-| claim-extractor | 0.1.0 | 45 | 0.8667 | 0.0 | None | None | EXPERIMENTAL |
+| claim-extractor | 0.1.0 | 46 | 0.8696 | 0.0 | None | None | EXPERIMENTAL |
 | cognitive-load-analyser | 6bbbce418f82 | 1 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
-| diagram-designer | 0.1.0 | 14 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
-| docx-exporter | 0.1.0 | 24 | 0.625 | 0.0 | None | None | EXPERIMENTAL |
+| diagram-designer | 0.1.0 | 15 | 0.4667 | 0.0 | None | None | EXPERIMENTAL |
+| docx-exporter | 0.1.0 | 25 | 0.6 | 0.0 | None | None | EXPERIMENTAL |
 | dual-coding-designer | 6bbbce418f82 | 4 | 0.75 | 0.25 | None | None | EXPERIMENTAL |
-| evidence-indexer | 0.1.0 | 14 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
-| evidence-reviewer | 0.1.0 | 52 | 0.8269 | 0.0 | None | None | EXPERIMENTAL |
+| evidence-indexer | 0.1.0 | 15 | 0.4667 | 0.0 | None | None | EXPERIMENTAL |
+| evidence-reviewer | 0.1.0 | 53 | 0.8302 | 0.0 | None | None | EXPERIMENTAL |
 | gate-runner | 0.1.0 | 38 | 0.6579 | 0.0 | None | None | EXPERIMENTAL |
 | hinge-question-designer | 6bbbce418f82 | 4 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
-| learning-designer | 0.1.0 | 41 | 0.9756 | 0.0 | None | None | EXPERIMENTAL |
-| lesson-designer | 0.1.0 | 40 | 0.7 | 0.0 | None | None | EXPERIMENTAL |
+| learning-designer | 0.1.0 | 42 | 0.9762 | 0.0 | None | None | EXPERIMENTAL |
+| lesson-designer | 0.1.0 | 41 | 0.6829 | 0.0 | None | None | EXPERIMENTAL |
 | load-reviewer | 0.1.0 | 7 | 0.7143 | 0.0 | None | None | EXPERIMENTAL |
-| media-router | 0.1.0 | 13 | 0.5385 | 0.0 | None | None | EXPERIMENTAL |
-| pck-developer | 0.1.0 | 41 | 0.7561 | 0.0 | None | None | EXPERIMENTAL |
-| presentation-composer | 0.1.0 | 14 | 0.4286 | 0.0 | None | None | EXPERIMENTAL |
-| presentation-planner | 0.1.0 | 14 | 0.4286 | 0.0 | None | None | EXPERIMENTAL |
-| preview-builder | 0.1.0 | 24 | 0.8333 | 0.0 | None | None | EXPERIMENTAL |
-| requirements-builder | 0.1.0 | 45 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| media-router | 0.1.0 | 14 | 0.5 | 0.0 | None | None | EXPERIMENTAL |
+| pck-developer | 0.1.0 | 42 | 0.7381 | 0.0 | None | None | EXPERIMENTAL |
+| presentation-composer | 0.1.0 | 15 | 0.4 | 0.0 | None | None | EXPERIMENTAL |
+| presentation-planner | 0.1.0 | 15 | 0.4 | 0.0 | None | None | EXPERIMENTAL |
+| preview-builder | 0.1.0 | 25 | 0.84 | 0.0 | None | None | EXPERIMENTAL |
+| requirements-builder | 0.1.0 | 46 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
 | script-writer | 0.1.0 | 39 | 0.7436 | 0.0 | None | None | EXPERIMENTAL |
-| template-parser | 0.1.0 | 45 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
+| template-parser | 0.1.0 | 46 | 1.0 | 0.0 | None | None | EXPERIMENTAL |
 | worksheet-designer | 0.1.0 | 7 | 0.7143 | 0.0 | None | None | EXPERIMENTAL |
 

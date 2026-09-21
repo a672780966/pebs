@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T21:44:03",
+  "generated_at": "2026-09-21T22:09:49",
   "cases": [
     {
       "case_id": "A",
@@ -212,7 +212,7 @@
       },
       "dynamic": {
         "status": "succeeded",
-        "attempts": 5,
+        "attempts": 6,
         "succeeded": 1,
         "evidence_policy": [
           "SUPPORTED"
@@ -439,7 +439,7 @@
         "automatic_issues": 0.0,
         "gate_fail": 0.0,
         "gate_review": 0.0,
-        "code_version_current": true,
+        "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -590,7 +590,7 @@
         "automatic_issues": 0.0,
         "gate_fail": 2.0,
         "gate_review": 1.0,
-        "code_version_current": true,
+        "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -972,7 +972,7 @@
       "variant": "dynamic",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 5,
+      "attempts": 6,
       "succeeded": 1,
       "evidence_policy": [
         "SUPPORTED"
@@ -1245,7 +1245,7 @@
       "automatic_issues": 0,
       "gate_fail": 0,
       "gate_review": 0,
-      "code_version_current": true
+      "code_version_current": false
     },
     {
       "run_id": "run_e065d4c09320",
@@ -1429,7 +1429,7 @@
       "automatic_issues": 0,
       "gate_fail": 2,
       "gate_review": 1,
-      "code_version_current": true
+      "code_version_current": false
     },
     {
       "run_id": "run_c3c600f6b004",
@@ -1599,7 +1599,7 @@
       "model_calls": 518.0,
       "runtime_seconds": 25079.22,
       "succeeded": 25.0,
-      "attempts": 48.0
+      "attempts": 49.0
     },
     "scenario": {
       "variants": 2,
