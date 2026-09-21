@@ -208,7 +208,12 @@
   当 LLM 目标与确定性引用冲突时，采用确定性结果并把冲突写入 `unmapped`（不静默丢弃）
 - **regression_test**: `tests/test_target_resolution.py::test_deterministic_section_label_beats_a_wrong_llm_guess`
   （并保留 `test_llm_layer_cannot_override_deterministic_intent` 覆盖序数场景）
-- **复跑验证**: 修复后再跑 F（见下一条）
+- **复跑验证（零模型调用，真实产物）**: 在 `20260921-175142` 那个**已建好 C 课程的项目**上重放同一条指令
+  （`engine.conversation_edit(..., execute=False)`）：patch plan 目标为
+  `case:sec2:1` / `script:sec2` / `gate:G1..G7:script:sec2`，**没有任何 sec1 目标**，锁定 51 个产物
+- **未能完成的部分（如实记录）**: 完整 F 场景的端到端复跑（`20260921-193240`）因 provider
+  在构建前置课程时 `learning_design: codex exec 超时` 而失败（2 次调用），scenario 未执行；
+  真实端到端确认待下一次配额窗口
 
 ## 2026-09-21 — 模型把 `claim_refs` 返回成对象 → `set(...)` 抛 unhashable dict，整条运行 failed（RUNTIME §67）
 

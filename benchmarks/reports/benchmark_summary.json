@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T19:00:31",
+  "generated_at": "2026-09-21T19:45:00",
   "cases": [
     {
       "case_id": "A",
@@ -574,7 +574,7 @@
       "case_id": "F",
       "scenario": {
         "status": "succeeded",
-        "attempts": 4,
+        "attempts": 5,
         "succeeded": 3,
         "evidence_policy": null,
         "human_score": null,
@@ -591,7 +591,7 @@
         "automatic_issues": 0.0,
         "gate_fail": 0.0,
         "gate_review": 0.0,
-        "code_version_current": true,
+        "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
         "runs": 1
@@ -1380,7 +1380,7 @@
       "variant": "scenario",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 4,
+      "attempts": 5,
       "succeeded": 3,
       "evidence_policy": null,
       "human_score": null,
@@ -1401,7 +1401,7 @@
       "automatic_issues": 0,
       "gate_fail": 0,
       "gate_review": 0,
-      "code_version_current": true
+      "code_version_current": false
     },
     {
       "run_id": "run_ee22bc3e2062",
@@ -1555,7 +1555,7 @@
       "model_calls": 110.0,
       "runtime_seconds": 6480.85,
       "succeeded": 4.0,
-      "attempts": 5.0
+      "attempts": 6.0
     }
   }
 }
