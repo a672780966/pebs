@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T19:45:00",
+  "generated_at": "2026-09-21T20:59:46",
   "cases": [
     {
       "case_id": "A",
@@ -574,7 +574,7 @@
       "case_id": "F",
       "scenario": {
         "status": "succeeded",
-        "attempts": 5,
+        "attempts": 6,
         "succeeded": 3,
         "evidence_policy": null,
         "human_score": null,
@@ -1380,7 +1380,7 @@
       "variant": "scenario",
       "experiment": "",
       "status": "succeeded",
-      "attempts": 5,
+      "attempts": 6,
       "succeeded": 3,
       "evidence_policy": null,
       "human_score": null,
@@ -1555,7 +1555,7 @@
       "model_calls": 110.0,
       "runtime_seconds": 6480.85,
       "succeeded": 4.0,
-      "attempts": 6.0
+      "attempts": 7.0
     }
   }
 }
