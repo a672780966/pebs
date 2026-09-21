@@ -172,6 +172,8 @@ def run_scenario(
         # §35 Cost：scenario 的成本必须包含它自己先跑完的那门基线课程，
         # 否则 F/G 会显示 5/9 次调用，而 harness 实际已经花掉约 50 次。
         "base_model_calls": int(engine.store.get_run(base_start["run_id"])["calls_used"]),
+        # §35/§41：scenario 同样记录生效预算（不同预算的运行不可直接比较）
+        "budgets": dict(effective_budgets),
         "project_id": project,
     }
     if base_status["run"]["status"] != "succeeded":
@@ -408,6 +410,10 @@ def run_case(
             # §35/§41：本次运行实际生效的证据政策（来自冻结契约的唯一权威常量），
             # 该字段此前只被报告/UI/材料包/API 读取，从未写过分毫。
             "evidence_policy": [preconditions.PCK_REQUIRED_STATUS],
+            # §35/§41：把**生效预算**写进 run 记录。B 的对照曾被预算差异污染：
+            # 成功那次是 model 250 / research 120，被阻断两次是 70–80 / 20——
+            # 不同预算的运行不能拿来比较，记录里必须能看出来。
+            "budgets": dict(effective_budgets),
             "wall_time_seconds": round(time.time() - started, 2),
             "fixtures": _fixture_hashes(case),
             "reproducibility": (record.get("trace") or {}).get("reproducibility")

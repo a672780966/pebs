@@ -609,6 +609,41 @@ def test_case_quality_checks_are_wired_into_evaluate():
     assert checks.case_checks(good) == []
 
 
+def test_report_flags_variants_compared_under_different_budgets():
+    """§35/§41：不同预算的运行不可直接比较，报告必须显式提示。
+
+    真实教训：case B 的"Builtin 阻断 vs Dynamic 成功"曾由预算差异造成
+    （250/120 对 70-80/20），不是模式差异。
+    """
+    runs = [
+        {
+            "case_id": "B",
+            "mode": "dynamic",
+            "run_id": "r1",
+            "metrics": {},
+            "automatic_issues": {},
+            "budgets": {"model_calls": 250, "research_requests": 120},
+        },
+        {
+            "case_id": "B",
+            "mode": "builtin",
+            "run_id": "r2",
+            "metrics": {},
+            "automatic_issues": {},
+            "budgets": {"model_calls": 70, "research_requests": 20},
+        },
+    ]
+    summary = report.summarize(runs)
+    notes = "\n".join(report.budget_mismatch_notes(summary))
+    assert "预算差异提示" in notes
+    assert "model=250/research=120" in notes and "model=70/research=20" in notes
+    assert "不可直接比较" in notes
+
+    # 预算一致时不提示
+    same = [dict(run, budgets={"model_calls": 70, "research_requests": 20}) for run in runs]
+    assert report.budget_mismatch_notes(report.summarize(same)) == []
+
+
 def test_scenario_cost_includes_the_prerequisite_base_course():
     """§35 Cost：F/G 的成本必须含先跑完的基线课程，否则会低估约 10 倍。"""
     run = {

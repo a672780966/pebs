@@ -84,6 +84,73 @@ def load_runs(runs_dir: Path | None = None) -> list[dict[str, Any]]:
     return representatives
 
 
+def budget_mismatch_notes(summary: dict[str, Any]) -> list[str]:
+    """§35/§41：同一 case 的变体若用了不同预算，横向对比不成立，必须显式提示。
+
+    真实教训：case B 的"Builtin 被阻断 vs Dynamic 成功"曾经是预算差异造成的
+    （250/120 对 70–80/20），而不是模式差异；报告若不提示，读者会得出错误结论。
+    """
+    notes: list[str] = []
+    for case in summary.get("cases", []):
+        seen: dict[str, list[str]] = {}
+        for variant, entry in case.items():
+            if variant == "case_id" or not isinstance(entry, dict):
+                continue
+            budgets = entry.get("budgets")
+            if not budgets:
+                continue
+            label = f"model={budgets.get('model_calls')}/research={budgets.get('research_requests')}"
+            seen.setdefault(label, []).append(str(variant))
+        if len(seen) > 1:
+            detail = "；".join(f"{label}（{'+'.join(variants)}）" for label, variants in sorted(seen.items()))
+            notes.append(f"- case {case.get('case_id')}：变体使用不同预算，**不可直接比较** —— {detail}")
+    if not notes:
+        return []
+    return ["", "> ⚠ 预算差异提示（§35/§41）：", *notes, ""]
+
+
+def budgets_for_run(run: dict[str, Any]) -> dict[str, Any] | None:
+    """§35/§41：取该 run 的生效预算。
+
+    新 run 直接写在 run.json 里；历史 run 没有这个字段，就从项目 Store 的 runs 行读回来
+    （只读，不改写已有记录）——否则"不同预算不可比较"这条提示对历史数据永远不生效。
+    """
+    if run.get("budgets"):
+        return run["budgets"]
+    project_id = str(run.get("project_id") or "")
+    run_id = str(run.get("run_id") or "")
+    if not project_id or not run_id:
+        return None
+    try:
+        from .. import config
+        from ..store import Store
+
+        base = config.project_dir(project_id)
+        if not (base / "state.db").exists():
+            return None
+        store = Store(project_id, base)
+        try:
+            row = store.get_run(run_id)
+        finally:
+            store.close()
+    except Exception:  # noqa: BLE001 - 项目已清理时视为未知
+        return None
+    return {
+        "model_calls": row.get("budget_model_calls"),
+        "research_requests": row.get("budget_research"),
+        "run_seconds": row.get("budget_seconds"),
+    }
+
+
+def _with_budgets(run: dict[str, Any]) -> dict[str, Any]:
+    if run.get("budgets"):
+        return run
+    budgets = budgets_for_run(run)
+    if budgets is None:
+        return run
+    return {**run, "budgets": budgets}
+
+
 def _same_code_version(run: dict[str, Any]) -> bool | None:
     """run 的 PEBS commit 是否等于当前代码版本；未知（旧记录无 commit）返回 None。"""
     from . import trace as trace_mod
@@ -131,6 +198,7 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
         # §35/§71-8：门禁 FAIL 与"自动问题"是两层，报告必须能同时看到，
         # 否则会出现"Auto Issues = 0 但 G6 FAIL"这种互相矛盾的行。
         "gate_fail": len([g for g in (run.get("trace") or {}).get("gates", []) if g.get("status") == "FAIL"]),
+        "budgets": run.get("budgets"),
         "gate_review": len(
             [g for g in (run.get("trace") or {}).get("gates", []) if g.get("status") == "NEEDS_REVIEW"]
         ),
@@ -194,7 +262,7 @@ def _with_human_eval(run: dict[str, Any]) -> dict[str, Any]:
 
 def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     runs = runs if runs is not None else load_runs()
-    runs = [_with_human_eval(run) for run in runs]
+    runs = [_with_budgets(_with_human_eval(run)) for run in runs]
     rows = [_row_for(run) for run in runs]
     by_case: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
@@ -229,6 +297,8 @@ def summarize(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
                 "code_version_current": matching[-1].get("code_version_current"),
                 "reviewers": sorted({str(row["reviewer"]) for row in matching if row.get("reviewer")}),
                 "human_eval_stale": any(row.get("human_eval_stale") for row in matching),
+                # §35/§41：同一 case 的各变体若预算不同，正文里的对比不成立
+                "budgets": matching[-1].get("budgets"),
                 "runs": len(matching),
             }
         table.append(entry)
@@ -419,6 +489,7 @@ def render_markdown(summary: dict[str, Any]) -> str:
             )
             if reviewers or note:
                 lines.append(f"| | 教师：{('、'.join(reviewers)) or '—'}{note} | | | | | | | | | | | |")
+    lines.extend(budget_mismatch_notes(summary))
     lines.extend(render_mode_comparison(summary))
     lines.extend(failure_category_section())
     lines.extend(_gate_audit_section())

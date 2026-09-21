@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-21T22:09:49",
+  "generated_at": "2026-09-21T22:53:03",
   "cases": [
     {
       "case_id": "A",
@@ -25,6 +25,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 90,
+          "research_requests": 20,
+          "run_seconds": 3000
+        },
         "runs": 1
       },
       "direct_codex": {
@@ -51,6 +56,7 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": null,
         "runs": 1
       },
       "dynamic": {
@@ -77,6 +83,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 70,
+          "research_requests": 20,
+          "run_seconds": 2700
+        },
         "runs": 1
       },
       "dynamic [+external-media-A2]": {
@@ -103,6 +114,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 80,
+          "research_requests": 80,
+          "run_seconds": 5400
+        },
         "runs": 1
       },
       "dynamic [+external-media-A]": {
@@ -129,6 +145,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 80,
+          "research_requests": 80,
+          "run_seconds": 7200
+        },
         "runs": 1
       },
       "dynamic [+external-media]": {
@@ -155,6 +176,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 80,
+          "research_requests": 80,
+          "run_seconds": 7200
+        },
         "runs": 1
       }
     },
@@ -184,6 +210,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 70,
+          "research_requests": 20,
+          "run_seconds": 2700
+        },
         "runs": 1
       },
       "direct_codex": {
@@ -208,6 +239,7 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": null,
         "runs": 1
       },
       "dynamic": {
@@ -234,6 +266,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 250,
+          "research_requests": 120,
+          "run_seconds": 21600
+        },
         "runs": 1
       },
       "dynamic [+empty-claims-policy]": {
@@ -260,6 +297,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 120,
+          "research_requests": 60,
+          "run_seconds": 10800
+        },
         "runs": 1
       },
       "dynamic [+external-media-B]": {
@@ -286,6 +328,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 80,
+          "research_requests": 60,
+          "run_seconds": 7200
+        },
         "runs": 1
       }
     },
@@ -313,6 +360,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 110,
+          "research_requests": 20,
+          "run_seconds": 3600
+        },
         "runs": 1
       },
       "direct_codex": {
@@ -337,6 +389,7 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": null,
         "runs": 1
       },
       "dynamic": {
@@ -363,6 +416,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 200,
+          "research_requests": 120,
+          "run_seconds": 14400
+        },
         "runs": 1
       },
       "dynamic [+external-backwards-design]": {
@@ -389,6 +447,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 170,
+          "research_requests": 20,
+          "run_seconds": 4200
+        },
         "runs": 1
       }
     },
@@ -416,6 +479,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 60,
+          "research_requests": 20,
+          "run_seconds": 2400
+        },
         "runs": 1
       },
       "direct_codex": {
@@ -442,6 +510,7 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": null,
         "runs": 1
       },
       "dynamic": {
@@ -468,6 +537,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 200,
+          "research_requests": 120,
+          "run_seconds": 14400
+        },
         "runs": 1
       },
       "dynamic [+external-assessment]": {
@@ -492,6 +566,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 80,
+          "research_requests": 20,
+          "run_seconds": 3000
+        },
         "runs": 1
       },
       "dynamic [+external-backwards-design]": {
@@ -516,6 +595,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 60,
+          "research_requests": 20,
+          "run_seconds": 2400
+        },
         "runs": 1
       },
       "dynamic [+external-dual-coding]": {
@@ -540,6 +624,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 60,
+          "research_requests": 20,
+          "run_seconds": 2400
+        },
         "runs": 1
       },
       "dynamic [+external-load]": {
@@ -564,6 +653,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 50,
+          "research_requests": 20,
+          "run_seconds": 2400
+        },
         "runs": 1
       }
     },
@@ -593,6 +687,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 70,
+          "research_requests": 20,
+          "run_seconds": 2700
+        },
         "runs": 1
       }
     },
@@ -620,6 +719,11 @@
         "code_version_current": false,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 40,
+          "research_requests": 20,
+          "run_seconds": 1800
+        },
         "runs": 1
       }
     },
@@ -649,6 +753,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 300,
+          "research_requests": 150,
+          "run_seconds": 21600
+        },
         "runs": 1
       }
     },
@@ -678,6 +787,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 150,
+          "research_requests": 60,
+          "run_seconds": 14400
+        },
         "runs": 1
       }
     },
@@ -707,6 +821,11 @@
         "code_version_current": null,
         "reviewers": [],
         "human_eval_stale": false,
+        "budgets": {
+          "model_calls": 200,
+          "research_requests": 60,
+          "run_seconds": 14400
+        },
         "runs": 1
       }
     }
@@ -740,6 +859,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 90,
+        "research_requests": 20,
+        "run_seconds": 3000
+      },
       "gate_review": 3,
       "code_version_current": false
     },
@@ -772,6 +896,7 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": null,
       "gate_review": 0,
       "code_version_current": null
     },
@@ -804,6 +929,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 70,
+        "research_requests": 20,
+        "run_seconds": 2700
+      },
       "gate_review": 3,
       "code_version_current": false
     },
@@ -836,6 +966,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 3,
       "gate_fail": 6,
+      "budgets": {
+        "model_calls": 80,
+        "research_requests": 80,
+        "run_seconds": 7200
+      },
       "gate_review": 3,
       "code_version_current": null
     },
@@ -868,6 +1003,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 3,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 80,
+        "research_requests": 80,
+        "run_seconds": 7200
+      },
       "gate_review": 0,
       "code_version_current": null
     },
@@ -900,6 +1040,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 3,
       "gate_fail": 6,
+      "budgets": {
+        "model_calls": 80,
+        "research_requests": 80,
+        "run_seconds": 5400
+      },
       "gate_review": 3,
       "code_version_current": null
     },
@@ -932,6 +1077,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 4,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 70,
+        "research_requests": 20,
+        "run_seconds": 2700
+      },
       "gate_review": 0,
       "code_version_current": false
     },
@@ -962,6 +1112,7 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": null,
       "gate_review": 0,
       "code_version_current": null
     },
@@ -994,6 +1145,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 1,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 250,
+        "research_requests": 120,
+        "run_seconds": 21600
+      },
       "gate_review": 1,
       "code_version_current": null
     },
@@ -1026,6 +1182,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 3,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 120,
+        "research_requests": 60,
+        "run_seconds": 10800
+      },
       "gate_review": 0,
       "code_version_current": null
     },
@@ -1058,6 +1219,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 3,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 80,
+        "research_requests": 60,
+        "run_seconds": 7200
+      },
       "gate_review": 0,
       "code_version_current": null
     },
@@ -1088,6 +1254,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 2,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 110,
+        "research_requests": 20,
+        "run_seconds": 3600
+      },
       "gate_review": 4,
       "code_version_current": false
     },
@@ -1118,6 +1289,7 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": null,
       "gate_review": 0,
       "code_version_current": false
     },
@@ -1150,6 +1322,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 10,
+      "budgets": {
+        "model_calls": 200,
+        "research_requests": 120,
+        "run_seconds": 14400
+      },
       "gate_review": 4,
       "code_version_current": null
     },
@@ -1182,6 +1359,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 2,
+      "budgets": {
+        "model_calls": 170,
+        "research_requests": 20,
+        "run_seconds": 4200
+      },
       "gate_review": 4,
       "code_version_current": false
     },
@@ -1212,6 +1394,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 1,
       "gate_fail": 1,
+      "budgets": {
+        "model_calls": 60,
+        "research_requests": 20,
+        "run_seconds": 2400
+      },
       "gate_review": 1,
       "code_version_current": false
     },
@@ -1244,6 +1431,7 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": null,
       "gate_review": 0,
       "code_version_current": false
     },
@@ -1276,6 +1464,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 1,
       "gate_fail": 2,
+      "budgets": {
+        "model_calls": 200,
+        "research_requests": 120,
+        "run_seconds": 14400
+      },
       "gate_review": 1,
       "code_version_current": null
     },
@@ -1306,6 +1499,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 1,
+      "budgets": {
+        "model_calls": 80,
+        "research_requests": 20,
+        "run_seconds": 3000
+      },
       "gate_review": 1,
       "code_version_current": false
     },
@@ -1336,6 +1534,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 3,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 60,
+        "research_requests": 20,
+        "run_seconds": 2400
+      },
       "gate_review": 1,
       "code_version_current": false
     },
@@ -1366,6 +1569,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 1,
+      "budgets": {
+        "model_calls": 60,
+        "research_requests": 20,
+        "run_seconds": 2400
+      },
       "gate_review": 0,
       "code_version_current": false
     },
@@ -1396,6 +1604,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 3,
+      "budgets": {
+        "model_calls": 50,
+        "research_requests": 20,
+        "run_seconds": 2400
+      },
       "gate_review": 1,
       "code_version_current": false
     },
@@ -1428,6 +1641,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 2,
+      "budgets": {
+        "model_calls": 70,
+        "research_requests": 20,
+        "run_seconds": 2700
+      },
       "gate_review": 1,
       "code_version_current": false
     },
@@ -1458,6 +1676,11 @@
       "locality_preservation_rate": 0.875,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 40,
+        "research_requests": 20,
+        "run_seconds": 1800
+      },
       "gate_review": 0,
       "code_version_current": false
     },
@@ -1490,6 +1713,11 @@
       "locality_preservation_rate": 1.0,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 300,
+        "research_requests": 150,
+        "run_seconds": 21600
+      },
       "gate_review": 0,
       "code_version_current": null
     },
@@ -1522,6 +1750,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 3,
       "gate_fail": 3,
+      "budgets": {
+        "model_calls": 150,
+        "research_requests": 60,
+        "run_seconds": 14400
+      },
       "gate_review": 2,
       "code_version_current": null
     },
@@ -1554,6 +1787,11 @@
       "locality_preservation_rate": null,
       "automatic_issues": 0,
       "gate_fail": 0,
+      "budgets": {
+        "model_calls": 200,
+        "research_requests": 60,
+        "run_seconds": 14400
+      },
       "gate_review": 1,
       "code_version_current": null
     }

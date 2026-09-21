@@ -1,6 +1,6 @@
 # M6 Benchmark Summary
 
-生成时间：2026-09-21T22:09:49；run 数（每 case×mode 取最新）：27
+生成时间：2026-09-21T22:53:03；run 数（每 case×mode 取最新）：27
 
 | Case | Variant | Status | Attempts | Human Score | Edit Ratio | Evidence Errors | Routing Errors | Plan Errors | Model Calls | Runtime(s) | Auto Issues | Gate FAIL/Review |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -31,6 +31,13 @@
 | G | scenario ? | succeeded | 1/1 | None | None | None | None | None | 9.0 | 2354.22 | 0.0 | 0/0 |
 | H | dynamic ? | succeeded | 6/6 | None | None | None | None | None | 32.0 | 1570.97 | 3.0 | 3.0/2.0 |
 | I | dynamic ? | succeeded | 1/1 | None | None | None | None | None | 7.0 | 361.02 | 0.0 | 0/1.0 |
+
+> ⚠ 预算差异提示（§35/§41）：
+- case A：变体使用不同预算，**不可直接比较** —— model=70/research=20（dynamic）；model=80/research=80（dynamic [+external-media-A2]+dynamic [+external-media-A]+dynamic [+external-media]）；model=90/research=20（builtin）
+- case B：变体使用不同预算，**不可直接比较** —— model=120/research=60（dynamic [+empty-claims-policy]）；model=250/research=120（dynamic）；model=70/research=20（builtin）；model=80/research=60（dynamic [+external-media-B]）
+- case C：变体使用不同预算，**不可直接比较** —— model=110/research=20（builtin）；model=170/research=20（dynamic [+external-backwards-design]）；model=200/research=120（dynamic）
+- case D：变体使用不同预算，**不可直接比较** —— model=200/research=120（dynamic）；model=50/research=20（dynamic [+external-load]）；model=60/research=20（builtin+dynamic [+external-backwards-design]+dynamic [+external-dual-coding]）；model=80/research=20（dynamic [+external-assessment]）
+
 
 ## 模式对比（§42：Metric × Direct Codex / Builtin / Dynamic）
 

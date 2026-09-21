@@ -1,11 +1,12 @@
 run:
-  case_id: F
-  mode: scenario
-  run_id: run_c3c600f6b004
+  case_id: D
+  mode: direct_codex
+  run_id: ''
   run_status: succeeded
-  run_dir: C:\Users\admin\Documents\ChatGPT\心理学教育skills\benchmarks\runs\20260921-175142-F-scenario
-  artifact_count: 61
-  evidence_policy: null
+  run_dir: C:\Users\admin\Documents\ChatGPT\心理学教育skills\benchmarks\runs\20260921-212802-D-direct_codex
+  artifact_count: 0
+  evidence_policy:
+  - SUPPORTED
 reviewer: ''
 role: teacher
 scores:

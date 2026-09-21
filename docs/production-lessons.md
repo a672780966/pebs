@@ -216,6 +216,30 @@
   `20260921-202853` 是 `pck-developer` 前置条件"证据索引为空，没有可用的 SUPPORTED Claim"
   （60 次调用）——与 case B 同源（冻结契约 + 证据波动），不是 F 场景本身的问题
 
+## 2026-09-21 — 跨预算比较：run 记录不带生效预算，B 的"模式差异"其实是预算差异（BENCHMARK §35/§41）
+
+- **date**: 2026-09-21
+- **task**: M6.4 复核 case B 的 Builtin/Dynamic 结论
+- **symptom**: 之前登记的结论是"Builtin 被空证据前置条件阻断，Dynamic 通过"，
+  但把两次运行的**预算**摆出来就站不住了：
+  - 成功的 `20260919-084324-B-dynamic`：`budget_model_calls=250`、`budget_research=120`，
+    实际用 45 次模型调用 / **33 次研究请求**
+  - 被阻断的 `20260921-215555-B-dynamic`（27/12）与 `20260920-222030-B-builtin`（23/12）：
+    预算是 **70–80 / 20**（受 `--max-model-calls` 与默认 `budgets.research_requests=20` 限制）
+  即"通过 vs 阻断"主要是**研究投入**差异（33 对 12 次请求），不是模式优劣
+- **root_cause**: `run.json` 不记录生效预算，`benchmark_summary.md` 也不提示预算差异；
+  读者（包括我）会把不同预算的运行当同一条件下的 A/B
+- **skill**: `benchmark-runner` / `benchmark-report`
+- **artifact**: `pebs/benchmark/runner.py`、`pebs/benchmark/report.py`
+- **fix**:
+  (1) 新 run 在 `run.json` 记录 `budgets`（scenario 也记）；
+  (2) 历史 run 由 `budgets_for_run()` 从项目 Store 的 runs 行**只读**读回（不改写已有记录）；
+  (3) 报告新增"预算差异提示"：同一 case 的变体预算不一致时明确标注 **不可直接比较**
+  （实测已标出 A/B/C/D 四个 case）
+- **regression_test**: `tests/test_benchmark_scaffold.py::test_report_flags_variants_compared_under_different_budgets`
+- **结论修正**: 见上一条 B 记录的"重要修正"——两种模式都可能因空证据中止，
+  差别在研究投入；**任何 A/B 必须在相同预算下重跑**才成立
+
 ## 2026-09-21 — case D 补齐 Direct 基线：四个 case 已具备三模式对照（BENCHMARK §28/§71-4）
 
 - **date**: 2026-09-21
