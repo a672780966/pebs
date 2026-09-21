@@ -169,6 +169,9 @@ def run_scenario(
         "base_case": base_id,
         "base_run_id": base_start["run_id"],
         "base_run_status": base_status["run"]["status"],
+        # §35 Cost：scenario 的成本必须包含它自己先跑完的那门基线课程，
+        # 否则 F/G 会显示 5/9 次调用，而 harness 实际已经花掉约 50 次。
+        "base_model_calls": int(engine.store.get_run(base_start["run_id"])["calls_used"]),
         "project_id": project,
     }
     if base_status["run"]["status"] != "succeeded":
@@ -213,6 +216,9 @@ def run_scenario(
                     "unnecessary_regeneration": len(locality["unnecessary_regeneration"]),
                     "unnecessary_regeneration_rate": locality["unnecessary_regeneration_rate"],
                     "model_calls": int(engine.store.get_run(result["run_id"])["calls_used"]) if result.get("run_id") else 0,
+                    "base_model_calls": record["base_model_calls"],
+                    "total_model_calls": record["base_model_calls"]
+                    + (int(engine.store.get_run(result["run_id"])["calls_used"]) if result.get("run_id") else 0),
                 },
                 "artifact_hashes": after,
             }
@@ -240,6 +246,9 @@ def run_scenario(
                     "locality_preservation_rate": 1.0 if reused else 0.0,
                     "reuse_rate": round(len(reused) / max(len(nodes), 1), 3),
                     "model_calls": int(engine.store.get_run(start["run_id"])["calls_used"]),
+                    "base_model_calls": record["base_model_calls"],
+                    "total_model_calls": record["base_model_calls"]
+                    + int(engine.store.get_run(start["run_id"])["calls_used"]),
                     "reused_skills": reused,
                 },
                 "artifact_hashes": metrics.snapshot_hashes(engine.store),

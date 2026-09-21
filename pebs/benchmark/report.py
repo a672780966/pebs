@@ -119,7 +119,9 @@ def _row_for(run: dict[str, Any]) -> dict[str, Any]:
         "reviewer": human.get("reviewer"),
         "human_eval_run_id": human.get("run_id"),
         "human_eval_stale": bool(run.get("human_eval_stale")),
-        "model_calls": metrics.get("model_calls"),
+        # §35 Cost：scenario 的成本 = 本轮 phase + 它必须先跑完的基线课程。
+        # 只报 phase（5/9 次）会让 F/G 看起来比实际便宜约 10 倍。
+        "model_calls": metrics.get("total_model_calls") or metrics.get("model_calls"),
         "research_calls": metrics.get("research_calls"),
         "runtime_seconds": metrics.get("wall_time_seconds") or run.get("wall_time_seconds"),
         "skill_failure_rate": metrics.get("skill_failure_rate"),

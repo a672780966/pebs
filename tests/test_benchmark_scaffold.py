@@ -609,6 +609,21 @@ def test_case_quality_checks_are_wired_into_evaluate():
     assert checks.case_checks(good) == []
 
 
+def test_scenario_cost_includes_the_prerequisite_base_course():
+    """§35 Cost：F/G 的成本必须含先跑完的基线课程，否则会低估约 10 倍。"""
+    run = {
+        "case_id": "F",
+        "mode": "scenario",
+        "run_id": "r1",
+        "metrics": {"model_calls": 5, "base_model_calls": 47, "total_model_calls": 52},
+        "automatic_issues": {},
+    }
+    summary = report.summarize([run])
+    assert summary["cases"][0]["scenario"]["model_calls"] == 52
+    markdown = report.render_markdown(summary)
+    assert "52.0" in markdown
+
+
 def test_benchmark_run_records_the_effective_evidence_policy(tmp_path, monkeypatch):
     """§35/§41：run 记录必须写明本次生效的证据政策。
 
