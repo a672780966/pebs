@@ -216,6 +216,28 @@
   `20260921-202853` 是 `pck-developer` 前置条件"证据索引为空，没有可用的 SUPPORTED Claim"
   （60 次调用）——与 case B 同源（冻结契约 + 证据波动），不是 F 场景本身的问题
 
+## 2026-09-21 — case B 同预算对照的结论：两种模式都不通过，之前的"模式差异"是预算差异（BENCHMARK §28）
+
+- **date**: 2026-09-21
+- **task**: M6.4 用**相同预算**重跑 case B 的 Builtin/Dynamic 对照（回应上一条修正）
+- **做法**: `benchmark --cases B --modes builtin,dynamic --max-model-calls 120 --max-research 60`
+  （两者 `budgets` 完全一致，已写入 run.json）
+- **结果**:
+  | 模式 | 状态 | 模型调用 | 研究请求 | 中止点 |
+  | --- | --- | --- | --- | --- |
+  | builtin（静态） | failed | 2 | 0 | `claims`：Claim 提取结果为空（fail-fast） |
+  | dynamic | blocked | 26 | 21 | `pck-developer`：证据索引为空，没有可用的 SUPPORTED Claim |
+- **结论（这是当前最有数据支撑的表述）**: 在**相同预算**下，B 的两种模式**都没有完成**，
+  只是失败得更早或更晚；先前"Builtin 卡住 / Dynamic 通过"的差别来自预算
+  （250/120 对 70–80/20），不是模式优劣。B 这类**概念型第一课**能否完成，
+  取决于研究是否能产出 SUPPORTED 证据，而这一步目前不稳定
+- **附带确认**: 动态侧 Router 仍正确识别 `research_need=VERIFY` 与
+  `concept/distinction/reflection/attitude/critical_thinking/transfer`，
+  问题不在路由，而在证据获取与冻结契约的交互
+- **留给上游的决策（不改代码，§3/§47）**: 是否允许"概念型课程在无实证 Claim 时"
+  走一条不依赖 empirical SUPPORTED 的 PCK 路径；若允许，应由规则所有者改冻结契约并同步 §85
+- **artifact**: `benchmarks/runs/20260921-230657-B-builtin/`、`benchmarks/runs/20260921-230834-B-dynamic/`
+
 ## 2026-09-21 — 跨预算比较：run 记录不带生效预算，B 的"模式差异"其实是预算差异（BENCHMARK §35/§41）
 
 - **date**: 2026-09-21
