@@ -1,8 +1,21 @@
 from __future__ import annotations
 
+import pytest
 from conftest import REQUEST_1, make_skill_package, run_dynamic_build
 
-from pebs import skills_mgr
+from pebs import provider_edu, skills_mgr
+
+
+@pytest.fixture(autouse=True)
+def _skip_sandbox_probe(monkeypatch):
+    """导入的 Skill 默认 execution_policy=SANDBOX_ONLY，权限闸门会走 sandbox.available()。
+
+    临时 registry 下探测缓存是冷的，probe_all 在本机要 ~25s；这里不考沙箱适配器探测。
+    """
+    from pebs import sandbox
+
+    monkeypatch.setattr(sandbox, "available", lambda refresh=False: True)
+    return True
 
 
 def _install(registry_env, name: str):
@@ -18,7 +31,18 @@ def _install(registry_env, name: str):
     skills_mgr.review(name, "IN_REVIEW", reviewer="tester")
     skills_mgr.review(name, "APPROVED", reviewer="tester", evidence="上下文最小化测试包")
     skills_mgr.publish(name)
+    # §7 生命周期：与 provider_edu 生产入口一致（allowlist → enable）
+    provider_edu.add_to_allowlist(name)
+    skills_mgr.enable(name, True)
     return name
+
+
+def _select_explicitly(engine, request: str, name: str) -> str:
+    """§43：外部 Skill 只能显式选择；permissions 需在 allowlist 之后重建。"""
+    from pebs.permissions import PermissionManager
+
+    engine.permissions = PermissionManager()
+    return f"{request} /{name}"
 
 
 def test_external_skill_prompt_is_minimal_and_pii_free(registry_env, engine, tmp_path):
@@ -26,7 +50,9 @@ def test_external_skill_prompt_is_minimal_and_pii_free(registry_env, engine, tmp
     material = tmp_path / "家长联系表.txt"
     material.write_text("学生：张三 学号：20230001 家长李四 手机 13800138000", encoding="utf-8")
 
-    start, status = run_dynamic_build(engine, REQUEST_1, material_paths=[material])
+    start, status = run_dynamic_build(
+        engine, _select_explicitly(engine, REQUEST_1, name), material_paths=[material]
+    )
     assert status["run"]["status"] == "succeeded", [
         (step["step_id"], step["status"], step["error"]) for step in status["steps"]
     ]

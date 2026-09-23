@@ -23,10 +23,20 @@ class PlanEditRejected(Exception):
 def _pinned_skill_names() -> list[str]:
     """自动偏好的 pinned Skill。
 
-    M6 §18：Provider 安装的外部 Skill（record.provider 非空）不自动偏好——
+    M6 §18：Provider 安装的外部 Skill 不自动偏好——
     生产默认仍用 Builtin；外部 Skill 必须通过显式 `/skill-name`（§43 Explicit User
     Choice）或 benchmark 实验指定，直到 §68 的 promotion 门槛达成（M7 才会把历史
     表现用于路由）。
+
+    判据是来源而非执行 provider：`provider` 记录的是该 Skill 允许在哪些执行来源
+    下运行（`permissions.py` 把它当白名单用），内置记录本身也标注 `default-llm` /
+    `default-research`，所以“provider 非空即跳过”会误排除将来 pin 住的 Builtin；
+    而通用导入路径（`skills_mgr.derive_contract`）对未声明 provider 的上游会把
+    `provider` 落成 `[]`，只看 provider 又会让外部导入溜进自动偏好。
+
+    `self_implemented` 才是导入路径显式写入的来源标志（外部导入恒为 False，见
+    `skills_mgr`），`resolver.choose()` 亦用它优先 Builtin。字段缺失按外部处理：
+    宁可漏掉一次自动偏好，也不能让外部 Skill 自动上路由。
     """
     from . import registry
 
@@ -34,7 +44,7 @@ def _pinned_skill_names() -> list[str]:
     for name, record in registry.load_skills().items():
         if not record.get("pinned_version") or record.get("status") not in ("APPROVED", "PATCHED"):
             continue
-        if record.get("provider"):
+        if record.get("self_implemented") is not True:
             continue
         names.append(name)
     return sorted(names)
